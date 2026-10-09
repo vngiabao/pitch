@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 from .store import now,js,digest,PolicyError
 from .application_pilot import ApplicationPilot
 from .email_design import render_email,TEMPLATE_VERSION
+from .owner_links import founder_url
 
 CREDENTIAL_TARGET='AStoryFounderOS:DailyReport:gbao.n.vo@gmail.com'
 class Credential(ctypes.Structure):
@@ -122,11 +123,11 @@ class DailyReporter:
             lines.append('Your decision: '+('; '.join(b['owner_decisions']) if b['owner_decisions'] else 'None yet - agent research/preparation continues.'))
             lines.append('Eligibility: '+a['eligibility']['status']+' | Fit: '+(str(d['fit_score'])+'/100' if d['fit_score'] is not None else 'not established; no optimistic score assigned'))
             lines += ['Sources (checked '+d['last_verified'][:10]+'): '+', '.join(b['source_urls']),
-                      'Open in Founder OS on this PC: http://127.0.0.1:8765/opportunities/'+d['opportunity_id'],'']
+                      'Open in Founder OS: '+founder_url('/opportunity/'+d['opportunity_id']),'']
             cards.append({'name':data['canonical_name'],'recommendation':d['recommendation'],'priority':b['priority'],
                           'fields':dict(line.split(': ',1) for line in lines[start:] if ': ' in line),
                           'checked':d['last_verified'][:10],'sources':b['source_urls'],
-                          'os_url':'http://127.0.0.1:8765/opportunities/'+d['opportunity_id']})
+                          'os_url':founder_url('/opportunity/'+d['opportunity_id'])})
         if not selected:lines+=['No sufficiently researched, relevant opportunities to recommend today. The agent will continue verification; no generic review backlog is being handed to you.','']
         elif len(selected)<5:lines+=['Showing fewer than five because the remaining records do not meet the research and relevance checks.','']
         dash=self.h.dashboard();auto=self.p.dashboard();runs=dash['agent_activity']

@@ -1,8 +1,9 @@
 """Owner-only editorial email. Inline styles are the baseline in mail clients."""
 from html import escape
 from urllib.parse import urlsplit
+from .owner_links import public_site_enabled
 
-TEMPLATE_VERSION='editorial-mono-v1'
+TEMPLATE_VERSION='editorial-mono-v2'
 
 def e(value):return escape(str(value),quote=True)
 
@@ -15,6 +16,7 @@ def paragraph(label,text):
     return '<p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#333333;"><strong style="color:#171717;">'+e(label)+'</strong> '+e(text)+'</p>'
 
 def render_email(day,cards,status,attached=False,sample=False):
+    access_note=('Founder OS links require your owner sign-in. Keep your Windows PC awake and online.' if public_site_enabled() else 'Founder OS links open on your Windows PC. Official source links work on any device.')
     pieces=[]
     for n,c in enumerate(cards,1):
         f=c['fields'];category={'CORE_PRODUCT':'Product & experience','COST_SAVINGS':'Infrastructure & savings','EXPLORATORY':'Explore & evaluate'}.get(c['priority'],'Funding & programs')
@@ -41,4 +43,4 @@ def render_email(day,cards,status,attached=False,sample=False):
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="outer" align="center" style="padding:32px 12px;"><table role="presentation" width="680" cellspacing="0" cellpadding="0" style="width:100%;max-width:680px;background:#ffffff;">
 <tr><td class="pad" style="padding:28px 36px;background:#171717;color:#ffffff;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td style="font-size:22px;font-weight:600;letter-spacing:-.5px;">A Story</td><td align="right" style="font-size:12px;color:#d6d6d6;">'''+e(day)+'''</td></tr></table></td></tr>
 <tr><td class="pad" style="padding:36px;border-bottom:1px solid #d8d8d8;"><h1 class="headline" style="margin:0 0 18px;font-size:40px;line-height:1.1;letter-spacing:-1.2px;">Opportunities worth<br>your time.</h1><p style="margin:0 0 22px;font-size:16px;line-height:1.6;color:#454545;">'''+e(intro)+'''</p><p style="margin:0;font-size:13px;line-height:1.6;border-top:2px solid #171717;padding-top:16px;">'''+('DESIGN SAMPLE &nbsp; / &nbsp; ' if sample else '')+'''<strong>Review first. Submit only after your approval.</strong><br>Credit allowances are not cash or guaranteed savings. Unverified eligibility stays visible.</p></td></tr>
-'''+''.join(pieces)+'''<tr><td class="pad" style="padding:28px 36px;background:#f5f5f5;"><h2 style="margin:0 0 12px;font-size:20px;line-height:1.3;">Behind the brief</h2><p style="margin:0 0 16px;font-size:13px;line-height:1.7;color:#454545;">'''+e(status)+'''</p>'''+(paragraph('Attached for review.', 'Your private text file contains application questions, saved answers, blank fields, blockers, and essay drafts. Unfinished work is marked; it is not a submission approval.') if attached else '')+'''<p style="margin:18px 0 0;font-size:12px;line-height:1.7;color:#595959;">Founder OS links open on your Windows PC. Official source links work on any device.<br>Prepared for Bao Vo. No application is sent by approving or reading this report.</p></td></tr></table></td></tr></table></body></html>'''
+'''+''.join(pieces)+'''<tr><td class="pad" style="padding:28px 36px;background:#f5f5f5;"><h2 style="margin:0 0 12px;font-size:20px;line-height:1.3;">Behind the brief</h2><p style="margin:0 0 16px;font-size:13px;line-height:1.7;color:#454545;">'''+e(status)+'''</p>'''+(paragraph('Attached for review.', 'Your private text file contains application questions, saved answers, blank fields, blockers, and essay drafts. Unfinished work is marked; it is not a submission approval.') if attached else '')+'''<p style="margin:18px 0 0;font-size:12px;line-height:1.7;color:#595959;">'''+e(access_note)+'''<br>Prepared for Bao Vo. No application is sent by approving or reading this report.</p></td></tr></table></td></tr></table></body></html>'''

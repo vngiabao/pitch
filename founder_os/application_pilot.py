@@ -10,6 +10,7 @@ from urllib.parse import urlsplit
 from .store import now,js,digest,uid,PolicyError
 from .funding_hunter import FundingHunter,stamp
 from .public_forms import PublicFormTransport,TOKEN
+from .owner_links import founder_url
 
 FIELD_FACTS={
  'company name':'company_name','startup name':'company_name','company website':'website_url','website':'website_url',
@@ -124,7 +125,7 @@ class ApplicationPilot:
         for field in definition['fields']:
             if field['type']=='hidden':continue
             lines+=['','Question: '+(field['label'] or field['name']),'Field: '+field['name'],'Answer: '+p['payload']['fields'].get(field['name'],'[blank]')]
-        lines+=['','No files, payment or terms acceptance included.','Review and confirm this exact preview on your PC:','http://127.0.0.1:8765/applications#'+cid,
+        lines+=['','No files, payment or terms acceptance included.','Review and confirm this exact preview in Founder OS:',founder_url('/applications#'+cid),
           'If company facts, questions or program details change, this confirmation becomes invalid. You will receive a new preview.']
         email={'id':cid,'recipient':'gbao.n.vo@gmail.com','subject':'Confirm before submission: '+name,'body':'\n'.join(lines)}
         if not self.db.execute('SELECT id FROM application_confirmations WHERE id=?',(cid,)).fetchone():

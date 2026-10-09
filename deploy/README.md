@@ -1,5 +1,7 @@
 # pitch.gbaonvo.com
 
+The deployment is active. See [verified deployment details](DEPLOYMENT.md). Future report links are enabled by `report_links_enabled: true` in the private Access configuration only after successful live verification; already claimed or sent messages are preserved.
+
 The current deployment uses the full Windows Founder OS through Cloudflare Tunnel. The app, SQLite state, material references, research and application workers stay on this PC. This is not an always-on Cloudflare Worker rewrite. The PC must be awake and online. Existing local access remains at port 8765; the protected origin uses a separate loopback port 8766.
 
 Cloudflare Access application: A Story Founder OS. Hostname: `pitch.gbaonvo.com`. Team: `astoryapp.cloudflareaccess.com`. Allow only `gbao.n.vo@gmail.com`, with no bypass or service-token policy. Email login is provided by Cloudflare Access. The origin independently verifies RS256 signatures, issuer, exact audience, token validity and email on every route. No asserted email header alone is trusted. Cloudflare should also enable Protect with Access on the tunnel route.

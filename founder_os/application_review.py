@@ -6,6 +6,7 @@ questions are deliberately separated from inspected current official forms.
 import json,sqlite3
 from pathlib import Path
 from .store import now,digest,js,PolicyError
+from .owner_links import founder_url
 
 SCHEMA='''
 CREATE TABLE IF NOT EXISTS review_artifacts(id TEXT PRIMARY KEY,filename TEXT NOT NULL,body TEXT NOT NULL,sha256 TEXT NOT NULL,created_at TEXT NOT NULL);
@@ -54,7 +55,7 @@ class ApplicationReview:
                 lines+=['Application: '+q['title'],'QUESTION: '+q['prompt'],'Source: '+str(q['original_path'] or 'unknown'),'Locator: '+str(q['locator']),'Question ID: '+q['question_id'],'Current official form verified: '+('yes' if q['checked'] else 'NO — historical / unverified'),'Limit: '+str(q['limit_value'] or 'UNKNOWN')+' '+str(q['limit_unit'] or ''),'Answer state: SAVED '+str(q['status'] or 'UNFILLED').upper()+' — NOT LIVE FORM','Answer version: '+str(q['answer_version'] or 'none'),'ANSWER:',q['body'] or '[blank]','']
             try:
                 count=self.s.one('SELECT count(*) total,sum(body IS NOT NULL) text_count FROM material_library')
-                lines+=['MATERIALS LIBRARY',str(count['total'])+' source references; '+str(count['text_count'] or 0)+' files with searchable text.','Full provenance manifest and original downloads: http://127.0.0.1:8765/materials','Historical materials remain references, not approved current facts.','']
+                lines+=['MATERIALS LIBRARY',str(count['total'])+' source references; '+str(count['text_count'] or 0)+' files with searchable text.','Full provenance manifest and original downloads: '+founder_url('/materials'),'Historical materials remain references, not approved current facts.','']
             except sqlite3.OperationalError as e:
                 if 'no such table: material_library' not in str(e):raise
         return '\n'.join(lines)+'\n'
@@ -79,6 +80,6 @@ class ApplicationReview:
     def supplement(self):
         # A distinct owner-requested supplement preserves an already sent daily report.
         a=self.snapshot();key='report-supplement-'+a['sha256'][:24]
-        m={'id':key,'recipient':'gbao.n.vo@gmail.com','subject':'A Story — questions, prepared answers & pitch materials','body':'Your requested question-and-answer text preview is attached. It includes known questions, locally prepared values, saved essay drafts, blank fields and blockers. Unknown official questions are explicitly labeled. No application has been submitted. Review your searchable pitch materials at http://127.0.0.1:8765/materials on this PC. Each future daily report will include this text preview. Every submission still requires your individual confirmation of its exact emailed preview.','attachments':[a]}
+        m={'id':key,'recipient':'gbao.n.vo@gmail.com','subject':'A Story — questions, prepared answers & pitch materials','body':'Your requested question-and-answer text preview is attached. It includes known questions, locally prepared values, saved essay drafts, blank fields and blockers. Unknown official questions are explicitly labeled. No application has been submitted. Review your searchable pitch materials at '+founder_url('/materials')+'. Each future daily report will include this text preview. Every submission still requires your individual confirmation of its exact emailed preview.','attachments':[a]}
         self.db.execute("INSERT OR IGNORE INTO report_supplements VALUES(?,?,'PENDING',?,NULL,NULL)",(key,js(m),now()))
         return key
