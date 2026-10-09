@@ -84,6 +84,7 @@ class Handler(BaseHTTPRequestHandler):
                 from .application_review import ApplicationReview
                 ApplicationPilot(s);result=ApplicationReview(s).plan(route.rsplit('/',1)[1])
             elif route=='/api/dashboard':result=h.dashboard()
+            elif route=='/api/shortlist':result=h.daily_shortlist()
             elif route=='/api/opportunities':result=h.list(q.get('view',['Recommended'])[0],{k:v[0] for k,v in q.items() if k!='view'})
             elif route.startswith('/api/opportunity/'):result=h.detail(route.rsplit('/',1)[1])
             elif route=='/api/applications':result=s.rows('SELECT a.*,o.program,o.cycle FROM applications a JOIN opportunities o ON o.id=a.opportunity_id')

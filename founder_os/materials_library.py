@@ -25,17 +25,27 @@ class MaterialsLibrary:
 
     def search(self,q='',kind='',category='',offset=0,limit=40,duplicates=False):
         offset=max(0,int(offset));limit=min(100,max(1,int(limit)));where=[];values=[]
+        # Generated artifacts remain accessible without flooding useful-source results.
+        path="lower(replace(relative_path,char(92),'/'))"
+        generated='('+' OR '.join(path+" LIKE '%"+part+"%'" for part in ('/.chart-data','/build/','/pages/','/media/','/__pycache__/','/node_modules/','/rendered/','/thumbnails/','/slide-previews/','/qa/'))+')'
         if q:
             escaped=q[:300].replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
             where.append("(relative_path LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\')");values+=['%'+escaped+'%']*2
         if kind:where.append('kind=?');values.append(kind)
         if category=='all':pass
+        elif category=='ARCHIVE':where.append("(category='ARCHIVE' OR "+generated+')')
         elif category:where.append('category=?');values.append(category)
-        else:where.append("category!='ARCHIVE'")
+        else:where.append("category!='ARCHIVE' AND NOT "+generated)
         if not duplicates:where.append('duplicate_of IS NULL')
         clause=' WHERE '+' AND '.join(where) if where else ''
         count=self.s.one('SELECT count(*) total FROM material_library'+clause,values)['total']
-        rows=self.s.rows('SELECT id,source_path,relative_path,kind,category,size_bytes,sha256,source_version_id,extraction,duplicate_of,(SELECT count(*) FROM material_library b WHERE b.duplicate_of=material_library.id) duplicates FROM material_library'+clause+' ORDER BY CASE kind WHEN \'deck\' THEN 0 WHEN \'document\' THEN 1 WHEN \'pdf\' THEN 2 ELSE 3 END,relative_path LIMIT ? OFFSET ?',values+[limit,offset])
+        order=' ORDER BY '+generated+', '
+        order_values=[]
+        if q:
+            order+="CASE WHEN relative_path LIKE ? ESCAPE '\\' THEN 0 ELSE 1 END, "
+            order_values=['%'+escaped+'%']
+        order+="CASE kind WHEN 'deck' THEN 0 WHEN 'document' THEN 1 WHEN 'pdf' THEN 2 ELSE 3 END,relative_path"
+        rows=self.s.rows('SELECT id,source_path,relative_path,kind,category,size_bytes,sha256,source_version_id,extraction,duplicate_of,(SELECT count(*) FROM material_library b WHERE b.duplicate_of=material_library.id) duplicates FROM material_library'+clause+order+' LIMIT ? OFFSET ?',values+order_values+[limit,offset])
         return {'items':rows,'total':count,'offset':offset,'limit':limit,'stats':self.stats()}
 
     def detail(self,key):

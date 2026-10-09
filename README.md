@@ -34,7 +34,7 @@ Reports go only to the authorized personal email, once per local day, using the 
 
 ## Pitch materials and question previews
 
-**Pitch Studio** is available at http://127.0.0.1:8765/pitches and in the website navigation. Fourteen starting pitches cover 30 seconds through 20 minutes, families, investors, judges, storytellers, community partners and technology partners. Short scripts and longer working outlines are distinguished. Length, audience, scenario, speaker, wording and notes are editable; custom choices are supported. Save keeps earlier versions, Duplicate & adapt creates a separate pitch, and Rehearse shows current wording with a start/pause/reset timer. Saved pitches export as TXT.
+**Pitch Studio** is available at http://127.0.0.1:8765/pitches and in the website navigation. Sixteen active pitches cover 30 seconds through 20 minutes, families, investors, judges, storytellers, community partners and technology partners. Short scripts and longer working outlines are distinguished. Length, audience, scenario, speaker, wording and notes are editable; custom choices are supported. Save keeps earlier versions, Make a variant creates a separate pitch, and Practice aloud shows current wording with a start/pause/reset timer. Saved pitches export as TXT.
 
 The studio preserves historical sources and the original Pitch OS pitch. Version conflicts cannot silently overwrite another tab's edits. Materials includes Adapt in Pitch Studio for using extracted source text as a new working draft. Editing a pitch does not approve answers, change canonical facts or submit anything externally. See `PITCH-STUDIO-RUNBOOK.md`; `reports/pitch-studio-manifest.json` traces the starter drafts to their source versions.
 
