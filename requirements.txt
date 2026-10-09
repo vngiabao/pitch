@@ -1,0 +1,2 @@
+# Only remote Cloudflare Access mode needs these; local mode uses the standard library.
+PyJWT[crypto]>=2.15.1,<3

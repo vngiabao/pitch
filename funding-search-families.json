@@ -1,0 +1,85 @@
+{
+  "version": 2,
+  "families": {
+    "pitch_competitions": [
+      "startup pitch competition {year} applications open",
+      "student founder university pitch competition {year}",
+      "early stage venture competition cash prize {year}"
+    ],
+    "grants": [
+      "startup grants non dilutive funding applications {year}",
+      "consumer technology startup grant {year}",
+      "small business economic development grant Michigan {year}"
+    ],
+    "ai_programs": [
+      "AI startup accelerator applications {year}",
+      "generative AI startup credits founder program {year}",
+      "AI startup challenge demo day applications {year}"
+    ],
+    "michigan": [
+      "Michigan startup pitch competition grant applications {year}",
+      "Ann Arbor startup accelerator incubator funding {year}",
+      "University of Michigan entrepreneurship competition founder alumni funding {year}"
+    ],
+    "midwest": [
+      "Midwest startup competition accelerator non dilutive {year}",
+      "Great Lakes startup challenge early stage {year}",
+      "Michigan university nonprofit entrepreneurship funding {year}"
+    ],
+    "vertical": [
+      "family tech longevity elder tech accelerator startup {year}",
+      "consumer AI startup accelerator fellowship {year}",
+      "storytelling media digital legacy technology grant {year}"
+    ],
+    "corporate": [
+      "NVIDIA Inception AWS Activate Google Microsoft startup programs",
+      "OpenAI Anthropic ElevenLabs startup credits grants {year}",
+      "corporate innovation startup challenge applications {year}"
+    ],
+    "ecosystem": [
+      "startup awards founder fellowships applications {year}",
+      "startup funding opportunities directory {year}",
+      "university affiliated founder programs alumni startup applications {year}"
+    ],
+    "cloud_credits": [
+      "free bootstrapped startup cloud credits AWS Activate Founders Microsoft Google {year}",
+      "startup cloud credits no referral no equity {year}"
+    ],
+    "voice_credits": [
+      "ElevenLabs Deepgram AssemblyAI Cartesia Speechmatics startup grants free credits {year}",
+      "voice speech API startup grant bootstrapped {year}"
+    ],
+    "creative_credits": [
+      "Runware Runpod Modal Nebius startup grants image video animation credits {year}",
+      "generative media design animation API startup grant free credits {year}"
+    ],
+    "bootstrap_credits": [
+      "Anthropic Claude startup program bootstrapped free credits {year}",
+      "OpenAI Mistral Cohere Databricks startup credits no VC referral {year}"
+    ]
+  },
+  "directory_policy": "Discovery only. Follow through to official organizer/program and current cycle before asserting dates, benefits or eligibility.",
+  "evolution_policy": "Track family yields and official-source conversion. Propose query refinements in run notes; retain broad family coverage. Never change scoring weights automatically.",
+  "provider_seeds": [
+    "NVIDIA Inception",
+    "Microsoft for Startups",
+    "AWS Activate",
+    "Google for Startups Cloud Program",
+    "Anthropic Claude Startups",
+    "ElevenLabs Startup Grants",
+    "Deepgram Startup Program",
+    "AssemblyAI Startup Program",
+    "Cartesia Startups Grant",
+    "Smallest.ai",
+    "Speechmatics",
+    "Runware",
+    "Runpod",
+    "Modal",
+    "Nebius",
+    "Databricks",
+    "Mistral",
+    "OpenAI",
+    "Cohere"
+  ],
+  "credit_policy": "Screenshots and directory maxima are discovery leads only. Verify current tier, referral/VC requirements, supported products, expiration, renewal, paid-account/deposit conditions and company-email rules. Never equate credits with cash, guarantee acceptance, or accept terms automatically."
+}

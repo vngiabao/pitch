@@ -1,0 +1,30 @@
+"""Apply the six bounded findings from the fresh Impeccable review."""
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1];p=ROOT/'founder_os/ui/app.js';text=p.read_text(encoding='utf-8')
+old="const benefits=d=>d.data.funding.cash_prize_max!==null?`${money(d.data.funding.cash_prize_max)}<br><small>${E(d.data.funding.award_scope||'Award terms require review')}</small>`:d.data.funding.credits_value!==null?`Up to ${money(d.data.funding.credits_value)}<br><small>Credits · tier-dependent</small>`:'<span class=\"muted\">Benefits listed in detail</span>';"
+new="""const readableDate=v=>v?new Date(v).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}):'Not yet verified';
+const exactDate=v=>`<time datetime="${E(v||'')}" title="${E(v||'Unknown')}">${E(readableDate(v))}</time>`;
+const benefitText=d=>d.data.funding.other_benefits||d.data.funding.award_scope||({credits_grant:'API credit grant',startup_support:'Startup support program',pitch_competition:'Pitch competition',grant:'Grant',accelerator:'Accelerator'}[d.data.opportunity_type])||d.data.opportunity_type.replaceAll('_',' ');
+const benefits=d=>d.data.funding.cash_prize_max!==null?`${money(d.data.funding.cash_prize_max)}<br><small>${E(d.data.funding.award_scope||'Award terms require review')}</small>`:d.data.funding.credits_value!==null?`Up to ${money(d.data.funding.credits_value)}<br><small>Credits · tier-dependent</small>`:`<span class="benefit-description">${E(benefitText(d).slice(0,150))}</span><br><small>Usable value unknown</small>`;
+const prettyKey=k=>k.replaceAll('_',' ').replace(/^./,c=>c.toUpperCase());
+function factsView(facts){return Object.keys(facts).length?Object.entries(facts).map(([key,f])=>`<div class="record"><strong>${E(prettyKey(key))}</strong><p>${E(Array.isArray(f.value)?f.value.join(', '):typeof f.value==='boolean'?(f.value?'Yes':'No'):f.value)}</p><small>Verified ${exactDate(f.last_verified)}</small></div>`).join(''):'<p class="muted">No structured eligibility facts are approved yet.</p>';}
+function errorView(errors){return errors.length?errors.map(e=>`<div class="record"><strong>${E(prettyKey(e.state||'Research incomplete'))}</strong><p>${E(e.message||e)}</p><small>${E(e.program||'')} ${e.state==='ELIGIBILITY_UNKNOWN'?'Confirm company facts before relying on eligibility.':e.state==='SOURCE_UNAVAILABLE'?'The Hunter will retry verification on a later check.':''}</small></div>`).join(''):'<p>No research errors recorded.</p>';}
+function usageView(usage){usage=usage||{};const tokens=usage.tokens||{};return `<p><strong>Research runner:</strong> ${usage.runner==='codex_chatgpt'?'Your existing ChatGPT sign-in':E(usage.research_runner||usage.runner||'Not recorded')}</p><p><strong>API key:</strong> ${usage.api_key_used===false?'Not used':'Not recorded'}</p><p><strong>Tokens:</strong> ${E(tokens.input_tokens??'Unknown')} input · ${E(tokens.output_tokens??'Unknown')} output</p><p><strong>API cost:</strong> ${usage.model_api_cost===null?'Not reported; this run uses your ChatGPT plan allowance':E(usage.model_api_cost??'Unknown')}</p>`;}
+function proposalView(a){const p=a.proposal;return p?`<h2>${E(p.label)}</h2><p>${E(a.decision_needed)}</p><h3>Exact proposal</h3><p>${E(p.body)}</p><p><strong>Evidence status:</strong> ${E(p.evidence_status)} · Verified ${exactDate(p.last_verified_at)}</p><details><summary>Source and exact approval record</summary><p class="source-path">${E(p.original_path)}<br>${E(p.locator)}</p><pre>${E(JSON.stringify(JSON.parse(a.payload_json),null,2))}</pre></details>`:`<h2>${E(prettyKey(a.action))}</h2><p>${E(a.decision_needed)}</p><details><summary>Exact approval record</summary><pre>${E(JSON.stringify(JSON.parse(a.payload_json),null,2))}</pre></details>`;}
+"""
+assert old in text;text=text.replace(old,new)
+text=text.replace('<small>Fit unresolved / 100</small>','<small>A Story fit · unresolved / 100<br>Range includes unknown points</small>')
+text=text.replace('<small>Fit / 100</small>','<small>A Story fit / 100</small>')
+text=text.replace("${E(d.data.cycle)} · ${E(d.data.opportunity_type.replaceAll('_',' '))}</small>","${E(d.data.cycle)} · ${E(d.data.opportunity_type.replaceAll('_',' '))}<br>${d.verification_state==='VERIFIED'?'Official state verified':'Verification needed'} · ${exactDate(d.last_verified)}</small>")
+text=text.replace("<small>${E(new Date(r.started_at).toLocaleString())}</small>","<small>Started ${exactDate(r.started_at)} · ${r.completed_at?'Completed '+exactDate(r.completed_at):'In progress'}</small>")
+text=text.replace("${dash.requests.length} research requests waiting.","${dash.requests.filter(r=>r.state==='QUEUED').length} waiting · ${dash.requests.filter(r=>r.state==='RUNNING').length} running.")
+text=text.replace("${c.result==='PASS'?'✓':c.result==='FAIL'?'✕':'?'}","${c.result==='PASS'?'Meets':c.result==='FAIL'?'Fails':'Unknown'}")
+text=text.replace("${E(d.last_verified||'unknown')}","${exactDate(d.last_verified)}")
+text=text.replace("Checked ${E(s.checked_at)}","Checked ${exactDate(s.checked_at)}")
+text=text.replace("<pre>${E(JSON.stringify(r.report.errors,null,2))}</pre>","${errorView(r.report.errors||[])}")
+text=text.replace("<pre>${E(JSON.stringify(r.report.usage,null,2))}</pre>","${usageView(r.report.usage||JSON.parse(r.usage_json||'{}'))}<details><summary>Exact run data</summary><pre>${E(JSON.stringify(r.report,null,2))}</pre></details>")
+text=text.replace("<pre>${E(JSON.stringify(dash.company_memory.attributes,null,2))}</pre>","${factsView(dash.company_memory.attributes)}")
+text=text.replace("<h2>${E(a.action.replaceAll('_',' '))}</h2><pre>${E(JSON.stringify(JSON.parse(a.payload_json),null,2))}</pre>","${proposalView(a)}")
+p.write_text(text,encoding='utf-8')
+p=ROOT/'founder_os/ui/style.css';text=p.read_text(encoding='utf-8')+'\n.benefit-description{display:block;max-width:26ch;font-size:13px}.check{width:auto;margin-right:8px;font-size:11px}.source-path{overflow-wrap:anywhere}summary{cursor:pointer}.record small time{white-space:normal}\n';p.write_text(text,encoding='utf-8')
+print('Applied the six reviewed fixes; no new design pass')
