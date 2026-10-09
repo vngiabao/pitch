@@ -6,7 +6,7 @@ Cloudflare Access application: A Story Founder OS. Hostname: `pitch.gbaonvo.com`
 
 Copy `cloudflare.example.json` to `deploy/private/cloudflare.json` and set the actual Access audience. This file contains configuration, not an API credential, but remains outside Git. Start `Start-Pitch-Origin.ps1` after installing `requirements.txt`. Route the tunnel to HTTP `127.0.0.1:8766` and preserve/set the HTTP Host header to `pitch.gbaonvo.com`. Do not route the public hostname to the unprotected local port 8765.
 
-Tunnel credentials stay under ignored `deploy/private/`; never commit the connector token. Use the installed Windows startup task to restart the origin and connector at sign-in. Closing the website does not stop the workers. Powering off this PC does.
+Tunnel credentials stay under ignored `deploy/private/`; never commit the connector token. Put the connector token in `deploy/private/tunnel-token.txt`; use the official `cloudflared.exe` under `%USERPROFILE%\.cache\astory-deployment\`. After configuring Access and the tunnel, run `Install-Pitch-Startup.ps1` to install the owner-level Windows startup task. It checks at sign-in and every five minutes, starts missing processes in hidden windows, and keeps the token out of process arguments. `Start-Pitch-Deployment.ps1 -CheckOnly` checks configuration without starting services. Closing the website does not stop the workers. Powering off this PC does.
 
 ## GitHub contents and private state
 
