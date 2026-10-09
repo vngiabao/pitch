@@ -1,0 +1,310 @@
+{
+  "revision": "final-deck-alignment-2026-10-09",
+  "source_folder": "C:\\Users\\vngia\\OneDrive - Umich\\Desktop\\My startups\\Pitch Competition\\Powerpoint Design\\Final final final",
+  "primary_deck": "A Story - Pitch Deck.pptx",
+  "primary_pdf": "A Story - Pitch Deck.pdf",
+  "source_date": "2026-09-29",
+  "status": "Editable working adaptations; no canonical fact promotion or application approval",
+  "pitches": [
+    {
+      "title_match": "Explain A Story in 30 seconds",
+      "slides": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        22
+      ],
+      "body": "A Story is an AI biographer that calls your family. They answer, talk, and it does the asking. Each interview remembers earlier calls and picks up unfinished stories. Relatives add their own memories, and different versions stay attributed. Those contributions shape the next conversation. The family keeps their original voices, adds today's moments, and can make a book without closing the story.",
+      "notes": "Aim: make the product and its recurring family loop clear in one breath. Lead with the call, then the reason the next call improves. The book is an output, not the end. Leave pricing and buyer detail for the next question.",
+      "pitch_id": "pitch-20075476a35548e3b7f51e9b07008ea3",
+      "expected_version_id": "pitch-version-b86468670439449fad2f3593665f187d"
+    },
+    {
+      "title_match": "30 seconds with an investor",
+      "slides": [
+        8,
+        19,
+        20,
+        21,
+        22
+      ],
+      "body": "A Story is an AI biographer that calls your family. An adult child buys it for a parent, who answers and talks. Relatives contribute memories that shape later interviews. Each perspective stays attributed, and the story continues after a book. Families pay for guided calls; the archive stays free. Our bet is that family participation gives them a reason to renew.",
+      "notes": "Aim: earn the next business conversation. Land buyer, product loop and renewal hypothesis. Renewal is a bet to test, not an observed result. Explain the free archive deliberately: families pay for the next interview, not continued access to old stories.",
+      "pitch_id": "pitch-71d3f1e6cdda4038bd1dd6a8c9b5324f",
+      "expected_version_id": "pitch-version-35762d29736641989eb5ba6d84b4be5c"
+    },
+    {
+      "title_match": "Original 30-second pitch",
+      "title": "30-second family introduction",
+      "slides": [
+        2,
+        10,
+        11,
+        12,
+        14,
+        24
+      ],
+      "body": "A Story calls your family and asks about the stories you haven't heard. A parent talks, the interviewer follows up, and relatives add what they remember too. Each person's version stays their own. Earlier conversations shape later calls, so it becomes a habit the family can keep. It captures life happening now as well as the years before you knew each other.",
+      "notes": "Aim: explain the experience to someone outside the startup world. Invite curiosity about a particular person or shared event. This replaces the active wording of the legacy draft at the owner's request; its original text remains in Version history.",
+      "pitch_id": "pitch-45141eb47c9973b18218906e",
+      "expected_version_id": "pitch-version-29e88fa03f654eb2bf6eeaee7cacfa83"
+    },
+    {
+      "title_match": "When a family asks how it works",
+      "slides": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        24
+      ],
+      "body": "A Story is an AI biographer that calls your family. You help arrange a time, and your parent answers the phone and talks. The interviewer follows what they say, remembers earlier calls, and comes back to stories they haven't finished. You and other relatives can add photographs, missing details or your own memories. If you remember the same day differently, both accounts stay with the person who told them. Those additions give the next interview something worth asking about. Their original voice stays part of the family record. You can turn chapters into a book and keep adding afterward, including what's happening in the family now. Who would you like to hear from, and what have you never asked them?",
+      "notes": "Aim: help the family name a willing storyteller and one real question. Pause at the end and listen. No pricing pitch is needed before their interest is clear. Explain actual consent and sharing controls before arranging a call.",
+      "pitch_id": "pitch-ff6d061e6202490194bc0540de0fe308",
+      "expected_version_id": "pitch-version-99fffc6c56144f39a936b29bfb699c32"
+    },
+    {
+      "title_match": "Invite a parent or grandparent",
+      "slides": [
+        2,
+        10,
+        11,
+        12,
+        14
+      ],
+      "body": "Would you be open to a phone interview about your life? We're making A Story, an AI biographer for families. You choose a time, answer the phone, and talk. It does the asking, follows the details you mention, and can pick up an unfinished story on another call. There's no memoir to write or speech to prepare. Your family can add what they remember, but their version stays theirs and yours stays yours. Your own voice is part of what they keep. It can include something that happened this week as well as years ago. Before trying it, we'll explain the recording and who can see it. Is there something you'd enjoy telling your family that they've never asked about?",
+      "notes": "Aim: obtain interest without pressure or implying a relative can consent for the storyteller. Identify the interviewer as AI. Explain and demonstrate the current recording, approval and access controls before any trial.",
+      "pitch_id": "pitch-4d4c31c775844304bef6c2ce35c185c9",
+      "expected_version_id": "pitch-version-d863b7731e864abf966f789569a96859"
+    },
+    {
+      "title_match": "Propose a community pilot",
+      "slides": [
+        8,
+        10,
+        12,
+        18,
+        21,
+        24,
+        25
+      ],
+      "body": "Could we test a small family-story program with your community? A Story is an AI biographer that calls a parent or grandparent, so they can participate by answering the phone. Relatives add their own memories, and those contributions shape later interviews. Each person's account stays attributed. A first gift can lead to an ongoing family habit, including ordinary life today as well as the past. We'd agree on the scope, consent and staff responsibilities before starting. We'd measure how many families complete a first and second call, whether relatives contribute, and how much help they need. The deck proposes colleges and community groups as channels; this conversation would establish whether it actually serves your members. Who should help us design that first test?",
+      "notes": "Aim: find a pilot-design partner, not imply an existing agreement. College gifting, cultural groups and veterans groups are proposed channels. No partnership is signed in the deck's notes. Ask about member needs and staff burden before offering a rollout.",
+      "pitch_id": "pitch-835ee93f05a349ab9e62145cdaa3ce4c",
+      "expected_version_id": "pitch-version-a1e43926530e40fea88572098294112b"
+    },
+    {
+      "title_match": "Make the case for voice credits",
+      "slides": [
+        11,
+        12,
+        15,
+        22,
+        25,
+        27
+      ],
+      "body": "Natural turn-taking, clear speech and reliable follow-up across recurring family interviews. That's what we'd test with your voice credits. A Story is an AI biographer that calls family members and remembers earlier conversations. A name, a pause or an unfinished detail can change the next question; a relative's contribution can change the next call. We want to measure how well the voice stack supports that interview, including accents, family names, interruptions and response delay. We also need to track cost per completed call as families keep using it. Their original voice belongs in the record, separately from the AI interviewer's voice. A useful trial would compare interview quality and actual cost on the same task. What can your program support?",
+      "notes": "Aim: connect the provider's support to a specific experiment. Start with the needed capabilities, not another formal company introduction. Verify this provider supports each proposed feature and confirm our actual current stack. Custom interviewer voice is an exploration; do not claim deployed cloning or substitute generated speech for original recordings.",
+      "pitch_id": "pitch-3ab017e342674863857959660b983be9",
+      "expected_version_id": "pitch-version-d7c94ef6786a438d8aadab751f80e4b5"
+    },
+    {
+      "title_match": "Runway - personalized interviewer exploration",
+      "slides": [
+        10,
+        11,
+        12,
+        15,
+        23
+      ],
+      "body": "A personalized visual interviewer for A Story's web and mobile experience. We want to explore GWM Avatars as an extension of our AI biographer, with our own memory and interview system deciding what it knows and asks. The interviewer could remember earlier conversations and family contributions, then adapt its appearance, personality, voice and interview style to the person and purpose. We're interested in expressive real-time conversation and custom voices where supported. Phone calls remain the simplest core experience. Avatars could support optional video interviews, onboarding and memory review. The deck also explores interactive access to recorded stories; that would require explicit storyteller consent and a clear distinction between original testimony and an AI-generated interaction.",
+      "notes": "Aim: describe a relevant Runway experiment without saying it is deployed. Preserve the owner's customized interviewer direction. The latest deck also explores storyteller avatars; distinguish that future use from an interviewer avatar and do not imply vendor features or consent controls have been verified. Where did you hear: University of Michigan, per owner. No Runway application submission is authorized by editing this pitch.",
+      "pitch_id": "pitch-30c4210cab734cbb8cd286062ba3815a",
+      "expected_version_id": "pitch-version-acd95f4f5bdc40abb9a4757351847eb0"
+    },
+    {
+      "title_match": "Three-minute competition pitch",
+      "slides": [
+        2,
+        3,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        20,
+        21,
+        22,
+        25
+      ],
+      "body": "A Story is an AI biographer that calls your family. The phone rings, they talk, and it does the asking. We start with an adult child who speaks to a parent often but still knows very little about the years before they were born. They want those stories. Arranging the interviews, knowing what to ask and organizing the answers keeps becoming a project for later. We're building a way to make it a recurring habit. The storyteller answers a scheduled call. The interviewer follows what they actually say, remembers earlier conversations and returns to unfinished stories. Relatives add photographs, corrections and their own memories. Those additions shape what it asks next. Think about one family photograph. Your mother remembers where it was taken. Her brother remembers who was there. Someone else remembers the argument before the camera came out. Each account belongs to the person who tells it. We keep them side by side, with their original voices, rather than asking AI to turn them into one official version. That is the family loop we're building: an interview gives relatives something to respond to, and their responses give the next interview a reason. Families can print chapters as books and keep adding afterward. Today's first steps, a reunion or an ordinary Saturday belong there too. Our first buyer is the adult child purchasing a gift. Our business model charges for guided calls while family contributions and the archive stay free. The commercial question is whether people return for the next interview after the first gift. We are a four-person, bootstrapped team in Michigan. The latest deck sets out a holiday launch, voice reliability work and first partner campaigns. Support would help us test those with paying families. We'd report first and second completed calls, family participation, acquisition cost by channel and eventual paid renewal. Those are milestones to prove, not results we're claiming today. A whole life exists beyond the part we shared. A Story gives the family a way to ask, hear each other and keep going.",
+      "notes": "Aim: judges understand the buyer, attributed family perspectives, recurring loop and concrete use of support. The photograph is an illustration, not a customer story. Tailor the funding amount and milestones to the actual competition before delivery. The latest deck's Q4 launch is a target, not a completed launch. Do not borrow competitor revenue or market-wide surveys as A Story traction.",
+      "pitch_id": "pitch-6bc4019e0d7f47cfbb0aff3a7c6efb11",
+      "expected_version_id": "pitch-version-5f4c5d942d354bef97463e6335dcb1d6"
+    },
+    {
+      "title_match": "Three-minute application video",
+      "slides": [
+        2,
+        8,
+        10,
+        11,
+        12,
+        14,
+        19,
+        20,
+        21,
+        22,
+        23,
+        25
+      ],
+      "body": "I'm Bao Vo, co-founder and COO of A Story. Daniel Nguyen is our co-founder and CEO. We're building an AI biographer that calls your family. A parent or grandparent answers the phone and talks; the interviewer does the asking, remembers earlier calls and follows up on details they leave unfinished. Our first customer is the adult child who wants a parent's stories but keeps postponing the work of interviewing and organizing them. The product is designed to make that a habit the family can sustain. Relatives can contribute photographs, corrections and their own version of a shared event. Each person's account stays attributed, even when they disagree. That contribution can become a question in the next interview. This is the difference we want to establish: the family helps the interviewer get better, and a better interview gives the family more to respond to. We keep the storyteller's real voice with the record. A book is something the family can make from it; the record continues afterward. It also includes the life happening now, so the product has a reason to remain useful beyond recording one person's past. We enter through gifting, starting with adult children buying for parents. The business model charges for guided calls and keeps family participation and the archive free. Renewal needs to come from another worthwhile conversation. Our team has four members, is based in Michigan and is bootstrapped. The deck proposes a public launch and holiday gifting campaign, followed by tests with colleges and community groups. Those channels are plans, not signed partnerships. The next proof is paying families reaching a first interview, coming back for a second, and bringing relatives into the record. We also need actual call costs and acquisition cost by channel. We'd use this program's support to improve voice reliability and run those tests, with results tied to the support received. Interactive avatars and custom voices are future experiments that need explicit consent; the core remains a phone call someone can comfortably answer. That's the business we're working to prove: families return because there's another person to hear from and another question worth asking.",
+      "notes": "Aim: answer a general competition application video in founder language without an origin story. Use the actual question and time limit. Include Daniel naturally if both founders are required. This three-minute script is not the YC one-minute video. Replace general program support with its verified offer; do not imply measured traction where the deck contains only goals.",
+      "pitch_id": "pitch-c3f63c36f90a46a8863433b2c370aa3f",
+      "expected_version_id": "pitch-version-17658dd096db482d9b5983891f7fcbad"
+    },
+    {
+      "title_match": "Five-minute investor pitch",
+      "slides": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        19,
+        20,
+        21,
+        22,
+        23,
+        25,
+        26,
+        27,
+        28
+      ],
+      "body": "A Story is an AI biographer that calls your family. We start with an adult child buying it for a parent or grandparent. They want the stories they haven't heard, but arranging interviews, asking good questions and organizing the answers keeps becoming a project for later. We want the storyteller to be able to answer the phone and talk, with the interviewer doing the work of asking and following up. The business is built around what happens after that first call. The interviewer remembers earlier conversations and returns to unfinished details. Relatives add their own memories, photographs or corrections. Those additions help decide what to ask next. One person remembers who was in a photograph; another remembers what happened before it was taken. We preserve each version with the person who told it. We aren't trying to make one synthetic account that sounds consistent. The original voice is part of the record. That makes the family contribution useful to the next interview, rather than just another item uploaded to an archive. Each interview gives the family something to respond to, and each contribution gives another call a reason. A printed book is an output the family can choose. The record keeps going afterward, including new events and ordinary life. We begin with parents and grandparents because the adult child has a clear reason to buy. The same behavior could later serve new parents, reunions and other shared milestones, but our first acquisition test stays focused on that gifting customer. Our pricing plan in the deck is $119 a year for one storyteller, with 90 minutes of guided calls each month, and $229 for up to three storytellers sharing 200 minutes a month. Family contributions and the archive stay free. Books are an additional purchase. That choice puts the burden of renewal on the next interview. The risk is obvious: a family might get what it wants from the first few calls and never need another paid year. We need to show that family participation changes that behavior, not assume an archive alone creates retention. We'd measure first and second completed calls, repeat interviews, contributing relatives and paid renewal when it becomes observable. Our entry is a gift, and the deck proposes holiday gifting, colleges and community groups, with referrals through invited relatives. We don't claim signed distribution partners or a measured acquisition cost. We'd compare the channels with actual paying-family cohorts. Cost also depends on how much families call. The deck models our own voice stack at about four and a half cents per minute. At heavier use, margins tighten; a fully used plan on a more expensive managed stack can lose money. Those are modeled sensitivities, not production invoices or realized margins. We are a four-person bootstrapped team in Michigan. The next stage is public launch, reliable interviews at growing usage and the first channel tests. We want support tied to that work and a clear review of what it proves. The case for A Story is a family record that gets more useful because several people participate, with recurring conversations people want to continue. If the repeat behavior holds, a first gift can become an ongoing business. That's the question we'd like to test with you.",
+      "notes": "Aim: make the repeat-use business hypothesis credible and invite a concrete investor discussion. Deck pricing is a plan, not a newly approved current offer. The 70% renewal and ~10K-account goals, ~$27 CAC, ~$141 revenue/account and $100M scale math are targets or models, not measured outcomes. Keep those out of the short spoken argument unless explicitly asked. Demonstrate actual product and paid evidence separately. Confirm the current round and ask; no amount is invented.",
+      "pitch_id": "pitch-84ca69d1170a401287f361b18058ccd1",
+      "expected_version_id": "pitch-version-5e65368a2a2444a0bb6f666f02bd24aa"
+    },
+    {
+      "title_match": "YC founder video - one-minute talking points",
+      "slides": [
+        8,
+        10,
+        11,
+        12,
+        19,
+        20,
+        22
+      ],
+      "body": "0:00-0:10 - Daniel and Bao introduce themselves and their roles.\n0:10-0:25 - Explain in your own words: A Story is an AI biographer that calls your family. The first buyer is an adult child giving it to a parent, who answers the phone and talks.\n0:25-0:45 - Explain the difference: relatives contribute their own memories; each perspective stays attributed; those contributions and earlier conversations shape the next interview. The record continues after a book is made and includes life today.\n0:45-1:00 - State the strongest actual evidence you can demonstrate and why you're the team to build this. If no verified metric is available, explain what works and what you're testing. Use these points, not a memorized script.",
+      "notes": "Aim: the founders explain a clear product and a specific insight naturally. No founder backstory is required. Both roles are owner-confirmed. Confirm current YC video instructions before recording; do not fill the final evidence slot with the deck's targets or competitor sales. Keep under the actual one-minute limit after rehearsal.",
+      "pitch_id": "pitch-daeaca65b2284396a4e4875581322c65",
+      "expected_version_id": "pitch-version-77b80125e7d24ec78d8f62fb71dd6cfa"
+    },
+    {
+      "title_match": "Seven-minute family product demonstration",
+      "slides": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        24
+      ],
+      "body": "0:00-1:00 - Explain and ask\nA Story is an AI biographer that calls your family. A parent answers and talks; the interviewer asks and follows up. Relatives add their memories, which give later calls something new to ask about. Each person's version stays theirs. Who would you want to hear from, and what is something you've never asked them? Listen before showing the product.\n\n1:00-2:30 - Show the interview\nDemonstrate arranging an actual call and play a short excerpt that shows the interviewer following a detail the person volunteered. Explain that the interviewer is AI and identify any fictional or sample material before playing it. Show how an unfinished topic can be revisited. Leave enough time for the family to react to the voice and pacing.\n\n2:30-4:00 - Let the family contribute\nOpen a permitted sample story. Show how a relative adds a photograph or their own memory, and how attribution appears. Ask: If two people remember this day differently, what would you want the record to keep? Demonstrate the review and access controls that actually work. Show how an approved addition could shape another interview; distinguish a planned connection from a demonstrated one.\n\n4:00-5:00 - Show what they keep\nOpen the original recording, transcript and a chapter view where available. Show a book sample as an optional output. The family can keep adding after making a book. Ask which format they would use or share, without assuming print is the main reason to return.\n\n5:00-6:00 - Bring it into today\nThe same family record can hold new events and everyday stories. Ask what happened recently that different relatives would tell differently. Stay with their family rather than listing every possible use case. Confirm the actual offer and pricing before discussing a purchase.\n\n6:00-7:00 - Agree on the next step\nWould the storyteller want to try a call? Explain recording, sharing, consent and the exact current trial process. Invite a willing storyteller into that decision. Close with the question they'd like the interviewer to ask first.",
+      "notes": "Seven-minute session plan: about four minutes of demonstration/listening plus spoken transitions. The timing is a schedule, not seven minutes of written monologue. Use permitted sample material; demonstrate current controls before promising them. The deck's family/photo examples are illustrative.",
+      "pitch_id": "pitch-b06bc28f1ce147b894e337159ca30bbc",
+      "expected_version_id": "pitch-version-14a6a65720164fa980675ba688f20cf1"
+    },
+    {
+      "title_match": "Ten-minute voice / AI partner briefing",
+      "slides": [
+        10,
+        11,
+        12,
+        15,
+        22,
+        25,
+        27
+      ],
+      "body": "0:00-1:00 - State the workload\nRecurring phone interviews where speech immediately affects the next question, and family context affects the next call. A Story is an AI biographer for families. We need to support a storyteller who talks naturally, mentions names and places, pauses, and sometimes changes direction. Start with the provider capabilities that matter to this workload.\n\n1:00-3:00 - Demonstrate a difficult moment\nPlay a permitted excerpt and identify whether it is real or illustrative. Show the detail that caused the interviewer to change its follow-up. Walk through input speech, transcription, the interview decision and spoken response. Show an unfinished topic being revisited only if that capability is working. Original testimony stays distinct from generated interviewer speech.\n\n3:00-4:30 - Explain the family loop\nA relative supplies another memory or corrects a name; the account remains attributed and reviewed; that approved context can inform a later question. Explain how our own memory and interview logic should govern the experience. Do not send private family material to a provider as part of this briefing. Discuss permitted evaluation data instead.\n\n4:30-6:00 - Agree on a benchmark\nPropose the same permitted interview task across the available approaches. Measure response delay, interruption recovery, family-name accuracy, completion and cost per completed call. Define what success means before spending credits. Separate issues the provider controls from our own interview design. Ask which languages, voices and turn-taking features its actual offer supports.\n\n6:00-7:30 - Discuss cost and operational limits\nThe deck models own-stack voice cost around $0.045 per minute; this is a model to check against invoices. Compare typical and full allowance use. Clarify credit units, expiry, overages, data use, renewal and any publicity obligations. A nominal award is useful only if it fits the workload and reduces usable cost.\n\n7:30-8:30 - Explore future voice and video\nCustom interviewer voices and optional visual interaction are experiments, with the phone call remaining core. Any storyteller-avatar or familiar-voice experience requires explicit consent and clear attribution of original versus generated material. Verify provider support before promising an integration.\n\n8:30-10:00 - Decide the trial\nAgree on a bounded evaluation, permitted data, duration and results to share. Identify what the program could support and what remains blocked. End with a specific next discussion or trial plan, without accepting program terms or uploading data here.",
+      "notes": "Ten-minute meeting plan with a two-minute demo and time for partner questions. Tailor the first line to the actual provider and avoid reintroducing the company in every answer. Numbers are deck models, not verified operating cost. No terms acceptance, external message or upload is authorized by this draft.",
+      "pitch_id": "pitch-f052357deb9e4fec80066150bc908ccb",
+      "expected_version_id": "pitch-version-3c150737241449c4b4145cf7734db0fd"
+    },
+    {
+      "title_match": "Fifteen-minute competition finals session",
+      "slides": [
+        2,
+        3,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        19,
+        20,
+        21,
+        22,
+        23,
+        25,
+        26,
+        27,
+        28
+      ],
+      "body": "0:00-1:30 - Buyer and problem\nA Story is an AI biographer that calls your family. We start with the adult child who speaks to a parent often and still hasn't heard whole chapters of their life. They want those stories, but interviewing and organizing them keeps becoming a project for later. The storyteller should be able to answer the phone and talk. Introduce the family habit we want to build without an invented founder origin story.\n\n1:30-3:00 - One event, several perspectives\nUse the deck's photograph as an illustration. One person knows where it was taken; another remembers who was there; another remembers what happened before. Explain why each account should stay attributed, even when the accounts disagree. Add the wider idea: families are still living stories today, not only recovering the past.\n\n3:00-5:00 - Show the interview\nDemonstrate an actual call or a clearly labeled illustrative excerpt. The important moment is a follow-up prompted by what the person said, rather than the next item on a fixed list. Show current memory and playback behavior accurately. A live failure is something to explain, not cover with a fictional customer claim.\n\n5:00-6:30 - Show the family loop\nDemonstrate a relative's contribution, attribution and review where working. Explain how a contribution can change the next question, and the next interview gives the family more to respond to. The archive can keep growing after a book is printed. Preserve original words separately from any generated interaction.\n\n6:30-8:00 - Explain the business\nThe deck's plan charges for guided calls and keeps family participation and the archive free. Planned annual offers are $119 for one storyteller and $229 for shared family minutes. Explain the renewal risk directly: families need another interview worth paying for. The 70% renewal figure is a target, not observed retention.\n\n8:00-9:30 - Show the entry channel\nStart with adult-child gifts, then proposed college and community distribution. Invited relatives may become a referral route to another family. No signed partner or measured CAC is established by this deck. Explain the first channel comparison and the founder work it needs.\n\n9:30-11:00 - Evidence and economics\nShow any actual paid-family and completed-call evidence separately from targets. If it is unavailable, state the next measurement. Deck costs and margins are models; full use on a more expensive voice stack can undermine the plan. Market ceilings in the appendix are conditional household arithmetic, not proven demand or a revenue forecast.\n\n11:00-12:30 - Ask tied to proof\nRequest this program's actual support for launch, call reliability and the first campaigns. Explain what would be measured: paid activation, repeat calls, participating relatives, acquisition cost and eventual annual renewal. Confirm the award and amount before delivery. The Q4 2026 launch and later roadmap dates are targets.\n\n12:30-15:00 - Questions\nReserve time for judges. Bring source-linked answers on current product readiness, storyteller consent, heavy-use cost, willingness to pay and the renewal risk. If a result is unknown, say what would establish it. Close with the next conversation the family wants to have, rather than a new feature list.",
+      "notes": "Fifteen-minute session including a two-minute demonstration and 2.5-minute Q&A. Adapt if the event requires a continuous speech. Read the exact rules and time limit before using. Real customer evidence is separate from illustrative slides and modeled economics. No amount or award terms are invented.",
+      "pitch_id": "pitch-c5c4d2af05b0407788155cb9077243e0",
+      "expected_version_id": "pitch-version-929c4336908c433eb9d047ddb2e0d2dc"
+    },
+    {
+      "title_match": "Twenty-minute investor working session",
+      "slides": [
+        8,
+        10,
+        11,
+        12,
+        14,
+        19,
+        20,
+        21,
+        22,
+        23,
+        25,
+        26,
+        27,
+        28
+      ],
+      "body": "0:00-2:00 - The product and the first buyer\nA Story is an AI biographer that calls your family. An adult child buys it for a parent, who answers the phone and talks. The interviewer follows the conversation and revisits unfinished details. Explain the first gifting customer and the difference between the buyer and storyteller. Keep broader life-stage uses as expansion, not a substitute for the first channel.\n\n2:00-5:00 - Product proof\nDemonstrate the follow-up, an earlier conversation informing another call, and a relative's attributed contribution. Identify sample data clearly. Discuss what works today and what is still being built. Show the original recording separately from generated speech. Explain the intended approval model without claiming an untested privacy control is live.\n\n5:00-7:00 - The business hypothesis\nThe family contribution gives the interviewer a new question; the interview gives relatives another reason to participate. The archive stays free. Families pay for guided calls, so renewal has to be earned by the next conversation. Ask whether this behavior could support repeat purchasing beyond the first gift and what evidence would persuade the investor.\n\n7:00-9:00 - Evidence and missing proof\nBring actual paying-family counts, completed calls, repeat use and contribution rates if available and verified. The deck itself does not establish those results. Distinguish a product screenshot from a user cohort, and a competitor's category evidence from ours. The 70% renewal target becomes a future measurement; early repeat interviews are a signal to investigate, not a substitute for annual renewal.\n\n9:00-11:30 - Pricing and operating cost\nThe deck plans $119 per year with 90 monthly minutes and $229 with 200 monthly minutes shared across up to three storytellers. Compare typical and full use, payment fees and voice-stack choices. The modeled own-stack rate is around $0.045 per minute; confirm actual invoiced cost. Model margins exclude acquisition, support, salaries and trials. Explain the downside on a fully used managed stack and the decisions that would address it. Confirm launch pricing before treating it as a current offer.\n\n11:30-14:00 - Acquisition and distribution\nHoliday gifting is the proposed entry. Colleges and community organizations are candidate channels; no signed partnership is established. The first-10K-account model allocates 4K paid, 4K partner and 2K organic/referral accounts, with roughly $27 blended CAC. All are assumptions. Discuss a smaller staged test, actual campaign cost, conversion into a completed interview and the founder labor the model omits.\n\n14:00-16:00 - Scale and risks\nThe appendix models roughly $141 per paid account at an assumed annual-plan mix. About 709K concurrent paid accounts would produce roughly $100M annualized revenue under those inputs. This is conditional arithmetic, not a forecast or proven serviceable market. Discuss repeat-use risk, household-to-account mapping, replacement acquisition at different renewal rates and whether family contributions produce a defensible interview advantage.\n\n16:00-18:00 - Funding and milestones\nDiscuss support for public launch, call reliability and first channel tests. Confirm the actual raise and current readiness rather than borrowing the older deck's placeholder ask or another program's terms. Define the evidence to review after each stage: paying families, first and second calls, contribution rates, actual unit cost, channel CAC and eventual paid renewal. The deck's dates and 10K-account objective are targets.\n\n18:00-20:00 - Decision and next meeting\nInvite questions about the product and business assumptions. Agree on which evidence would justify another meeting, who should attend and what to bring. Leave with a defined next step, not a commitment to funding or an implication that targets have already been reached.",
+      "notes": "Twenty-minute working-session plan includes a three-minute demonstration and discussion throughout. It is not a twenty-minute monologue. Financial values remain explicitly planned, modeled or conditional in the spoken cues. Ask for a specific next meeting; no investment terms, current raise amount or measured results are invented.",
+      "pitch_id": "pitch-37e3c88c2a694b03830ee156ffc23977",
+      "expected_version_id": "pitch-version-5e9063520463460289deca07f5d40c60"
+    }
+  ],
+  "deck_sources": [
+    {
+      "path": "C:\\Users\\vngia\\OneDrive - Umich\\Desktop\\My startups\\Pitch Competition\\Powerpoint Design\\Final final final\\A Story - Investor Deck.pdf",
+      "sha256": "cdc8ce65b5b63c227f2015da49c0f176d763f9a1c78e3e601bb7703263af3452"
+    },
+    {
+      "path": "C:\\Users\\vngia\\OneDrive - Umich\\Desktop\\My startups\\Pitch Competition\\Powerpoint Design\\Final final final\\A Story - Pitch Deck.pdf",
+      "sha256": "301394c6e72868b1d3b74f0448b2c366cbec6694dfcd1372f4207d7e36494b9b"
+    },
+    {
+      "path": "C:\\Users\\vngia\\OneDrive - Umich\\Desktop\\My startups\\Pitch Competition\\Powerpoint Design\\Final final final\\A Story - Pitch Deck.pptx",
+      "sha256": "10885618260137f3a56ef49f1dd21d163a85c9d7e3ccffcb7fc483a4e35a145a"
+    },
+    {
+      "path": "C:\\Users\\vngia\\OneDrive - Umich\\Desktop\\My startups\\Pitch Competition\\Powerpoint Design\\Final final final\\A Story — Investor Deck.pptx",
+      "sha256": "6efc9418310548a15f4d56f2a653cdf05c517242b20a841fb2066882642e5e46"
+    }
+  ]
+}

@@ -47,3 +47,11 @@ Treat word counts as estimates. Rehearse the actual script. Long meeting version
 ## October 9 editorial revision
 
 Fifteen audience-specific working drafts are in seed-data/pitch-editorial-2026-10-09.json. Thirteen revise the existing starter records; the YC video and Runway drafts are new. tools/curate_pitches.py applies them as immutable new versions, preserving source links and originals. The manifest is generated locally under reports. This is a dated editorial migration, not a tool to overwrite later founder edits. Check the existing body before any later rerun, and never automatically reapply this revision to owner-edited work.
+
+## Latest deck alignment
+
+The owner subsequently requested that every active Pitch Studio conversation use the latest deck in `Powerpoint Design/Final final final`. The September 29, 2026 `A Story - Pitch Deck.pptx` (29 slides) and its PDF are the primary references; the September 27 investor files provide older context. Prefer the newer deck when they conflict. Keep the archive going after a printed book, include life happening today, and explain how relatives' attributed contributions improve later interviews. Preserve disagreements rather than synthesizing one supposedly authoritative account.
+
+Sixteen audience-specific adaptations are in `seed-data/pitch-deck-aligned-2026-10-09.json`, including the legacy family introduction. `tools/align_pitches_to_latest_deck.py` requires the exact reviewed source hashes and previous version IDs, then saves the revisions together as new editable drafts. Later owner edits cause a conflict rather than being overwritten. Older editorial packs are history, not a default to reapply.
+
+Deck pricing is planned, unit costs and acquisition estimates are modeled, and launch dates, account goals and renewal percentages are targets unless separately verified in canonical memory. The newest ask is support for launch, voice reliability and first channel tests; do not carry forward an older placeholder raise or another program's terms. The deck does not establish signed partners or customer traction. Long versions are timed demonstration and discussion plans; short scripts remain one connected paragraph. Original deck files and earlier pitch versions remain intact.
