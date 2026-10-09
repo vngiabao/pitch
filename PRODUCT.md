@@ -31,5 +31,8 @@ The full migration manifest, an expanded library of 1,551 pitch material referen
 ## Product Principles
 Recommendations lead. Uncertainty stays visible. Founder time matters. Current facts govern reuse. Every import and decision remains traceable.
 
+## Pitch-writing preferences
+Read `PITCH_WRITING.md` before drafting or adapting pitches and application essays. The owner's October 9 feedback in **NVIDIA Inception Industry Selection** prioritizes distinctive recurring behavior, compounding family context, attributed collaborative perspectives, minimal storyteller effort and original voice. Answer the specific question directly; vendor build questions may start with the needed capabilities instead of a formal company introduction. Use ordinary founder language, one connected paragraph for short answers and normal hyphens. Founder backstories are optional. These are writing preferences and positioning priorities, not approval of new company facts or deployed capabilities.
+
 ## Open Decisions
 No production hosted deployment or API vendor is selected. This build uses local records and existing Codex research access. Fully offline/powered-off operation requires a later always-on host.

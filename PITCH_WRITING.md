@@ -6,13 +6,35 @@ A pitch earns the next conversation by making the product, buyer and business be
 
 Use product-first arguments. Founder backstories are optional and must not be requested as a prerequisite. Write ordinary spoken English, with normal hyphens rather than long dashes. Short spoken drafts and application essays should be one connected paragraph unless the actual form requires separate answers. Each audience deserves its own argument and next action, not the same script with a different greeting.
 
+Updated October 9, 2026 after reading **NVIDIA Inception Industry Selection**, conversation `6ac53e5c-8194-83ea-84c6-b9cafd77f07c`. The owner's explicit feedback rejects generic company descriptions without differentiation and unnecessarily formal, roundabout vendor answers. The priorities below translate that feedback into writing guidance; assistant drafts in that conversation are examples, not newly approved company facts.
+
+## Differentiation must survive the edit
+
+Keep A Story's particular product argument visible, rather than reducing it to AI that preserves family memories:
+
+- Recurring interviews should become an easy family habit, rather than another interview or writing project the family must manage.
+- The AI does the asking and follow-up. The storyteller can answer the phone and talk with almost no setup or learning burden.
+- Context compounds: earlier calls, unfinished stories and new family contributions change what the interviewer asks next. Say how this improves the next conversation, rather than only saying the archive grows.
+- Several relatives contribute to one connected family record. Their memories, corrections and different versions of events retain their attribution, rather than becoming one person's autobiography or an artificially reconciled account.
+- Original voice is part of what the family keeps, as well as the way the interview happens. Give this particular weight in voice-provider applications.
+
+These are positioning priorities and product direction. Check which capabilities actually work today before presenting them as deployed behavior. Do not invent results or assert that every competing product lacks these capabilities.
+
+## Answer the specific question first
+
+For a short company-description question, lead with a concrete product sentence and the distinction that matters. Do not automatically expand it into the buyer, business model, long photo anecdote and a closing explanation of why voice matters. Use an example only when it clarifies a mechanism the answer otherwise cannot explain.
+
+For a question such as "What are you aiming to build with this provider?", start directly with the needed capabilities. A short phrase can be a better opening than a formal introduction. Follow with why those capabilities matter for A Story and the relevant differentiation. Do not re-explain the company if the preceding answer already did that. Tailor to verified provider capabilities and our actual intended experiment; never add a claimed deployment or unsupported integration to sound qualified.
+
+The tone should sound like a founder answering the question, not polished corporate narration. Avoid generic emotional framing, a feature tour, and labels such as "living family documentary" when they obscure the actual difference. Clear and concise still needs to be distinctive. Preserve the recurring behavior, compounding context and collaborative perspectives when shortening. Never force every differentiation point into every answer; choose the ones the question and audience need.
+
 ## Retrieve before writing
 
 Read current canonical company memory, the exact application questions and limits, relevant saved answers, original pitch materials and outcome history. Historical decks, essays and screenshots are references, not current facts. Separate owner-confirmed product direction from verified live capabilities. Put unresolved facts and proof needed in delivery notes; never disguise a proposal, illustration, pilot target or modeled margin as a result.
 
 ## Make the argument concrete
 
-Start with what A Story does and who pays. Describe a real interaction: the relative sets up the interview, the storyteller answers the phone, and earlier family context informs a later question. Explain the product's repeat-use bet with one example rather than generic claims about preserving precious memories. Examples are illustrative unless backed by an actual customer record. Use only confirmed numbers. If paid demand, retention or interview cost is not established, name the next test instead of inventing traction.
+For a full pitch, start with what A Story does and make the buyer clear where that audience needs it. Describe the relevant interaction: the storyteller answers the phone, and earlier family context informs a later question. Explain the repeat-use mechanism instead of generic claims about preserving precious memories. Examples are illustrative unless backed by an actual customer record; do not require the same photo example in every draft. Use only confirmed numbers. If paid demand, retention or interview cost is not established, name the next test where relevant instead of inventing traction. A short vendor-form answer does not need the structure of a full investor pitch.
 
 For investors: buyer, acquisition wedge, repeat-use reason, actual proof and next business milestone. For judges: buyer, experience, differentiation, evidence, and what this specific award would fund. For families: picture the first call and end with a question they can answer. For storytellers: a low-pressure invitation, transparent AI involvement and actual consent controls. For program partners: the workload, measured experiment and relevant support request. A proposed avatar experiment is not a deployed product feature.
 
