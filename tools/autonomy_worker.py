@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from founder_os.store import Store,now,js,uid
 from founder_os.application_pilot import ApplicationPilot
 from founder_os.report_email import DailyReporter
+from founder_os.inbox_tracker import InboxTracker
 
 def poll(s):
     p=ApplicationPilot(s);h=p.h;instant=datetime.now(timezone.utc)
@@ -19,7 +20,10 @@ def poll(s):
         local=instant.astimezone(ZoneInfo(schedule['timezone']))
         if schedule.get('enabled') and (local.hour,local.minute)>=(schedule['hour'],schedule['minute']):h.request_run('Daily free credits discovery',key='daily-credits-'+local.date().isoformat())
         applications=p.poll();report=DailyReporter(s).poll(instant)
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')}}
+        # Read-only inbox check last, so a slow mailbox never delays reports or applications.
+        try:inbox=InboxTracker(s,h).poll(instant)
+        except Exception as e:s.log('inbox.failed','autonomy_worker',{'error_type':type(e).__name__});inbox={'error':type(e).__name__}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()

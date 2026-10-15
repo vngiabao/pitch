@@ -85,7 +85,16 @@ class Handler(BaseHTTPRequestHandler):
                 from .application_pilot import ApplicationPilot
                 from .application_review import ApplicationReview
                 ApplicationPilot(s);result=ApplicationReview(s).plan(route.rsplit('/',1)[1])
-            elif route=='/api/dashboard':result=h.dashboard()
+            elif route=='/api/dashboard':
+                from .inbox_tracker import InboxTracker
+                result=h.dashboard();result['inbox']=InboxTracker(s,h).dashboard()
+            elif route=='/api/inbox':
+                from .inbox_tracker import InboxTracker
+                result=InboxTracker(s,h).dashboard()
+            elif route=='/api/tracker/export.csv':
+                from .inbox_tracker import InboxTracker
+                from datetime import date
+                return self.respond(200,InboxTracker(s,h).export_csv().encode('utf-8'),'text/csv',filename='A-Story-application-tracker-'+date.today().isoformat()+'.csv')
             elif route=='/api/shortlist':result=h.daily_shortlist()
             elif route=='/api/opportunities':result=h.list(q.get('view',['Recommended'])[0],{k:v[0] for k,v in q.items() if k!='view'})
             elif route.startswith('/api/opportunity/'):result=h.detail(route.rsplit('/',1)[1])
@@ -157,6 +166,16 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/connect-report-email':
                 script=Path(__file__).resolve().parents[1]/'Connect-Report-Email.ps1'
                 subprocess.Popen(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(script)],creationflags=getattr(subprocess,'CREATE_NEW_CONSOLE',0))
+                result={'setup_opened':True,'email_sent':False}
+            elif route=='/api/inbox-decision':
+                from .inbox_tracker import InboxTracker
+                if p.get('confirmed') is not True:raise PolicyError('Explicit confirmation needed')
+                result=InboxTracker(s,h).decide(p['id'],p['decision'],p.get('outcome') or None)
+            elif route=='/api/connect-inbox':
+                from .report_email import INBOX_ACCOUNTS
+                if p.get('account') not in INBOX_ACCOUNTS:raise PolicyError('Mailbox is outside owner authorization')
+                script=Path(__file__).resolve().parents[1]/'Connect-Inbox.ps1'
+                subprocess.Popen(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(script),'-Account',p['account']],creationflags=getattr(subprocess,'CREATE_NEW_CONSOLE',0))
                 result={'setup_opened':True,'email_sent':False}
             elif route=='/api/research':
                 h.detail(p['opportunity_id'])

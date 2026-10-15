@@ -10,6 +10,9 @@ from .email_design import render_email,TEMPLATE_VERSION
 from .owner_links import founder_url
 
 CREDENTIAL_TARGET='AStoryFounderOS:DailyReport:gbao.n.vo@gmail.com'
+OWNER_ACCOUNT='gbao.n.vo@gmail.com'
+# The only mailboxes Founder OS may use. The owner Gmail password also sends the daily report.
+INBOX_ACCOUNTS=(OWNER_ACCOUNT,'bao@astoryapp.com')
 PENDING=('PENDING','MAIL_CONNECTION_REQUIRED','CONNECTOR_PENDING')
 
 class MailNotSent(PolicyError):
@@ -17,28 +20,34 @@ class MailNotSent(PolicyError):
 class Credential(ctypes.Structure):
     _fields_=[('Flags',wintypes.DWORD),('Type',wintypes.DWORD),('TargetName',wintypes.LPWSTR),('Comment',wintypes.LPWSTR),('LastWritten',wintypes.FILETIME),('CredentialBlobSize',wintypes.DWORD),('CredentialBlob',ctypes.POINTER(ctypes.c_byte)),('Persist',wintypes.DWORD),('AttributeCount',wintypes.DWORD),('Attributes',ctypes.c_void_p),('TargetAlias',wintypes.LPWSTR),('UserName',wintypes.LPWSTR)]
 
-def credential_present():
-    try:read_credential();return True
+def credential_target(account=OWNER_ACCOUNT):
+    if account not in INBOX_ACCOUNTS:raise PolicyError('Mail account is outside owner authorization')
+    return CREDENTIAL_TARGET if account==OWNER_ACCOUNT else 'AStoryFounderOS:Inbox:'+account
+
+def credential_present(account=OWNER_ACCOUNT):
+    try:read_credential(account);return True
     except (PolicyError,OSError):return False
 
-def read_credential():
+def read_credential(account=OWNER_ACCOUNT):
+    target=credential_target(account)
     if not hasattr(ctypes,'WinDLL'):raise PolicyError('Windows mail credential unavailable')
     lib=ctypes.WinDLL('Advapi32.dll',use_last_error=True);ptr=ctypes.POINTER(Credential)()
     lib.CredReadW.argtypes=[wintypes.LPCWSTR,wintypes.DWORD,wintypes.DWORD,ctypes.POINTER(ctypes.POINTER(Credential))];lib.CredReadW.restype=wintypes.BOOL
     lib.CredFree.argtypes=[ctypes.c_void_p]
-    if not lib.CredReadW(CREDENTIAL_TARGET,1,0,ctypes.byref(ptr)):raise PolicyError('Connect Gmail for scheduled reports; no mail credential is stored')
+    if not lib.CredReadW(target,1,0,ctypes.byref(ptr)):raise PolicyError('Connect '+account+'; no mail credential is stored')
     try:
         c=ptr.contents
-        if c.UserName!='gbao.n.vo@gmail.com':raise PolicyError('Report mail account does not match owner authorization')
+        if c.UserName!=account:raise PolicyError('Mail credential does not match owner authorization')
         return ctypes.string_at(c.CredentialBlob,c.CredentialBlobSize).decode('utf-16-le')
     finally:lib.CredFree(ptr)
 
-def store_credential(secret):
-    # Used only by the owner setup helper; never exposed through the web server.
+def store_credential(secret,account=OWNER_ACCOUNT):
+    # Used only by the owner setup helpers; never exposed through the web server.
+    target=credential_target(account)
     if not hasattr(ctypes,'WinDLL'):raise PolicyError('Windows Credential Manager is required')
     if len(secret.replace(' ',''))!=16 or not secret.replace(' ','').isalnum():raise PolicyError('Use a Google app password, not your Google account password')
     raw=secret.replace(' ','').encode('utf-16-le');blob=(ctypes.c_byte*len(raw)).from_buffer_copy(raw)
-    c=Credential();c.Type=1;c.TargetName=CREDENTIAL_TARGET;c.CredentialBlobSize=len(raw);c.CredentialBlob=blob;c.Persist=2;c.UserName='gbao.n.vo@gmail.com';c.Comment='A Story daily-report sender; this Windows user only'
+    c=Credential();c.Type=1;c.TargetName=target;c.CredentialBlobSize=len(raw);c.CredentialBlob=blob;c.Persist=2;c.UserName=account;c.Comment='A Story Founder OS mail ('+('daily-report sender and read-only inbox tracker' if account==OWNER_ACCOUNT else 'read-only inbox tracker')+'); this Windows user only'
     lib=ctypes.WinDLL('Advapi32.dll',use_last_error=True);lib.CredWriteW.argtypes=[ctypes.POINTER(Credential),wintypes.DWORD];lib.CredWriteW.restype=wintypes.BOOL
     if not lib.CredWriteW(ctypes.byref(c),0):raise PolicyError('Could not securely save the Gmail connection')
 
