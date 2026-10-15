@@ -10,6 +10,7 @@ from founder_os.report_email import DailyReporter
 from founder_os.inbox_tracker import InboxTracker
 from founder_os.application_drafter import ApplicationDrafter
 from founder_os.form_reader import BrowserFormReader
+from founder_os.growth_agents import Growth
 
 def poll(s):
     p=ApplicationPilot(s);h=p.h;instant=datetime.now(timezone.utc)
@@ -28,7 +29,10 @@ def poll(s):
         # Read one official application form per cycle (read-only) and queue answer drafts.
         try:forms=ApplicationDrafter(s,BrowserFormReader(ROOT/'data/browser-profile')).poll(limit=1)
         except Exception as e:s.log('forms.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});forms={'error':type(e).__name__}
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'forms':forms}
+        # Growth agents: one follow-up or press draft per cycle, press discovery twice a week.
+        try:growth=Growth(s).poll(limit=1)
+        except Exception as e:s.log('growth.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});growth={'error':type(e).__name__}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'forms':forms,'growth':growth}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()

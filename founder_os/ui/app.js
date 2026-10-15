@@ -97,8 +97,8 @@ function doNextList(items){
  return `<section class="do-next" aria-labelledby="next-title"><h2 id="next-title">Do next</h2><ol>${items.map((x,i)=>`<li><div><strong>${E(x.title)}</strong><p class="small">${E(x.detail)}</p></div><a class="button${i===0?' primary':''}" href="${E(x.href)}"${x.external?' target="_blank" rel="noopener noreferrer"':''}>${E(x.label)}</a></li>`).join('')}</ol></section>`;
 }
 async function home(){
- const board=dash.money_board,[pitches,apps]=await Promise.all([api('/api/pitches').catch(()=>({items:[]})),api('/api/application-list').catch(()=>[])]);
- const byOpp=Object.fromEntries(apps.map(x=>[x.opportunity_id,x])),todo=doNext(board,apps);
+ const board=dash.money_board,[pitches,apps,growth]=await Promise.all([api('/api/pitches').catch(()=>({items:[]})),api('/api/application-list').catch(()=>[]),api('/api/growth-alerts').catch(()=>[])]);
+ const byOpp=Object.fromEntries(apps.map(x=>[x.opportunity_id,x])),todo=[...doNext(board,apps),...growth.map(x=>({title:x.title,detail:x.detail,href:x.url,label:x.link}))].slice(0,8);
  const latestPitch=[...pitches.items].sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))[0];
  const closingSoon=board.cash.filter(d=>{const n=d.analysis.scoring.dates.days_remaining;return n!==null&&n>=0&&n<=7;}).length,waiting=board.tracked.filter(t=>t.waiting).length;
  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',timeZone:'America/New_York'});
@@ -224,7 +224,7 @@ document.addEventListener('submit',async e=>{
 });
 function routeContext(){
  const path=location.pathname,parent=path.startsWith('/pitch/')?'/pitches':path.startsWith('/material/')?'/materials':path.startsWith('/application-review/')||path.startsWith('/application/')?'/applications':path.startsWith('/opportunity/')?'/opportunities':path.startsWith('/run/')?'/activity':path;
- const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions'};
+ const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides'};
  document.querySelectorAll('#workspace-nav a').forEach(a=>{const active=a.getAttribute('href')===parent;a.classList.toggle('active',active);active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#breadcrumbs').innerHTML='<a href="/">A Story</a> / '+(parent!==path?'<a href="'+E(parent)+'">'+E(names[parent]||'Workspace')+'</a> / Detail':E(names[parent]||'Workspace'));
  document.querySelector('#workspace-location').textContent=location.hostname==='pitch.gbaonvo.com'?'Owner sign-in protected':'On this PC';document.title=(names[parent]||'Workspace')+' | A Story';
@@ -248,7 +248,7 @@ async function boot(){
  const count=document.querySelector('#decision-count');if(count){count.textContent=waitingCount();count.hidden=!waitingCount();}
  if(path.startsWith('/opportunity/'))return detail(path.split('/').at(-1));
  if(path.startsWith('/run/'))return run(path.split('/').at(-1));
- return ({'/':home,'/opportunities':opportunities,'/activity':activity,'/memory':memory,'/decisions':decisions}[path]||home)();
+ return ({'/':home,'/opportunities':opportunities,'/activity':activity,'/memory':memory,'/decisions':decisions,'/credits':credits,'/people':people,'/press':press}[path]||home)();
 }
 document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{if(b.dataset.view){view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));return await updateList();}const action=b.dataset.action;if(!action)return;if(action==='reload'){location.reload();return;}b.disabled=true;if(action==='material-page'){materialOffset=Number(b.dataset.offset);await materials();window.scrollTo(0,0);}else if(action==='confirm-application'){if(confirm(b.dataset.decision==='APPROVED'?'Submit this exact emailed application preview?':'Decline this exact application preview?')){await api('/api/application-confirm',{confirmation_id:b.dataset.id,decision:b.dataset.decision,confirmed:true});await boot();toast('Your exact application decision is saved.');}}else if(action==='resume-agent'){if(confirm('Resume this previously authorized agent with the same limits?')){await api('/api/autonomy-resume',{scope:b.dataset.scope,confirmed:true});await boot();toast('Automatic action resumed with the existing limits.');}}else if(action==='inbox-confirm'){const outcome=document.querySelector(`[data-outcome-for="${b.dataset.id}"]`)?.value;if(confirm('Record this program as '+outcome+' from this email?')){await api('/api/inbox-decision',{id:b.dataset.id,decision:'confirm',outcome,confirmed:true});await boot();toast('Outcome recorded with the email as evidence.');}}else if(action==='inbox-dismiss'){await api('/api/inbox-decision',{id:b.dataset.id,decision:'dismiss',confirmed:true});await boot();toast('Email set aside. Nothing was recorded.');}else if(action==='connect-inbox'){await api('/api/connect-inbox',{account:b.dataset.account});toast('Secure inbox setup opened on this PC. Enter the Google app password there, never in chat.');}else if(action==='connect-mail'){await api('/api/connect-report-email',{});toast('Secure Gmail setup opened on this PC. Enter the Google app password there, never in chat.');}else if(action==='report-now'){await api('/api/report-now',{});await boot();toast('Today’s report is saved. The sender will use the connected mail account when available.');}else if(action==='show-report'){const box=document.getElementById('report-'+b.dataset.id);if(box.innerHTML){box.innerHTML='';b.setAttribute('aria-expanded','false');}else{const r=await api('/api/report/'+encodeURIComponent(b.dataset.id));box.innerHTML='<pre class="report-copy">'+E(r.body)+'</pre>';b.setAttribute('aria-expanded','true');}}else if(action==='pause-agent'){await api('/api/autonomy-pause',{authorization_id:b.dataset.id});await boot();toast('Automatic action paused.');}else if(action==='prepare-pilot'){await api('/api/prepare-application',{opportunity_id:b.dataset.id});if(location.pathname!=='/applications'){location.href='/applications';return;}await boot();toast('Application plan refreshed with current facts and blockers.');}else if(action==='run'){await api('/api/run-now',{});toast('Research request saved. The connected worker will run the scan and record its findings.');}else if(action==='research'){await api('/api/research',{opportunity_id:b.dataset.id});toast('Re-verification request saved for this opportunity.');}else if(action==='start'){const r=await api('/api/start-application',{opportunity_id:b.dataset.id});toast('Internal application draft is ready. No submission was sent.');}else if(action==='decision'){const reason=prompt('Reason for your '+b.dataset.decision.toLowerCase()+' decision:');if(reason){await api('/api/decision',{opportunity_id:b.dataset.id,decision:b.dataset.decision,reason});await boot();toast('Decision saved with the agent recommendation.');}}else if(action==='approve'){if(confirm('Confirm this exact '+b.dataset.decision+' decision after reviewing the proposal and evidence?')){await api('/api/approval',{approval_id:b.dataset.id,decision:b.dataset.decision,confirmed:true});await boot();toast('Owner decision recorded.');}}else if(action==='read-notice'){await api('/api/notification-read',{id:b.dataset.id});await boot();}}catch(err){toast(err.message,true);}finally{b.disabled=false;}});
 document.addEventListener('submit',async e=>{if(!['material-filters','filters','decision-form'].includes(e.target.id))return;e.preventDefault();try{if(e.target.id==='material-filters'){const f=new FormData(e.target);materialQuery=f.get('q');materialKind=f.get('kind');materialCategory=f.get('category');materialOffset=0;return await materials();}if(e.target.id==='filters')return await updateList();if(e.target.id==='decision-form'){const f=new FormData(e.target);await api('/api/decision',{opportunity_id:e.target.dataset.id,decision:f.get('decision'),reason:f.get('reason')});await boot();toast('Decision saved. Scoring weights remain unchanged.');}}catch(err){toast(err.message,true);}});
@@ -317,5 +317,85 @@ document.addEventListener('click',async e=>{
  const r=e.target.closest('[data-read-form]');if(!r)return;e.preventDefault();r.disabled=true;const old=r.textContent;r.textContent='Reading the form…';
  try{const res=await api('/api/read-form',{opportunity_id:r.dataset.readForm});if(res.state==='QUESTIONS_READ'&&res.application_id&&!location.pathname.startsWith('/application')){location.href='/application/'+res.application_id;return;}await boot();toast(res.state==='QUESTIONS_READ'?`Read ${res.questions} questions and filled ${res.filled} from your facts.${res.draft_queued?' The agent is drafting the rest.':''}`:'The agent could not read this form: '+(res.reason||res.state));}
  catch(err){toast(err.message,true);r.textContent=old;}finally{r.disabled=false;}
+});
+// Growth agents: credits, people, press. Agents prepare; Bao sends.
+const fmtDay=v=>v?new Date(String(v).slice(0,10)+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+const CREDIT_STATE_WORDS=[['ACTIVE','Active'],['NOT_ACTIVATED','Not activated yet'],['USED_UP','Used up'],['ENDED','Ended']];
+function creditCard(c){
+ return `<section class="section credit-card level-${E(c.level.toLowerCase())}"><div class="section-title"><h2>${E(c.provider)}</h2><span class="credit-status">${E(c.label)}</span></div>`+
+ `<dl class="fact-list credit-facts"><div><dt>What you get</dt><dd>${E(c.allowance||'Amount not published')}</dd></div><div><dt>Covers</dt><dd>${E(c.covers||'Not published')}</dd></div>`+
+ `<div><dt>Started</dt><dd>${c.started_on?E(fmtDay(c.started_on)):'Not set yet'}</dd></div><div><dt>Ends</dt><dd>${c.ends_on?E(fmtDay(c.ends_on)):c.term_months?'12 months after the start date'.replace('12',String(c.term_months)):'Not set yet'}</dd></div>`+
+ `<div><dt>After it ends</dt><dd>${E(c.after_expiry||'Not published')}</dd></div><div><dt>Balance</dt><dd>${c.balance_note?E(c.balance_note)+`<small> · checked ${E(fmtDay(c.balance_checked_on))}${c.balance_stale?', check again':''}</small>`:'Not checked yet'}</dd></div></dl>`+
+ (c.notes?`<p class="small">${E(c.notes)}</p>`:'')+
+ `<details class="more"${c.level==='NEEDS_DATES'?' open':''}><summary>Update dates and balance</summary><form class="credit-form" data-id="${E(c.id)}"><div class="form-grid">`+
+ `<label>Start date<input type="date" name="started_on" value="${E(c.started_on||'')}"></label><label>End date, if the email states one<input type="date" name="expires_on" value="${E(c.expires_on||'')}"></label>`+
+ `<label>Balance left<input name="balance_note" maxlength="300" value="${E(c.balance_note||'')}" placeholder="e.g. 6.2M of 8M units this month"></label><label>Account email<input type="email" name="account_email" maxlength="200" value="${E(c.account_email||'')}"></label>`+
+ `<label>Status<select name="state">${CREDIT_STATE_WORDS.map(([v,l])=>`<option value="${v}"${v===c.state?' selected':''}>${l}</option>`).join('')}</select></label></div>`+
+ `<label>Notes<textarea name="notes" maxlength="2000">${E(c.notes||'')}</textarea></label><div class="actions"><button class="primary" type="submit">Save</button></div></form></details>`+
+ (c.program_url?`<p class="quiet-actions"><a href="${E(c.program_url)}" target="_blank" rel="noopener noreferrer">Program page ↗</a></p>`:'')+`</section>`;
+}
+async function credits(){
+ const list=await api('/api/credits'),open=list.filter(c=>c.level!=='DONE'),done=list.filter(c=>c.level==='DONE');
+ app.innerHTML=heading('Credits','Free service credits you have won. Use them before they lapse, and decide before any paid plan starts.')+
+ (open.length?open.map(creditCard).join(''):'<p class="empty">No active credit grants. Accepted credit programs appear here on their own.</p>')+
+ (done.length?`<details class="more finished-apps"><summary>Used up or ended (${done.length})</summary>${done.map(creditCard).join('')}</details>`:'');
+}
+const CONTACT_KIND_LIST=['Investor','Partner','Program','Press','Mentor','Customer','Other'];
+function draftBlock(d){return `<div class="growth-draft"><p class="small">Subject</p>${answerBox(d.title||'(no subject)')}<p class="small">Message</p>${answerBox(d.body)}${d.note?`<p class="small qa-note">${E(d.note)}</p>`:''}</div>`;}
+function personCard(c){
+ const last=c.touches[0];
+ return `<section class="section person-card" id="person-${E(c.id)}"><div class="section-title"><div><h3>${E(c.name)}</h3><p class="small">${E([c.org,c.kind].filter(Boolean).join(' · '))}${c.email?' · '+E(c.email):''}</p></div><span class="credit-status${c.due?' due':''}">${c.state!=='ACTIVE'?E(prettyKey(c.state)):c.next_followup_on?(c.due?'Follow up now':'Next: '+E(fmtDay(c.next_followup_on))):'No follow-up set'}</span></div>`+
+ (c.context?`<p class="small">${E(c.context)}</p>`:'')+(last?`<p class="small">Last: ${E(fmtDay(last.occurred_on))}, ${E(last.summary)}</p>`:'')+
+ (c.due?(c.draft?draftBlock(c.draft)+`<div class="actions"><button class="primary" type="button" data-person-sent="${E(c.id)}">I sent it</button>${c.email?`<a class="button" href="mailto:${E(c.email)}">Open email ↗</a>`:''}</div>`:`<p class="qa-needs">${c.drafting?'<strong>Drafting.</strong> The agent is writing this note now.':`<strong>No draft yet.</strong> <button class="link-button" type="button" data-growth-draft="contact" data-id="${E(c.id)}">Draft it now</button>`}</p>`):'')+
+ `<details class="more"><summary>Log a conversation</summary><form class="touch-form" data-id="${E(c.id)}"><label>What happened<textarea name="summary" required maxlength="2000" placeholder="e.g. Coffee chat; they want a demo after launch"></textarea></label><div class="form-grid"><label>Date<input type="date" name="occurred_on"></label><label>Next follow-up<input type="date" name="next_followup_on"></label></div><p class="small">Leave the next follow-up empty to use ${c.cadence_days} days.</p><div class="actions"><button class="primary" type="submit">Save</button></div></form></details>`+
+ `<p class="quiet-actions">${c.due&&c.draft?`<button class="link-button" type="button" data-growth-draft="contact" data-id="${E(c.id)}">Write a new draft</button>`:''}${c.touches.length>1?`<span class="small">${c.touches.length} conversations logged</span>`:''}<button class="link-button" type="button" data-person-state="${c.state==='ACTIVE'?'PAUSED':'ACTIVE'}" data-id="${E(c.id)}">${c.state==='ACTIVE'?'Pause follow-ups':'Resume follow-ups'}</button></p></section>`;
+}
+function addPersonForm(open){
+ return `<details class="more add-person"${open?' open':''}><summary>Add a person</summary><form class="person-form"><div class="form-grid"><label>Name<input name="name" required maxlength="120"></label><label>Organization<input name="org" maxlength="120"></label><label>Type<select name="kind">${CONTACT_KIND_LIST.map(k=>`<option>${k}</option>`).join('')}</select></label><label>Email (optional)<input type="email" name="email" maxlength="200"></label><label>First follow-up<input type="date" name="next_followup_on"></label><label>Follow up every (days)<input type="number" name="cadence_days" min="1" max="180" value="14"></label></div><label>How you know them<textarea name="context" maxlength="2000" placeholder="e.g. Judge at Startup World Cup Columbus; liked the family archive"></textarea></label><label>Last conversation (optional)<textarea name="summary" maxlength="2000"></textarea></label><div class="actions"><button class="primary" type="submit">Add person</button></div></form></details>`;
+}
+async function people(){
+ const list=await api('/api/people'),due=list.filter(c=>c.due),rest=list.filter(c=>!c.due);
+ app.innerHTML=heading('People','Who to follow up with, and a note ready to send. You send every message yourself.')+
+ (due.length?`<section aria-labelledby="due-title"><div class="block-title"><h2 id="due-title">Follow up now</h2></div>${due.map(personCard).join('')}</section>`:'<div class="all-clear"><h2>No follow-ups due</h2><p class="small">When a follow-up date arrives, the agent writes the note for you here.</p></div>')+
+ addPersonForm(!list.length)+
+ (rest.length?`<section aria-labelledby="all-title"><div class="block-title"><h2 id="all-title">Everyone else</h2></div>${rest.map(personCard).join('')}</section>`:'');
+}
+const PRESS_KIND_WORDS={gift_guide:'Gift guide',newsletter:'Newsletter',podcast:'Podcast',journalist:'Journalist',local_news:'Local news',blog:'Blog',community:'Community'};
+function pressCard(t){
+ const soon=t.days_left!==null&&t.days_left<=10,open=t.submit_url||t.url;
+ return `<section class="section press-card"><div class="section-title"><div><h3>${E(t.outlet)}</h3><p class="small">${E([PRESS_KIND_WORDS[t.kind]||t.kind,t.audience].filter(Boolean).join(' · '))}</p></div><span class="credit-status${soon?' due':''}">${t.deadline?'Pitch by '+E(fmtDay(t.deadline)):'No deadline stated'}</span></div>`+
+ (t.angle?`<p>${E(t.angle)}</p>`:'')+(t.submit_method?`<p class="small">How to pitch: ${E(t.submit_method)}</p>`:'')+
+ (t.state==='NEW'?(t.draft?draftBlock(t.draft):`<p class="qa-needs">${t.drafting?'<strong>Drafting.</strong> The agent is writing this pitch now.':`<strong>No pitch yet.</strong> <button class="link-button" type="button" data-growth-draft="press" data-id="${E(t.id)}">Draft it now</button>`}</p>`)+
+  `<div class="actions">${open?`<a class="button${t.draft?'':' primary'}" href="${E(open)}" target="_blank" rel="noopener noreferrer">Open how to pitch ↗</a>`:''}${t.draft?`<button class="primary" type="button" data-press-state="PITCHED" data-id="${E(t.id)}">I sent it</button>`:''}</div>`+
+  `<p class="quiet-actions"><button class="link-button" type="button" data-press-state="SKIPPED" data-id="${E(t.id)}">Skip</button>${t.draft?`<button class="link-button" type="button" data-growth-draft="press" data-id="${E(t.id)}">Write a new draft</button>`:''}${t.source_url?`<a href="${E(t.source_url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>`:''}</p>`
+ :`<p class="quiet-actions"><span class="small">${E(prettyKey(t.state))}</span>${t.state==='PITCHED'?`<button class="link-button" type="button" data-press-state="PUBLISHED" data-id="${E(t.id)}">It was published</button>`:''}<button class="link-button" type="button" data-press-state="NEW" data-id="${E(t.id)}">Move back to open</button></p>`)+`</section>`;
+}
+async function press(){
+ const r=await api('/api/press'),open=r.targets.filter(t=>t.state==='NEW'),done=r.targets.filter(t=>t.state!=='NEW');
+ app.innerHTML=heading('Press & gift guides','Holiday gift guides and outlets that take pitches, each with a pitch drafted from your approved facts. You send them yourself.',`<button class="primary" type="button" data-press-discover="1"${r.searching?' disabled':''}>${r.searching?'Searching…':'Find more now'}</button>`)+
+ `<p class="small press-last">${r.last_run?`Last search ${E(readableDate(r.last_run.at))}: ${r.last_run.found} new.`:'The agent searches every Monday and Thursday morning.'}${r.searching?' A search is running now.':''}</p>`+
+ (open.length?open.map(pressCard).join(''):`<div class="all-clear"><h2>No open press targets</h2><p class="small">${r.searching?'The agent is searching now. Results show up here in about 15 minutes.':'Use Find more now, or wait for the next scheduled search.'}</p></div>`)+
+ (done.length?`<details class="more finished-apps"><summary>Pitched, published or skipped (${done.length})</summary>${done.map(pressCard).join('')}</details>`:'');
+}
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-press-state],[data-growth-draft],[data-press-discover],[data-person-sent],[data-person-state]');if(!b)return;e.preventDefault();
+ try{
+  if(b.dataset.personSent!==undefined&&b.dataset.personSent){if(!confirm('Log that you sent this follow-up? The next one is scheduled automatically.'))return;b.disabled=true;await api('/api/person-touch',{id:b.dataset.personSent,summary:'Sent the follow-up email.'});await boot();toast('Logged. The next follow-up is scheduled.');return;}
+  b.disabled=true;
+  if(b.dataset.pressState){await api('/api/press-state',{id:b.dataset.id,state:b.dataset.pressState});await boot();toast(b.dataset.pressState==='PITCHED'?'Marked as pitched.':'Saved.');}
+  else if(b.dataset.growthDraft){await api('/api/growth-draft',{kind:b.dataset.growthDraft,id:b.dataset.id});await boot();toast('The agent is drafting it. It appears here in a few minutes.');}
+  else if(b.dataset.pressDiscover){await api('/api/press-discover',{});await boot();toast('Search started. New outlets appear here in about 15 minutes.');}
+  else if(b.dataset.personState){await api('/api/person-update',{id:b.dataset.id,state:b.dataset.personState});await boot();toast('Saved.');}
+ }catch(err){toast(err.message,true);}finally{b.disabled=false;}
+});
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(!f.classList.contains('credit-form')&&!f.classList.contains('person-form')&&!f.classList.contains('touch-form'))return;e.preventDefault();
+ const body=Object.fromEntries(new FormData(f)),btn=f.querySelector('button[type=submit]');btn.disabled=true;
+ try{
+  if(f.classList.contains('credit-form')){await api('/api/credit',{id:f.dataset.id,...body});toast('Credit details saved.');}
+  else if(f.classList.contains('person-form')){if(body.cadence_days)body.cadence_days=Number(body.cadence_days);await api('/api/person',body);toast('Added. The agent drafts a note when the follow-up date arrives.');}
+  else{await api('/api/person-touch',{id:f.dataset.id,...body});toast('Conversation logged.');}
+  await boot();
+ }catch(err){toast(err.message,true);}finally{btn.disabled=false;}
 });
 boot().catch(e=>{app.innerHTML='<section class="load-error">'+heading('Unable to open this page',e.message)+'<button data-action="reload">Reload workspace</button><p><a href="/pitches">Go to Pitch Studio</a></p></section>';});

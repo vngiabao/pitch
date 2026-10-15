@@ -38,7 +38,7 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
         if route in ('/app.js','/pitch.js','/style.css'):
@@ -102,6 +102,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/application-list':
                 from .application_drafter import application_list
                 result=application_list(s)
+            elif route in ('/api/credits','/api/people','/api/press','/api/growth-alerts'):
+                from .growth_agents import Growth
+                g=Growth(s);result={'/api/credits':g.credits,'/api/people':g.contacts,'/api/press':g.press,'/api/growth-alerts':g.alerts}[route]()
             elif route=='/api/applications':result=s.rows('SELECT a.*,o.program,o.cycle FROM applications a JOIN opportunities o ON o.id=a.opportunity_id')
             elif route=='/api/autonomy':
                 from .application_pilot import ApplicationPilot
@@ -195,6 +198,17 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/approval-edit':
                 if p.get('confirmed') is not True:raise PolicyError('Explicit confirmation needed')
                 result=h.owner_edit_claim(p['approval_id'],p.get('body',''))
+            elif route in ('/api/credit','/api/person','/api/person-update','/api/person-touch','/api/growth-draft','/api/press-state','/api/press-discover'):
+                from .growth_agents import Growth
+                g=Growth(s)
+                if route=='/api/credit':result=g.update_credit(p['id'],p)
+                elif route=='/api/person':result=g.add_contact(p)
+                elif route=='/api/person-update':result=g.update_contact(p['id'],p)
+                elif route=='/api/person-touch':result=g.log_touch(p['id'],p)
+                elif route=='/api/press-state':result=g.set_press_state(p['id'],p['state'])
+                else:
+                    result=g.queue_draft(p['kind'],p['id'],manual=True) if route=='/api/growth-draft' else g.request_press_discovery()
+                    self.start_worker()
             elif route=='/api/notification-read':
                 s.db.execute('UPDATE funding_notifications SET read_at=datetime(\'now\') WHERE id=?',(p['id'],));result={'read':True}
             else:return self.respond(404,{'error':'Action not available'})

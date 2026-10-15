@@ -534,3 +534,23 @@ details.more[open]>summary{margin-bottom:var(--space-3)}
 .qa:has(.answer-inline) .qa-source{grid-column:2}
 .section>.actions+.small{margin-top:var(--space-3)}
 @media (max-width:760px){.qa:has(.answer-inline){grid-template-columns:minmax(0,1fr)}.qa:has(.answer-inline) .answer-inline{margin-top:var(--space-2)}.qa:has(.answer-inline) .qa-source{grid-column:auto}}
+
+/* Growth agents: credits, people, press */
+.credit-status{font-size:var(--text-sm);font-weight:600;color:var(--color-muted);white-space:nowrap}
+.credit-status.due,.level-urgent .credit-status{color:var(--color-urgent)}
+.level-soon .credit-status,.level-needs_dates .credit-status,.level-activate .credit-status{color:var(--color-brass-text)}
+.level-ok .credit-status{color:var(--color-good)}
+.level-urgent,.level-needs_dates,.level-activate{border-left:3px solid var(--color-brass)}
+.level-urgent{border-left-color:var(--color-urgent)}
+.credit-facts{margin-bottom:var(--space-4)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3);margin:var(--space-2) 0 var(--space-3)}
+.credit-form label,.person-form label,.touch-form label{display:grid;gap:var(--space-1);font-size:var(--text-sm);font-weight:560}
+.credit-form textarea,.person-form textarea,.touch-form textarea{min-height:72px;margin-bottom:var(--space-3)}
+.person-card .section-title,.press-card .section-title{align-items:flex-start}
+.person-card h3,.press-card h3{font:400 var(--text-lg)/1.3 var(--font-display);margin:0 0 2px}
+.person-card .section-title p,.press-card .section-title p{margin:0}
+.growth-draft{margin:var(--space-3) 0}
+.growth-draft>.small{margin:var(--space-3) 0 0;font-weight:600}
+details.add-person{margin:0 0 var(--space-8);padding:var(--space-4) var(--space-5);border:var(--rule);border-radius:var(--radius-panel);background:var(--color-soft)}
+.press-last{margin:0 0 var(--space-6)}
+@media (max-width:760px){.form-grid{grid-template-columns:minmax(0,1fr)}.person-card .section-title,.press-card .section-title{flex-direction:column;gap:var(--space-1)}}

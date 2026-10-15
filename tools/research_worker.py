@@ -155,6 +155,61 @@ def draft(h,request):
     answers=json.loads(out.read_text(encoding='utf-8')).get('answers',[])
     return {'application_id':aid,'drafted':d.save_drafts(aid,answers),'asked':len(ctx['questions'])}
 
+def codex_json(h,request,prompt,schema,stem,search=False,timeout=900):
+    """One bounded Codex call that returns schema-shaped JSON. Search is the only tool ever enabled."""
+    cli=resolve_cli(h)
+    if not cli:raise RuntimeError('SOURCE_UNAVAILABLE: Codex runner executable is unavailable')
+    folders=ROOT/'reports/runs';folders.mkdir(parents=True,exist_ok=True)
+    stem=stem+'-'+digest(request['request_key'])[:16]+'-attempt-'+str(request['attempts']+1)
+    schema_path=folders/(stem+'-schema.json');out=folders/(stem+'-out.json')
+    schema_path.write_text(json.dumps(schema),encoding='utf-8')
+    disabled=('shell_tool','apps','plugins','browser_use','browser_use_external','computer_use','multi_agent','goals','workspace_dependencies','skill_search')
+    command=[cli]+(['--search'] if search else [])+['-a','never']
+    for feature in disabled:command.extend(['--disable',feature])
+    command.extend(['exec','--ignore-user-config','--sandbox','read-only','--skip-git-repo-check','--ephemeral','--color','never','--output-schema',str(schema_path),'--output-last-message',str(out),'--json','-'])
+    result=subprocess.run(command,input=prompt,text=True,encoding='utf-8',capture_output=True,cwd=ROOT,env=safe_env(),timeout=timeout,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    if result.returncode or not out.exists():
+        import re
+        raise RuntimeError('Runner failed: '+re.sub(r'sk-[\w-]+|Bearer\s+\S+','[REDACTED]',result.stderr[-800:]))
+    web_events=0
+    for line in result.stdout.splitlines():
+        try:event=json.loads(line)
+        except json.JSONDecodeError:continue
+        if 'web_search' in str(event.get('item',{}).get('type','')):web_events+=1
+    return json.loads(out.read_text(encoding='utf-8')),web_events
+
+def growth_draft(h,request):
+    """Follow-up or press pitch draft from approved company material only. No web access."""
+    from founder_os.growth_agents import Growth,FOLLOWUP_PREFIX
+    g=Growth(h.store);follow=request['reason'].startswith(FOLLOWUP_PREFIX)
+    kind,sid=('contact',request['reason'][len(FOLLOWUP_PREFIX):]) if follow else ('press',request['reason'].split(': ',1)[1])
+    ctx=g.followup_context(sid) if follow else g.press_context(sid)
+    schema={'type':'object','additionalProperties':False,'properties':{'title':{'type':'string'},'body':{'type':'string'},'note':{'type':'string'}},'required':['title','body','note']}
+    prompt=('You are the A Story Founder OS writing assistant. '+ctx['task']+' Use ONLY CONTEXT and follow CONTEXT.rules. '
+            'Return JSON: title (email subject), body (the message, ready to paste, signed Bao), note (anything Bao should check or fill in). '
+            'Do not use shell, files, web, email or any tool.\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False))
+    data,_=codex_json(h,request,prompt,schema,'growth-draft')
+    return {'kind':kind,'id':sid,'draft_id':g.save_draft(kind,sid,data.get('title'),data.get('body'),data.get('note'))}
+
+def press_discovery(h,request):
+    """Public-web search for gift guides and outlets. Returns targets for the owner to pitch himself."""
+    from founder_os.growth_agents import Growth,PRESS_KINDS
+    g=Growth(h.store);ctx=g.press_discovery_context()
+    target={'type':'object','additionalProperties':False,'properties':{**{k:{'type':'string'} for k in ('outlet','url','submit_url','submit_method','audience','angle','why','source_url')},
+            'kind':{'type':'string','enum':list(PRESS_KINDS)},'deadline':{'type':['string','null']}},'required':['outlet','kind','url','submit_url','submit_method','deadline','audience','angle','why','source_url']}
+    schema={'type':'object','additionalProperties':False,'properties':{'queries':{'type':'array','items':{'type':'string'}},'targets':{'type':'array','items':target},
+            'errors':{'type':'array','items':{'type':'object','additionalProperties':False,'properties':{'message':{'type':'string'}},'required':['message']}}},'required':['queries','targets','errors']}
+    prompt=('You are A Story Founder OS press scout, a READ-ONLY research worker. Use ONLY public web search and public page reads. '
+            'Do not use shell, file, email, form, account or posting tools. '+ctx['task']+' Use at most 6 search queries and read at most 12 pages. '
+            'Return up to 12 targets not in CONTEXT.known_outlets. Only list contact routes the outlet publishes for pitches (a form, a tips or submissions address, editorial guidelines); never guess a personal email. '
+            'deadline is YYYY-MM-DD only when the page states one, otherwise null. source_url is the page that shows the outlet accepts pitches or runs the guide. '
+            'angle is one sentence on why their readers would care. Do not invent coverage, deadlines or contacts.\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False))
+    data,events=codex_json(h,request,prompt,schema,'press',search=True,timeout=1200)
+    if not events:raise RuntimeError('SOURCE_UNAVAILABLE: no web-tool activity was recorded; press targets cannot be verified')
+    found=g.save_targets(data.get('targets',[]))
+    g.record_press_run({'at':now(),'found':found,'returned':len(data.get('targets',[])),'queries':data.get('queries',[])[:10],'errors':[e.get('message','') for e in data.get('errors',[])][:6]})
+    return {'press_targets_found':found}
+
 def research(h,request,probe=False):
     research_started_at=now()
     cli=resolve_cli(h)
@@ -198,7 +253,7 @@ def research(h,request,probe=False):
     if request['reason']=='Daily free credits discovery':
         # Daily scan: two cash families and two credit families, rotating so every family is covered within three days.
         day=datetime.now(timezone.utc).date().toordinal()
-        cash=('pitch_competitions','grants','michigan','midwest','vertical','ai_programs')
+        cash=('pitch_competitions','big_pitch_competitions','local_pitch_nights','founder_personal','grants','federal_state_grants','agetech','michigan','midwest','vertical','ai_programs','accelerators_with_cash','hackathons')
         credit=('voice_credits','bootstrap_credits','cloud_credits','creative_credits')
         chosen={cash[(2*day)%len(cash)],cash[(2*day+1)%len(cash)],credit[(2*day)%len(credit)],credit[(2*day+1)%len(credit)]}
         families={k:v for k,v in families.items() if k in chosen}
@@ -255,8 +310,10 @@ def main():
     if not work:s.close();return 0
     request,token=work
     try:
-        if request['reason'].startswith('Draft application: '):
-            result=draft(h,request);print(json.dumps(result),flush=True)
+        growth=request['reason'].startswith(('Draft follow-up: ','Draft press pitch: ')) or request['reason']=='Press and gift-guide discovery'
+        if request['reason'].startswith('Draft application: ') or growth:
+            result=(press_discovery(h,request) if request['reason']=='Press and gift-guide discovery' else growth_draft(h,request)) if growth else draft(h,request)
+            print(json.dumps(result),flush=True)
             s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
             return 0
         report=research(h,request,args.probe)

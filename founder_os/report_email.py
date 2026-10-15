@@ -187,7 +187,11 @@ class DailyReporter:
             if x['access']['level']=='READY' and x['questions'] and x['answered']<x['questions']:
                 needs.append({'title':f"{x['program']}: {x['answered']} of {x['questions']} answers ready",'detail':f"{x['questions']-x['answered']} need you (things only you know, like IDs or links). Copy the rest and submit.",'url':founder_url('/application/'+x['application_id']),'link':'Open answers'})
         for r in closing:needs.append({'title':f"{r['name']}: {r['when'].lower()}",'detail':r['access']['label']+'.','url':r['url'],'link':'Open'})
-        needs=needs[:6]
+        try:
+            from .growth_agents import Growth
+            needs+=[{**x,'url':founder_url(x['url'])} for x in Growth(self.store).alerts()]
+        except Exception as e:self.store.log('growth.alerts_failed','daily_report',{'error_type':type(e).__name__})
+        needs=needs[:8]
         tz=local.tzinfo
         waiting=[{'name':t['canonical_name'],'status':t['outcome']+' '+datetime.fromisoformat(t['occurred_at'].replace('Z','+00:00')).astimezone(tz).strftime('%b %d').replace(' 0',' ')} for t in board['tracked'] if t.get('waiting')]
         reach=[{'name':x['program'],'detail':f"{x['answered']} of {x['questions']} answers ready",'url':founder_url('/application/'+x['application_id'])} for x in apps if x['access']['level'] in ('READY','DRAFTING') and x['questions']]
