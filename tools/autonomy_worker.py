@@ -11,6 +11,7 @@ from founder_os.inbox_tracker import InboxTracker
 from founder_os.application_drafter import ApplicationDrafter
 from founder_os.form_reader import BrowserFormReader
 from founder_os.growth_agents import Growth
+from founder_os.pitch_lab import PitchLab
 
 def poll(s):
     p=ApplicationPilot(s);h=p.h;instant=datetime.now(timezone.utc)
@@ -32,7 +33,10 @@ def poll(s):
         # Growth agents: one follow-up or press draft per cycle, press discovery twice a week.
         try:growth=Growth(s).poll(limit=1)
         except Exception as e:s.log('growth.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});growth={'error':type(e).__name__}
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'forms':forms,'growth':growth}
+        # Pitch Lab: harvest Bao's edits and results, start reviews, keep every item moving.
+        try:lab=PitchLab(s).poll()
+        except Exception as e:s.log('lab.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});lab={'error':type(e).__name__}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'forms':forms,'growth':growth,'lab':lab}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()

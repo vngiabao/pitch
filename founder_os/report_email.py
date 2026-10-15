@@ -190,6 +190,8 @@ class DailyReporter:
         try:
             from .growth_agents import Growth
             needs+=[{**x,'url':founder_url(x['url'])} for x in Growth(self.store).alerts()]
+            from .pitch_lab import PitchLab
+            needs+=[{**x,'url':founder_url(x['url'])} for x in PitchLab(self.store).alerts()]
         except Exception as e:self.store.log('growth.alerts_failed','daily_report',{'error_type':type(e).__name__})
         needs=needs[:8]
         tz=local.tzinfo

@@ -210,6 +210,13 @@ def press_discovery(h,request):
     g.record_press_run({'at':now(),'found':found,'returned':len(data.get('targets',[])),'queries':data.get('queries',[])[:10],'errors':[e.get('message','') for e in data.get('errors',[])][:6]})
     return {'press_targets_found':found}
 
+def lab_step(h,request):
+    """One Pitch Lab AI stage (Tailor, Voice, Coach or Learner). Web search only for Tailor's first read of official rules."""
+    from founder_os.pitch_lab import PitchLab,PIPELINE_PREFIX
+    iid=request['reason'][len(PIPELINE_PREFIX):]
+    it=PitchLab(h.store).run_ai_stage(iid,lambda prompt,schema,stem,search:codex_json(h,request,prompt,schema,'lab-'+stem,search=search,timeout=1200)[0])
+    return {'item':iid,'stage':it['stage'],'round':it['round']}
+
 def research(h,request,probe=False):
     research_started_at=now()
     cli=resolve_cli(h)
@@ -311,6 +318,10 @@ def main():
     request,token=work
     try:
         growth=request['reason'].startswith(('Draft follow-up: ','Draft press pitch: ')) or request['reason']=='Press and gift-guide discovery'
+        if request['reason'].startswith('Pipeline: '):
+            print(json.dumps(lab_step(h,request)),flush=True)
+            s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
+            return 0
         if request['reason'].startswith('Draft application: ') or growth:
             result=(press_discovery(h,request) if request['reason']=='Press and gift-guide discovery' else growth_draft(h,request)) if growth else draft(h,request)
             print(json.dumps(result),flush=True)

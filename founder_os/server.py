@@ -38,7 +38,7 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
         if route in ('/app.js','/pitch.js','/style.css'):
@@ -105,6 +105,28 @@ class Handler(BaseHTTPRequestHandler):
             elif route in ('/api/credits','/api/people','/api/press','/api/growth-alerts'):
                 from .growth_agents import Growth
                 g=Growth(s);result={'/api/credits':g.credits,'/api/people':g.contacts,'/api/press':g.press,'/api/growth-alerts':g.alerts}[route]()
+            elif route=='/api/lab':
+                from .pitch_lab import PitchLab
+                result=PitchLab(s).board()
+            elif route.startswith('/api/lab/'):
+                from .pitch_lab import PitchLab
+                lab=PitchLab(s);result=lab.item(route.rsplit('/',1)[1]);result['program_detail']=lab.program_context(result['opportunity_id'])
+            elif route=='/api/lab-options':
+                from .pitch_studio import PitchStudio
+                from .application_drafter import application_list
+                seen=set();programs=[]
+                for d in h.list('All'):
+                    n=d['data']['canonical_name'].strip()
+                    if n.lower() in seen or d['recommendation'] in ('EXPIRED','SKIP','REJECTED'):continue
+                    seen.add(n.lower());programs.append({'id':d['opportunity_id'],'name':n,'type':d['data']['opportunity_type'],'deadline':d['data']['dates'].get('deadline')})
+                result={'programs':sorted(programs,key=lambda x:x['name'].lower()),'pitches':[{'id':x['pitch_id'],'title':x['title']} for x in PitchStudio(s).list()['items']],
+                        'applications':[{'id':a['application_id'],'program':a['program']} for a in application_list(s) if a.get('questions')]}
+            elif route=='/api/lab-alerts':
+                from .pitch_lab import PitchLab
+                result=PitchLab(s).alerts()
+            elif route=='/api/money':
+                from .money_map import MoneyMap
+                result=MoneyMap(s).board()
             elif route=='/api/applications':result=s.rows('SELECT a.*,o.program,o.cycle FROM applications a JOIN opportunities o ON o.id=a.opportunity_id')
             elif route=='/api/autonomy':
                 from .application_pilot import ApplicationPilot
@@ -209,6 +231,21 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result=g.queue_draft(p['kind'],p['id'],manual=True) if route=='/api/growth-draft' else g.request_press_discovery()
                     self.start_worker()
+            elif route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun','/api/lab-approve','/api/lab-save','/api/lesson'):
+                from .pitch_lab import PitchLab
+                lab=PitchLab(s)
+                if route=='/api/lab-edition':result=lab.start_edition(p['opportunity_id'],p.get('minutes',3),p.get('slide_limit') or None,p.get('note',''))
+                elif route=='/api/lab-review':result=lab.start_review(p['pitch_id'])
+                elif route=='/api/lab-application':result=lab.start_application(p['application_id'])
+                elif route=='/api/lab-rerun':result=lab.rerun(p['id'],p.get('note',''))
+                elif route=='/api/lab-approve':result=lab.approve(p['id'])
+                elif route=='/api/lab-save':result=lab.save_to_studio(p['id'])
+                else:result=lab.decide_lesson(p['id'],p['decision'])
+                if route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun'):
+                    result={k:v for k,v in result.items() if k!='payload'};self.start_worker()
+            elif route=='/api/money-move':
+                from .money_map import MoneyMap
+                result=MoneyMap(s).set_move(p['id'],p['state'])
             elif route=='/api/notification-read':
                 s.db.execute('UPDATE funding_notifications SET read_at=datetime(\'now\') WHERE id=?',(p['id'],));result={'read':True}
             else:return self.respond(404,{'error':'Action not available'})

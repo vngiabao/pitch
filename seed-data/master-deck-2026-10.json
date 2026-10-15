@@ -1,0 +1,167 @@
+{
+ "deck": "A Story - Pitch Deck (Oct 2026)",
+ "url": "https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN",
+ "captured": "2026-10-15",
+ "slides": [
+  {
+   "id": "cover",
+   "section": "story",
+   "title": "A Story - Family stories, in the voices that lived them.",
+   "seconds": 20,
+   "appendix": false,
+   "spoken": "Hi, we’re A Story. We build an AI biographer that calls your loved ones and helps them tell their stories in their own voice - and lets the whole family add their part. Today I’ll show you why families keep losing these stories, what we built, what’s already working, and the proof we’re going after next. A Story is a member of NVIDIA Inception, the AssemblyAI Startup Program, and a Cartesia Startups Grant recipient."
+  },
+  {
+   "id": "legacy-gap",
+   "section": "story",
+   "title": "Eighty years of a life, remembered by two dates and a folder of photos",
+   "seconds": 45,
+   "appendix": false,
+   "spoken": "A person can live for eighty years and eventually be remembered by a birth date, a death date, and a folder of photographs. The person between those dates - what they chose, believed, regretted, and loved - survives only in the stories someone keeps. Think about how your parents met. You may know the short version, but do you know who made the first move, what almost kept them apart, or how each of them remembers that day? Mom and Dad may not even agree. Dates and photographs can prove that someone lived, but their stories are what allow us to know who they were. When those stories fade, we lose them a second time."
+  },
+  {
+   "id": "retelling",
+   "section": "story",
+   "title": "Every retelling changes the story",
+   "seconds": 40,
+   "appendix": false,
+   "spoken": "That is how family stories work. One person remembers one part, and someone else remembers another, so no one carries the whole story. With each retelling, details shift - the Elks Hall dance becomes “a dance in Toledo, I think,” then “a party?”, then nothing. Even an “I’ll never forget this day” story can be lost if no one else ever hears it. 73% of Americans have lost a relative whose story they wish had been written down. If someone never passes their part on, no one else can recover it. That is the legacy gap."
+  },
+  {
+   "id": "want-to-know",
+   "section": "story",
+   "title": "Families care. They just keep missing the moment.",
+   "seconds": 45,
+   "appendix": false,
+   "spoken": "For adult children, this is not a niche problem. 79% want to know more about their parents’ lives before parenthood, but only 37% know their mother’s early life - 42 points of their story no one has asked about yet. And 74% regret not learning more about relatives who have died. Wanting to know is not the same as finding the right moment to ask. You don’t know where to start. The question comes at midnight, your parent is asleep three time zones away, and by the next call, the question is gone. One in five Americans has no extended family within an hour. Families care - they just keep missing the moment."
+  },
+  {
+   "id": "cant-wait",
+   "section": "story",
+   "title": "America is aging - and families live further apart",
+   "seconds": 40,
+   "appendix": false,
+   "spoken": "And it can’t wait. America is aging: 11,200 Americans turn 65 every day through 2027 - about 467 an hour, roughly 8 a minute - and by 2030 every baby boomer will be 65 or older. Nearly 1 in 5 Americans is already 65+, 64.6 million people. At the same time, families live further apart. And $124 trillion will pass between generations through 2048. Families plan carefully how to pass on their money. Who’s planning how to pass on their stories? The stories that used to come up at Sunday dinner now need a reason - and a way - to be told."
+  },
+  {
+   "id": "todays-options",
+   "section": "story",
+   "title": "They keep pieces, not the story",
+   "seconds": 50,
+   "appendix": false,
+   "spoken": "Most current options fall into two categories: photo albums and memoir services. Albums keep the pictures, but lose the voice and the life behind them. Memoir services, like Storyworth, send weekly prompts toward a physical book - but a meaningful gift turns into homework for the parent, and once the book is printed, the purpose is gone. Habits take a median of sixty-six days of daily repetition. Weekly prompts get about ten tries in that window, so the habit never forms. And for the business, it’s a one-time sale: 80% of Remento’s purchases are gifts, bought once by someone other than the storyteller. One year, one book, one voice - then renewal is optional, and growth has to be won again every gifting season. Q&A caution: no competitor publishes completion or renewal rates; the point is how the products are built."
+  },
+  {
+   "id": "meet-a-story",
+   "section": "product",
+   "title": "Meet A Story: an AI biographer that calls your loved ones",
+   "seconds": 50,
+   "appendix": false,
+   "spoken": "Most people will never write an autobiography - not because their lives are empty, but because reconstructing a whole life from a blank page is an overwhelming place to begin. Meet A Story, an AI biographer that calls your loved ones and helps them tell their stories in their own voice. The phone rings at the time they picked. They answer and talk; A Story does the asking, listens to what they actually say, and follows the conversation instead of a fixed script. After each call, A Story keeps the original voice and transcript and turns what was shared into a memory the family can revisit, connected to the photos, letters, people and dates around it. The interviewer remembers what has already been shared, picks up unfinished stories, and lets each memory shape the next conversation - a life preserved gradually, while it’s still being lived. (Live today: calls, archive, photo uploads and billing. The home screen shows Rose, the example family in the app.)"
+  },
+  {
+   "id": "every-narrator",
+   "section": "product",
+   "title": "Rome wasn’t built in one day. Or by one person.",
+   "seconds": 50,
+   "appendix": false,
+   "spoken": "Rome wasn’t built in one day - or by one person. One person can only tell the part they remember, so A Story is collaborative: every narrator can be in the room. Rose tells the summer at the lake on her call. Her daughter Jamie adds three photos of the dock. Uncle John adds his own version of the race. And the next time A Story calls Rose, it asks about what the family added. The original conversation stays at the center, and every account is kept side by side and credited - never merged into one “official” version. A photograph can raise a question no one thought to ask, and a missing detail can go to the relative most likely to know it. What begins as one person’s autobiography grows into a documentary of their life. (Rose’s family is the example family in the app screens. Relatives’ input shaping the next call is our core design and the thing we’re measuring now.)"
+  },
+  {
+   "id": "the-everyday",
+   "section": "product",
+   "title": "It never assumes the story is finished. Today is part of it too.",
+   "seconds": 40,
+   "appendix": false,
+   "spoken": "This is what makes A Story more than an app for interviewing grandparents. Other tools look backward - a memoir to finish before it’s too late. A Story never assumes the story is finished. Today is part of it too. The same model works for a grandparent’s whole life; for new parents capturing first words and the ordinary days childhood leaves behind; for a wedding told by everyone who was there; for a reunion, remembered by everyone at the table; for any ordinary day. Mom and Dad can start their child’s story today, so one day their child can return to those years through their parents’ eyes and voices. And when the family wants something physical, any chapter becomes a printed book - a chapter, not the finish line. A family tree brought to life."
+  },
+  {
+   "id": "why-now",
+   "section": "proof",
+   "title": "Now it’s affordable, familiar and one call away",
+   "seconds": 40,
+   "appendix": false,
+   "spoken": "Families have always wanted these stories. What changed is that ongoing interviews are now affordable, familiar and one call away. Affordable: after the 2026 voice price cuts - text-to-speech down up to 55% - the same dollar buys about 2.2 times as much voice (1 ÷ 0.45), and a 7–10 minute interview costs about $0.32–0.45 on our stack, modeled. Familiar: generative-AI use among adults 50+ went from 9% in 2023 to 30% in 2025 - 3.3 times in two years. One call away: 95% of adults 65+ own a cellphone. There is no app to learn; after setup, they just answer a scheduled call."
+  },
+  {
+   "id": "traction",
+   "section": "proof",
+   "title": "Built with families. Ready to prove retention.",
+   "seconds": 45,
+   "appendix": false,
+   "spoken": "The core product already works end to end: scheduled AI-guided phone interviews, transcripts and the family archive, relative invitations and photo contributions, and billing. We’re in private beta on TestFlight, and our App Store release is in review. Our first MVP brought in 50 leads. We deliberately selected 10 families for the private beta, learned from their actual behavior, and redesigned the product before scaling - and another five are waiting to join as paying customers at the redesigned release. Hope College has shown interest in gifting A Story to students’ grandparents this holiday season - interest, not a signed partnership. We’re members of NVIDIA Inception and the AssemblyAI Startup Program, and recipients of a Cartesia Startups Grant. What we measure next is what matters most: whether storytellers come back for another call, whether relatives contribute, and whether those contributions create the next conversation. (All traction is owner-reported; no payment records yet.)"
+  },
+  {
+   "id": "business",
+   "section": "business",
+   "title": "Families pay to keep the story growing",
+   "seconds": 45,
+   "appendix": false,
+   "spoken": "How we make money. First, subscription, because that is what keeps the story growing: families pay yearly for the ongoing interviews - $119 for an individual, with one storyteller, 90 minutes of calls a month and a Classic Hardcover each year; or $229 for a family plan, with up to three storytellers and 200 shared minutes a month. Relatives read and contribute for free. There’s also a one-time Express gift pass at $79 and a $19.99 monthly plan. Second, books, whenever the family wants something physical - softcover from $39, Classic Hardcover $69, Heirloom $149. The book is a chapter, not the finish line. It’s bought as a gift, but kept as a habit: the adult child buys, the parent just answers the phone, and every relative who adds a memory gives the next call - and the next year - a reason. Renewal is the number we are proving next."
+  },
+  {
+   "id": "market",
+   "section": "business",
+   "title": "A national market, starting with older-adult households",
+   "seconds": 40,
+   "appendix": false,
+   "spoken": "Bottom-up. 132.7 million U.S. households at our $119 price is a $15.8 billion ceiling. We start with the 43.6 million households that include someone 65 or older: $5.19 billion a year. And the target that matters: at about $141 per account - an 80/20 mix of Individual and Family plans - roughly 710,000 paying accounts, just 1.6% of 65+ households, is a $100 million a year business. These are demographic ceilings, not validated demand; one paid account covers a whole family."
+  },
+  {
+   "id": "competition",
+   "section": "business",
+   "title": "Guided calls exist. We win on the family workflow.",
+   "seconds": 50,
+   "appendix": false,
+   "spoken": "Guided calls already exist, and we respect that. Storyworth advertises Story Calls with follow-ups and Family Calls that keep two voices. Remento lets collaborators add questions, photos and their own stories. Storii schedules up to three calls a week. Spomen does follow-ups and multiple perspectives. So phone calls and family contributions are becoming category features. Where we win is the family workflow: scheduled calls that come to the storyteller, every relative’s version kept side by side and credited, and what relatives add shaping the next call - so the story keeps going after the first year instead of ending with the book. That last piece is our core design and what we’re measuring now, not a proven edge yet. “Not stated” means the company’s public pages don’t say either way."
+  },
+  {
+   "id": "next-90",
+   "section": "plan",
+   "title": "Launch for the holidays. Then prove they come back.",
+   "seconds": 45,
+   "appendix": false,
+   "spoken": "Our next step is the public launch and the holiday gifting campaign. First, convert the five families already waiting - our first paying customers on the redesigned release. Second, launch into the gifting season: the App Store release, gift passes for adult children, and a first partner gifting campaign with Hope College, who have shown interest. Third, prove that families come back: storytellers returning for another call, relatives contributing, and what they add shaping the next question. The path to our first hundred is channel math, not market share - for example, 1,000 qualified visits at 3% who buy and stay is 30 paying families. Those are example inputs; we’ll replace them with measured conversion. We’ll report back on second-call rate, relatives contributing, calls that use family input, and real cost per call against our model."
+  },
+  {
+   "id": "team",
+   "section": "plan",
+   "title": "Two full-time founders, based in Michigan",
+   "seconds": 40,
+   "appendix": false,
+   "spoken": "We are two full-time founders based in Michigan. Daniel Hoang Nguyen, our CEO, leads product vision, fundraising and finance. He ranked first at BGSU in the Putnam Competition, is Phi Beta Kappa, and placed second at the 2025 BGSU Hackathon for an AI search framework. He started A Story after two uncles who carried his family’s history had strokes and struggled to find the words. I’m Bao Vo, COO. I lead operations, customer discovery and partnerships - I chose our ten beta families from fifty leads after volunteering in nursing homes to learn how older adults share their stories. I hold an MS in Electrical and Computer Engineering from the University of Michigan, consulted for early-stage startups at miLEAD, and worked as an engineer at Faraday Technology. We’re a Delaware C-Corp, A Story Technologies, Inc., based in Allendale, Michigan. We met in 2024 through the Vietnamese student community. (For the Michigan Business Challenge edition, Pitch Tailor adds Nhi Tran, CMO.)"
+  },
+  {
+   "id": "close",
+   "section": "plan",
+   "title": "We’ve built the product. Now we’re proving families continue the story.",
+   "seconds": 20,
+   "appendix": false,
+   "spoken": "We’ve built the product. Now we’re proving that preserving a life story can become something families continue - not another project they start and abandon - so that “I meant to ask” doesn’t become “I wish I had.” Thank you. [Program editions add their ask on the slide before this one: the amount and the one result it funds.]"
+  },
+  {
+   "id": "a1-economics",
+   "section": "appendix",
+   "title": "The model has to work when families actually use it",
+   "seconds": null,
+   "appendix": true,
+   "spoken": "Modeled, not observed. First-year contribution per account, before acquisition and fixed costs: $77 at 25% of minutes used, $61 at 50%, $28 at 100% on our component voice stack. On a managed-agent stack it’s $53, $13 and a loss of $69 - so full use on a managed stack doesn’t work at today’s prices. At 50% use, out of $141: $8.79 payment fees, $32.74 voice, $14.40 hosting, $18 support, $6 archive reserve, about $37 acquisition plus trial, leaving $24.12 before fixed costs. At full use that turns to about minus $8.61. Assumptions: 80% Individual / 20% Family plan mix; 2026 voice pricing."
+  },
+  {
+   "id": "a2-competitors",
+   "section": "appendix",
+   "title": "What each company says it does today",
+   "seconds": null,
+   "appendix": true,
+   "spoken": "Full URLs: https://help.storyworth.com/can-i-voice-record-my-stories · https://help.storyworth.com/en_US/upgrading-your-storyworth-plan · https://help.remento.co/en/articles/8365892-remento-s-pricing-guide · https://resources.remento.co/getting-started/m-adding-collaborators · https://www.storii.com/faqs · https://spomen.app/faq · https://theheirloom.ai/pricing · https://theheirloom.ai/company/faq · https://www.linkedin.com/company/kinlily"
+  },
+  {
+   "id": "a3-sources",
+   "section": "appendix",
+   "title": "Every number, and where it comes from",
+   "seconds": null,
+   "appendix": true,
+   "spoken": "Full links: https://www.ancestry.com/corporate/newsroom/press-releases/mother-knows-best--but-do-you-really-know-her--ancestry-survey-r · https://www.prnewswire.com/news-releases/reflecting-back-one-year-into-the-pandemic-national-survey-uncovers-74-of-americans-regret-not-learning-more-about-their-relatives-301280513.html · https://www.pewresearch.org/short-reads/2022/05/18/more-than-half-of-americans-live-within-an-hour-of-extended-family/ · https://www.protectedincome.org/peak65/ · https://www.census.gov/newsroom/press-releases/2026/vintage-2025-pop-estimates.html · https://www.cerulli.com/press-releases/cerulli-anticipates-124-trillion-in-wealth-will-transfer-through-2048 · https://elevenlabs.io/blog/weve-lowered-api-agents-pricing-and-introduced-pay-as-you-go · https://www.aarp.org/pri/topics/technology/internet-media-devices/aarp-research-insights-technology/ · https://www.pewresearch.org/internet/fact-sheet/mobile/ · https://data.census.gov/table/ACSDT1Y2024.B11007?g=010XX00US · https://astoryapp.com/pricing/"
+  }
+ ]
+}
