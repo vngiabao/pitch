@@ -38,7 +38,7 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/pitch/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
         if route in ('/app.js','/pitch.js','/style.css'):
@@ -89,6 +89,7 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/shortlist':result=h.daily_shortlist()
             elif route=='/api/opportunities':result=h.list(q.get('view',['Recommended'])[0],{k:v[0] for k,v in q.items() if k!='view'})
             elif route.startswith('/api/opportunity/'):result=h.detail(route.rsplit('/',1)[1])
+            elif route.startswith('/api/application/'):result=h.application_view(route.rsplit('/',1)[1])
             elif route=='/api/applications':result=s.rows('SELECT a.*,o.program,o.cycle FROM applications a JOIN opportunities o ON o.id=a.opportunity_id')
             elif route=='/api/autonomy':
                 from .application_pilot import ApplicationPilot
@@ -130,6 +131,7 @@ class Handler(BaseHTTPRequestHandler):
                 result=h.request_run(p.get('reason','Founder requested broad scan'))
                 self.start_worker()
             elif route=='/api/decision':result=h.decide(p['opportunity_id'],p['decision'],p['reason'])
+            elif route=='/api/outcome':result=h.owner_outcome(p['opportunity_id'],p['outcome'],p.get('note',''),p.get('evidence_url'),p.get('application_id'))
             elif route=='/api/start-application':result={'application_id':h.start_application(p['opportunity_id']),'external_submission':False}
             elif route=='/api/prepare-application':
                 from .application_pilot import ApplicationPilot

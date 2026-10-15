@@ -477,6 +477,35 @@ class FundingHunter:
         self.db.execute('INSERT OR IGNORE INTO funding_outcomes VALUES(?,?,?,?,?,?,?,?,?,?)',(eid,oid,application_id,submission_id,outcome,source_version_id,clean_url(evidence_url),note,when,now()))
         return eid
 
+    def owner_outcome(self,oid,outcome,note='',evidence_url=None,application_id=None):
+        """Record an outcome the owner reports from the website. Their statement is kept as a dated source file."""
+        if outcome not in ('Applied','Advanced','Finalist','Won','Rejected','Accepted','Withdrawn'):raise ValueError('Unknown outcome')
+        name=self.detail(oid)['data']['canonical_name']
+        folder=Path(self.store.path).parent/'owner-attestations';folder.mkdir(exist_ok=True)
+        stamp=now();path=folder/('outcome-'+digest([oid,outcome,stamp])[:16]+'.txt')
+        statement=f'Owner reported on {stamp} via Founder OS: {name} ({oid}) -> {outcome}.\nNote: {note.strip() or "none"}\nEvidence URL: {evidence_url or "none"}\n'
+        path.write_text(statement,encoding='utf-8')
+        vid=self.store.import_source(path,'owner_attestation','REFERENCE',text=statement,extraction='owner_statement')
+        with self.store.transaction():
+            eid=self.outcome(oid,outcome,(note.strip() or 'Owner marked '+outcome.lower()+' in Founder OS.'),source_version_id=vid,evidence_url=evidence_url or None,application_id=application_id or None)
+        self.store.log('funding.owner_outcome','owner',{'opportunity_id':oid,'outcome':outcome,'outcome_id':eid})
+        return {'outcome_id':eid,'recommendation':self.detail(oid)['recommendation']}
+
+    def application_view(self,application_id):
+        app=self.store.one('SELECT * FROM applications WHERE id=?',(application_id,))
+        program=self.db.execute('SELECT p.canonical_name name,c.label cycle FROM funding_intelligence i JOIN funding_programs p ON p.id=i.program_id JOIN funding_cycles c ON c.id=i.cycle_id WHERE i.opportunity_id=?',(app['opportunity_id'],)).fetchone()
+        legacy=self.db.execute('SELECT program,cycle FROM opportunities WHERE id=?',(app['opportunity_id'],)).fetchone()
+        questions=[]
+        for q in self.store.rows('SELECT * FROM questions WHERE application_id=? ORDER BY ordinal',(application_id,)):
+            versions=self.store.rows("SELECT a.id,a.body,a.created_at,a.provenance,r.status FROM answer_versions a JOIN answer_reviews r ON r.version_id=a.id WHERE a.question_id=? ORDER BY CASE r.status WHEN 'approved' THEN 0 WHEN 'draft' THEN 1 ELSE 2 END,a.created_at DESC",(q['id'],))
+            questions.append({'id':q['id'],'ordinal':q['ordinal'],'prompt':q['prompt'],'limit':q['limit_value'],'unit':q['limit_unit'],'answer':versions[0] if versions else None,'versions':len(versions)})
+        outcomes=self.store.rows('SELECT outcome,evidence_note note,occurred_at FROM funding_outcomes WHERE opportunity_id=? ORDER BY occurred_at DESC,created_at DESC',(app['opportunity_id'],))
+        has_intel=self.db.execute('SELECT 1 FROM funding_intelligence WHERE opportunity_id=?',(app['opportunity_id'],)).fetchone()
+        d=self.detail(app['opportunity_id']) if has_intel else None
+        return {**app,'program':program['name'] if program else (legacy['program'] if legacy else app['title']),'cycle':program['cycle'] if program else (legacy['cycle'] if legacy else ''),
+                'questions':questions,'outcomes':outcomes,'official_url':d['data']['official_url'] if d else None,'application_url':d['data']['application_url'] if d else None,
+                'deadline':d['data']['dates']['deadline'] if d else None,'recommendation':d['recommendation'] if d else None}
+
     def money_board(self,items):
         """Cash first, then credits; one row per program. Applied and decided programs move to the tracker."""
         closed=('EXPIRED','SKIP','REJECTED','ACCEPTED','ALREADY APPLIED')
@@ -494,11 +523,14 @@ class FundingHunter:
         from .opportunity_curation import PRIORITIES
         priority=lambda d:PRIORITIES.get((d['analysis'].get('founder_brief') or {}).get('priority') or 'UNKNOWN',0)
         credits=sorted([d for d in active if d['analysis']['money']['kind']=='CREDITS'],key=lambda d:(-priority(d),due(d),-(d['analysis']['scoring']['estimate'] or 0)))
-        tracked=self.store.rows('SELECT o.opportunity_id,o.outcome,o.evidence_note note,o.occurred_at,p.canonical_name FROM funding_outcomes o JOIN funding_intelligence i ON i.opportunity_id=o.opportunity_id JOIN funding_programs p ON p.id=i.program_id ORDER BY o.occurred_at DESC')
+        tracked=self.store.rows('SELECT o.opportunity_id,o.outcome,o.evidence_note note,o.occurred_at,p.canonical_name,i.data_json,(SELECT a.id FROM applications a WHERE a.opportunity_id=o.opportunity_id ORDER BY a.created_at LIMIT 1) application_id FROM funding_outcomes o JOIN funding_intelligence i ON i.opportunity_id=o.opportunity_id JOIN funding_programs p ON p.id=i.program_id ORDER BY o.occurred_at DESC,o.created_at DESC')
         seen=set();applied=[]
         for t in tracked:
             if t['canonical_name'] in seen:continue
-            seen.add(t['canonical_name']);applied.append(t)
+            seen.add(t['canonical_name']);dates=json.loads(t.pop('data_json')).get('dates') or {}
+            # The next date worth knowing after applying: the event/finale when published.
+            t['next_date']=dates.get('event_date');t['waiting']=t['outcome'] in ('Applied','Advanced','Finalist')
+            applied.append(t)
         return {'cash':unique(cash),'credits':unique(credits),'tracked':applied}
 
     def dashboard(self):
