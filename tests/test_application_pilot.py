@@ -1,3 +1,4 @@
+import json
 import copy,json,tempfile,unittest,smtplib
 from pathlib import Path
 from datetime import datetime,timezone,timedelta
@@ -83,6 +84,14 @@ class AutonomyTests(unittest.TestCase):
     def test_mail_blocker_and_timeout_not_labeled_sent(self):
         reporter=DailyReporter(self.s);r=reporter.prepare();t=MailTransport(False);self.assertEqual(reporter.send(r['id'],t)['state'],'MAIL_CONNECTION_REQUIRED');self.assertEqual(t.calls,0)
         t=MailTransport(True,True);self.assertEqual(reporter.send(r['id'],t)['state'],'DELIVERY_UNKNOWN');reporter.send(r['id'],t);self.assertEqual(t.calls,1)
+    def test_connector_report_is_queued_before_the_sender_wakes(self):
+        # Oct 15 2026: the Gmail sender woke at 8:58 and found nothing, because the report was built at 9:01.
+        self.s.db.execute("INSERT OR REPLACE INTO hunter_settings VALUES('mail_delivery',?)",(json.dumps({'mode':'gmail_connector'}),))
+        reporter=DailyReporter(self.s)
+        self.assertEqual(reporter.poll(datetime.fromisoformat('2026-10-15T12:29:00+00:00')),{'waiting':True})
+        r=reporter.poll(datetime.fromisoformat('2026-10-15T12:30:00+00:00'))
+        self.assertEqual((r['state'],r['local_date']),('CONNECTOR_PENDING','2026-10-15'))
+
     def test_report_schedule_dst_and_no_backlog(self):
         reporter=DailyReporter(self.s)
         with patch.object(reporter,'send',return_value={'state':'fixture'}) as send:

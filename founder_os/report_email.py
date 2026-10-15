@@ -16,6 +16,7 @@ CREDENTIAL_TARGET='AStoryFounderOS:DailyReport:gbao.n.vo@gmail.com'
 OWNER_ACCOUNT='gbao.n.vo@gmail.com'
 # The only mailboxes Founder OS may use. The owner Gmail password also sends the daily report.
 INBOX_ACCOUNTS=(OWNER_ACCOUNT,'bao@astoryapp.com')
+CONNECTOR_LEAD_MINUTES=30
 PENDING=('PENDING','MAIL_CONNECTION_REQUIRED','CONNECTOR_PENDING')
 
 class MailNotSent(PolicyError):
@@ -312,7 +313,10 @@ class DailyReporter:
         instant=instant or datetime.now(timezone.utc);schedule=self.schedule();auth=self.p.authorization('daily_email_report')
         if not auth or not schedule.get('enabled'):return {'paused':True}
         local=instant.astimezone(ZoneInfo(schedule['timezone']))
-        if (local.hour,local.minute)<(schedule['hour'],schedule['minute']):return {'waiting':True}
+        # The connected Gmail sender wakes at about 9:00, sometimes a minute or two early (Oct 15: 8:58).
+        # Queue the report half an hour ahead so it is always there when the sender looks.
+        lead=CONNECTOR_LEAD_MINUTES if self.h.settings().get('mail_delivery',{}).get('mode')=='gmail_connector' else 0
+        if local.hour*60+local.minute<schedule['hour']*60+schedule['minute']-lead:return {'waiting':True}
         r=self.prepare(instant)
         # Rebuild a blocked draft from current state after the mail account is connected.
         # Never send a backlog; only today's report is considered on each poll.
