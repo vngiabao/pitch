@@ -132,6 +132,15 @@ Rules: brown with yellow, or teal with yellow. Keep orange to a minimum. Never t
 - Photos as circular portraits or polaroid stacks with cream borders, never as decoration with no job.
 - Prefer figures, graphs, plots and tables over images. A meaningless image is worse than none.
 
+### 5c. Every slide must read without a presenter (Bao, Oct 15 2026)
+
+Decks get read alone: in an application portal, a forwarded PDF, an investor's inbox. A slide has to land with no one talking over it.
+
+- **On the slide:** the claim, stated plainly, plus the evidence or the one moment that shows it. A reader should get the point in a few seconds.
+- **In the speaker notes:** spoken punchlines, rhetorical turns, set-ups, callbacks and transitions ("Later rarely comes.", "Imagine being one click away…").
+- **Test:** cover the notes and read the slide cold. If the point depends on someone saying it, rewrite the slide line.
+- **Show, don't explain:** one universally lived moment (a text thread, a photo) beats a chart that explains. Match the effect of Bao's script, not its exact words.
+
 ## 6. Slide patterns that worked (reuse these)
 
 | Pattern | Where it worked | When to use |
