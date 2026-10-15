@@ -53,7 +53,7 @@ The order of argument, for any length. Short versions compress; they never reord
 - **Team:** two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Nhi Tran (CMO) appears only in Michigan Business Challenge materials.
 - **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. No arrows between those numbers, no conversion rates, never "paying customers".
 - **Product state:** live end to end (calls, family archive, photo uploads, billing), private beta on TestFlight, App Store release in review.
-- **Partners and programs:** NVIDIA Inception, AssemblyAI Startup Program and Cartesia Startups Grant are accepted. Hope College is interest only, never a partnership.
+- **Partners and programs:** NVIDIA Inception, AssemblyAI Startup Program and Cartesia Startups Grant are accepted. Hope College: many students want to buy A Story as a Thanksgiving gift for their grandparents. It is student interest only, never a college partnership.
 - **Write " - " (spaced short hyphen), never an em dash.** En dashes are fine in number ranges (7–10 minutes).
 - **No placeholders, internal notes, "illustrative" labels or photo disclaimers on slides.** Unknowns go in speaker notes.
 - **Urgency without fear.** Calm, warm and plain. No hype words, no "revolutionary", no "it's not X, it's Y" drama.
