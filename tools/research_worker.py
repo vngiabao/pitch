@@ -126,6 +126,8 @@ def claim_work(h,scheduled=False,manual=False):
         h.db.execute("UPDATE hunter_requests SET state='RUNNING',attempts=attempts+1 WHERE id=?",(due['id'],))
         return dict(due),token
 
+PROGRAM_PREFIX='Research program: '
+
 def research(h,request,probe=False):
     research_started_at=now()
     cli=resolve_cli(h)
@@ -160,6 +162,10 @@ def research(h,request,probe=False):
     if request['reason'].startswith('Research opportunity '):
         target=h.detail(request['reason'].split()[-1])
         bounded['targeted_opportunity']={k:target['data'][k] for k in ('canonical_name','organizer','official_url','application_url','cycle','status','dates')}
+    elif request['reason'].startswith(PROGRAM_PREFIX):
+        # Owner-named program with no record yet (e.g. one already applied to).
+        name,_,hint=request['reason'][len(PROGRAM_PREFIX):].partition(' | ')
+        bounded['targeted_program']={'name':name.strip(),'hint':hint.strip() or None}
     config=json.loads((ROOT/'funding-search-families.json').read_text(encoding='utf-8'))
     families=config['families']
     if request['reason']=='Daily free credits discovery':
@@ -172,6 +178,8 @@ def research(h,request,probe=False):
         config={**config,'families':families}
     contract=(ROOT/'FUNDING-HUNTER-RUNBOOK.md').read_text(encoding='utf-8')
     budget='This is a bounded live verification probe, not a full broad scan. Use only ONE public search query and ONE official program verification; return at most one opportunity. Do not report the deliberately narrow probe as a failure to cover all families.' if probe else 'Cover each of the '+str(len(families))+' configured search families with ONE query per family this run (maximum '+str(len(families))+' queries). Deduplicate results and deeply verify at most 8 promising programs. Prioritize non-dilutive cash (pitch competitions, grants, fellowships) with open deadlines, then free credits for the voice and LLM providers A Story already uses. Michigan and student-founder programs come first. Stay within 15 minutes; quality beats filling limits.'
+    if bounded.get('targeted_program'):
+        budget='This is targeted research for ONE owner-named program that has no record yet, not broad discovery. Use at most TWO search queries and THREE official source reads to find the official program page for targeted_program and its current or most recent cycle. Return only that program (or none if no official source exists). If no specific annual or cohort cycle label (for example a year or round name) is published, set cycle_kind to unknown or rolling as the source states; never annual or cohort with an unknown cycle. Do not report missing family coverage as an error.'
     if bounded.get('targeted_opportunity'):
         budget='This is a targeted re-verification, not broad discovery. Use at most ONE search query and TWO official source reads for targeted_opportunity. Return only that program; do not report missing family coverage as an error.'
     request_scope='If request_reason identifies an opportunity, focus on that program and verify changes. If it is a due-program recheck, focus on due_for_recheck. Otherwise perform broad discovery covering all eight families.'
@@ -207,7 +215,7 @@ def research(h,request,probe=False):
     batch['research_started_at']=research_started_at
     out.write_text(json.dumps(batch,ensure_ascii=False,indent=2),encoding='utf-8')
     if not tool_events:raise RuntimeError('SOURCE_UNAVAILABLE: no actual web-tool activity was recorded; observations cannot be verified')
-    targeted_evidence=bool(bounded.get('targeted_opportunity') and any(item.get('sources') for item in batch.get('opportunities',[])))
+    targeted_evidence=bool((bounded.get('targeted_opportunity') or bounded.get('targeted_program')) and any(item.get('sources') for item in batch.get('opportunities',[])))
     if not targeted_evidence and (not batch.get('queries') or not batch.get('candidates')):raise RuntimeError('RESEARCH_INCOMPLETE: no actual discovery results')
     report=h.runFundingHunter(batch,batch['request_key'])
     if batch['opportunities'] and not report['records_created'] and not report['records_updated']:

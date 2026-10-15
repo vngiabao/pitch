@@ -93,7 +93,7 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/autonomy':
                 from .application_pilot import ApplicationPilot
                 from .report_email import credential_present
-                result=ApplicationPilot(s).dashboard();delivery=h.settings().get('mail_delivery',{});result['mail_delivery']=delivery;result['mail_connected']=credential_present() or (delivery.get('mode')=='gmail_connector' and delivery.get('profile_verified') is True);result['report_schedule']=h.settings().get('daily_report',{});result['credits_schedule']=h.settings().get('credits_schedule',{})
+                result=ApplicationPilot(s).dashboard();delivery=h.settings().get('mail_delivery',{});result['mail_delivery']=delivery;smtp=credential_present();result['smtp_fallback_connected']=smtp;result['mail_connected']=smtp or (delivery.get('mode')=='gmail_connector' and delivery.get('profile_verified') is True);result['report_schedule']=h.settings().get('daily_report',{});result['credits_schedule']=h.settings().get('credits_schedule',{})
             elif route.startswith('/api/report/'):
                 from .application_pilot import ApplicationPilot
                 ApplicationPilot(s)

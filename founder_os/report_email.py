@@ -10,6 +10,10 @@ from .email_design import render_email,TEMPLATE_VERSION
 from .owner_links import founder_url
 
 CREDENTIAL_TARGET='AStoryFounderOS:DailyReport:gbao.n.vo@gmail.com'
+PENDING=('PENDING','MAIL_CONNECTION_REQUIRED','CONNECTOR_PENDING')
+
+class MailNotSent(PolicyError):
+    """Failed before any message data left this PC; safe to try again later."""
 class Credential(ctypes.Structure):
     _fields_=[('Flags',wintypes.DWORD),('Type',wintypes.DWORD),('TargetName',wintypes.LPWSTR),('Comment',wintypes.LPWSTR),('LastWritten',wintypes.FILETIME),('CredentialBlobSize',wintypes.DWORD),('CredentialBlob',ctypes.POINTER(ctypes.c_byte)),('Persist',wintypes.DWORD),('AttributeCount',wintypes.DWORD),('Attributes',ctypes.c_void_p),('TargetAlias',wintypes.LPWSTR),('UserName',wintypes.LPWSTR)]
 
@@ -49,9 +53,15 @@ class GmailTransport:
         for a in report.get('attachments',[]):
             if digest(a['content'].encode('utf-8'))!=a['sha256']:raise PolicyError('Attachment integrity mismatch')
             message.add_attachment(a['content'],subtype='plain',filename=a['filename'])
-        with smtplib.SMTP_SSL('smtp.gmail.com',465,timeout=30,context=ssl.create_default_context()) as smtp:
-            smtp.login('gbao.n.vo@gmail.com',secret);refused=smtp.send_message(message)
-        del secret
+        try:
+            smtp=smtplib.SMTP_SSL('smtp.gmail.com',465,timeout=30,context=ssl.create_default_context())
+            try:smtp.login('gbao.n.vo@gmail.com',secret)
+            except BaseException:smtp.close();raise
+        except smtplib.SMTPAuthenticationError:raise
+        except (OSError,smtplib.SMTPException) as e:raise MailNotSent('Gmail was unreachable before sending') from e
+        finally:del secret
+        # From here on, a failure leaves transmission uncertain.
+        with smtp as conn:refused=conn.send_message(message)
         if refused:raise PolicyError('The report recipient was refused')
         return {'accepted':True,'transport':'gmail_smtp_tls','message_id':message['Message-ID'],'recipient':report['recipient'],'delivery_note':'Gmail accepted the message; inbox delivery is not independently confirmed'}
 
@@ -173,11 +183,12 @@ class DailyReporter:
         auth=self.p.authorization('daily_email_report');r=self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
         if not auth or r['recipient']!=auth['payload']['recipient']:raise PolicyError('Daily-report authorization is paused or changed')
         if r['state'] in ('SENT','SENDING','DELIVERY_UNKNOWN'):return r
+        # State guards: the connector may claim between the read above and these writes.
         if transport is None and self.h.settings().get('mail_delivery',{}).get('mode')=='gmail_connector':
-            self.db.execute("UPDATE daily_reports SET state='CONNECTOR_PENDING',error='Queued for the connected Gmail scheduled sender' WHERE id=?",(rid,));return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
+            self.db.execute("UPDATE daily_reports SET state='CONNECTOR_PENDING',error='Queued for the connected Gmail scheduled sender' WHERE id=? AND state IN "+str(PENDING),(rid,));return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
         transport=transport or GmailTransport()
         if not transport.available():
-            self.db.execute("UPDATE daily_reports SET state='MAIL_CONNECTION_REQUIRED',error='Connect the local Gmail sender; report saved, no email sent' WHERE id=?",(rid,));return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
+            self.db.execute("UPDATE daily_reports SET state='MAIL_CONNECTION_REQUIRED',error='Connect the local Gmail sender; report saved, no email sent' WHERE id=? AND state IN "+str(PENDING),(rid,));return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
         with self.store.transaction():
             changed=self.db.execute("UPDATE daily_reports SET state='SENDING',error=NULL WHERE id=? AND state IN ('PENDING','MAIL_CONNECTION_REQUIRED','CONNECTOR_PENDING')",(rid,)).rowcount
             if not changed:return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
@@ -188,8 +199,43 @@ class DailyReporter:
             self.db.execute("UPDATE daily_reports SET state='SENT',sent_at=?,receipt_json=?,error=NULL WHERE id=?",(now(),js(receipt),rid));self.store.log('report.sent','daily_reporter',{'report_id':rid,'receipt':receipt})
         except smtplib.SMTPAuthenticationError:
             self.db.execute("UPDATE daily_reports SET state='MAIL_CONNECTION_REQUIRED',error='Gmail rejected the connection. Reconnect the local sender; no message was sent' WHERE id=?",(rid,))
+            self.store.log('report.smtp_auth_failed','daily_reporter',{'report_id':rid})
+        except MailNotSent:
+            self.db.execute("UPDATE daily_reports SET state=?,error='Gmail was unreachable before sending; no message was sent. Will try again.' WHERE id=?",(r['state'],rid))
         except Exception:
             self.db.execute("UPDATE daily_reports SET state='DELIVERY_UNKNOWN',error='Mail transmission failed or was uncertain; no automatic resend' WHERE id=?",(rid,))
+        return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
+
+    def fallback_due(self,instant):
+        """Owner-approved SMTP fallback for days the connected Gmail sender never claimed."""
+        fb=self.h.settings().get('mail_delivery',{}).get('smtp_fallback') or {}
+        if fb.get('enabled') is not True:return False
+        schedule=self.schedule();local=instant.astimezone(ZoneInfo(schedule['timezone']))
+        return local.hour*60+local.minute>=schedule['hour']*60+schedule['minute']+int(fb.get('after_minutes',30))
+
+    def fallback(self,rid,transport=None):
+        """Send a never-claimed report locally. Claimed, sent or uncertain reports are left alone."""
+        r=self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
+        if r['state']!='CONNECTOR_PENDING':return r
+        # One rejected app password stops the fallback for that day; no lockout loop.
+        if self.db.execute("SELECT 1 FROM audit WHERE event='report.smtp_auth_failed' AND json_extract(payload_json,'$.report_id')=?",(rid,)).fetchone():return r
+        transport=transport or GmailTransport()
+        if not transport.available():
+            self.db.execute("UPDATE daily_reports SET error='Connected Gmail sender has not sent yet; local fallback not connected (run Connect-Report-Email.ps1). No email sent.' WHERE id=? AND state='CONNECTOR_PENDING'",(rid,))
+            return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
+        self.store.log('report.smtp_fallback','daily_reporter',{'report_id':rid,'reason':'connected Gmail sender had not claimed by the fallback time'})
+        return self.send(rid,transport)
+
+    def supersede(self,rid,reason,actor='owner'):
+        """Close a past day's never-claimed report without sending it."""
+        if actor!='owner' or not reason.strip():raise PolicyError('Only the owner can supersede a report, with a reason')
+        r=self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
+        today=datetime.now(timezone.utc).astimezone(ZoneInfo(self.schedule()['timezone'])).date().isoformat()
+        if r['local_date']>=today:raise PolicyError('Only a past day report can be superseded')
+        with self.store.transaction():
+            if not self.db.execute("UPDATE daily_reports SET state='SUPERSEDED',error=? WHERE id=? AND state IN "+str(PENDING),('Not sent: '+reason,rid)).rowcount:
+                raise PolicyError('Report was claimed, sent or is uncertain; it cannot be superseded')
+            self.store.log('report.superseded',actor,{'report_id':rid,'local_date':r['local_date'],'reason':reason,'sent':False})
         return self.store.one('SELECT * FROM daily_reports WHERE id=?',(rid,))
 
     def poll(self,instant=None):
@@ -200,4 +246,6 @@ class DailyReporter:
         r=self.prepare(instant)
         # Rebuild a blocked draft from current state after the mail account is connected.
         # Never send a backlog; only today's report is considered on each poll.
-        return self.send(r['id'])
+        r=self.send(r['id'])
+        if r['state']=='CONNECTOR_PENDING' and self.fallback_due(instant):r=self.fallback(r['id'])
+        return r
