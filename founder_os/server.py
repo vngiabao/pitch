@@ -184,6 +184,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/approval':
                 if p.get('confirmed') is not True:raise PolicyError('Explicit confirmation needed')
                 s.decide(p['approval_id'],p['decision'],True,p.get('note','Founder decision in local command center'));result={'decided':True}
+            elif route=='/api/approval-edit':
+                if p.get('confirmed') is not True:raise PolicyError('Explicit confirmation needed')
+                result=h.owner_edit_claim(p['approval_id'],p.get('body',''))
             elif route=='/api/notification-read':
                 s.db.execute('UPDATE funding_notifications SET read_at=datetime(\'now\') WHERE id=?',(p['id'],));result={'read':True}
             else:return self.respond(404,{'error':'Action not available'})

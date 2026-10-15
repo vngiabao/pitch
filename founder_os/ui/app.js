@@ -115,7 +115,43 @@ function waitingCount(){return dash.needs_decision.length+(dash.inbox?dash.inbox
 function inboxAccounts(inbox){return `<ul class="tracker">${inbox.accounts.map(a=>`<li><span><strong>${E(a.account)}</strong><small class="tracker-sub">${a.connected?(a.last_checked?'Checked '+exactDate(a.last_checked):'Connected · first check within 5 minutes'):'Not connected'}${a.last_error?' · '+E(a.last_error):''}</small></span>${a.connected?tag('Read-only'):`<button data-action="connect-inbox" data-account="${E(a.account)}">Connect</button>`}</li>`).join('')}</ul>`;}
 function inboxItem(m){return `<div class="decision"><div class="section-title"><h3>${E(m.program||'Unmatched email')}</h3>${tag(m.state==='PROPOSED'?m.proposed_outcome:'Review')}</div><p class="small">${E(m.sender)} to ${E(m.account)} · ${exactDate(m.received_at)}</p><p><strong>${E(m.subject)}</strong></p><p class="small">${E(m.snippet)}</p>${m.reason?`<p class="small">${E(m.reason)}</p>`:''}<div class="actions">${m.opportunity_id?`<label>Record as <select data-outcome-for="${E(m.id)}">${OUTCOME_CHOICES.map(o=>`<option${o===m.proposed_outcome?' selected':''}>${o}</option>`).join('')}</select></label><button class="primary" data-action="inbox-confirm" data-id="${E(m.id)}">Confirm</button>`:'<a class="button" href="/opportunities">Find the program</a>'}<button data-action="inbox-dismiss" data-id="${E(m.id)}">Not relevant</button></div></div>`;}
 function inboxSection(inbox){if(!inbox)return '';return `<section class="section" aria-labelledby="inbox-title"><div class="section-title"><h2 id="inbox-title">From your inboxes</h2><a class="button" href="/api/tracker/export.csv">Export tracker (CSV)</a></div><p class="small">Founder OS reads these inboxes every 30 minutes, read-only, and proposes outcomes from program emails. Nothing is recorded until you confirm, and nothing in the mailbox is changed.</p>${inboxAccounts(inbox)}${inbox.pending.map(inboxItem).join('')||'<p class="empty">No new program emails to confirm.</p>'}</section>`;}
-async function decisions(){app.innerHTML=heading('Needs decision','Confirm what your inboxes show, and approve exact company claims only after checking the evidence.')+inboxSection(dash.inbox)+`<section class="section"><h2>Company facts</h2>${dash.needs_decision.map(a=>`<div class="decision">${proposalView(a)}<div class="actions"><button data-action="approve" data-id="${E(a.id)}" data-decision="approved">Approve this exact proposal</button><button data-action="approve" data-id="${E(a.id)}" data-decision="rejected">Reject proposal</button></div></div>`).join('')||'<p class="empty">No pending fact proposals.</p>'}</section>`;}
+const KIND_WORDS={APPROVE:'Approve',CHECK:'Check it is still true',ANSWER:'Needs your answer',REMINDER:'Reminder'};
+const factValue=v=>Array.isArray(v)?v.join(', '):typeof v==='boolean'?(v?'Yes':'No'):String(v);
+function factCard(a){
+ const c=a.card,reminder=c.kind==='REMINDER';
+ return `<article class="fact-card kind-${E(c.kind.toLowerCase())}" id="card-${E(a.id)}"><div class="fact-head"><span class="fact-topic">${E(prettyKey(c.topic||'company'))} · ${E(c.label)}</span><span class="fact-kind">${E(KIND_WORDS[c.kind]||c.kind)}</span></div>`+
+ `<p class="fact-sentence">${E(c.sentence)}</p><p class="fact-why">${E(c.why)}</p>`+
+ (c.unlocks.length?`<p class="fact-line"><strong>Approving lets the agents check</strong> ${E(c.unlocks.join(', '))}.</p>`:'')+
+ (c.replaces.length?`<p class="fact-line fact-replaces"><strong>Changes your current facts:</strong> ${c.replaces.map(r=>`${E(prettyKey(r.fact))} ${E(factValue(r.current))} → ${E(factValue(r.proposed))}`).join('; ')}</p>`:'')+
+ (c.source?`<details class="fact-source"><summary>Where this came from</summary><p class="small source-path">${E(c.source)}${c.locator?'<br>'+E(c.locator):''}</p></details>`:'')+
+ `<div class="actions">${reminder?`<button data-action="approve" data-id="${E(a.id)}" data-decision="rejected">Dismiss</button>`:`<button class="primary" data-action="approve" data-id="${E(a.id)}" data-decision="approved">Approve</button>${c.editable?`<button type="button" data-fact-edit="${E(a.id)}">Edit</button>`:''}<button data-action="approve" data-id="${E(a.id)}" data-decision="rejected">Reject</button>`}</div>`+
+ (c.editable&&!reminder?`<form class="fact-edit" data-id="${E(a.id)}" hidden><label for="edit-${E(a.id)}">Write it the way it is true</label><textarea id="edit-${E(a.id)}" name="body" required>${E(c.sentence)}</textarea><div class="actions"><button class="primary" type="submit">Save and approve</button><button type="button" data-fact-edit="${E(a.id)}">Cancel</button></div></form>`:'')+
+ `</article>`;
+}
+function recentDecisions(list){
+ if(!list||!list.length)return '';
+ return `<section class="decided" aria-labelledby="decided-title"><h2 id="decided-title">Recently decided</h2><ul class="tracker">${list.map(r=>`<li class="${r.state==='rejected'?'done':''}"><span><strong>${E(r.label)}</strong>${r.sentence&&!r.sentence.trim().startsWith('{')?`<small class="tracker-sub">${E(r.sentence)}</small>`:r.sentence?'<small class="tracker-sub">Company profile updated</small>':''}</span><span class="decided-meta">${tag(r.state==='approved'?'Approved':'Rejected')}<small>${E(new Date(r.decided_at).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/New_York'}))}</small></span></li>`).join('')}</ul></section>`;
+}
+async function decisions(){
+ const cards=dash.needs_decision.filter(a=>a.card),open=cards.filter(a=>a.card.kind!=='REMINDER'),reminders=cards.filter(a=>a.card.kind==='REMINDER'),inboxWaiting=dash.inbox?dash.inbox.proposed+dash.inbox.review:0;
+ app.innerHTML=heading('Decisions','Things only you can confirm. An approved fact is something the agents can rely on; nothing here is sent anywhere.')+
+ `<p class="state-line"><span><strong>${open.length}</strong> facts to confirm</span><span><strong>${inboxWaiting}</strong> from your inboxes</span><span><strong>${reminders.length}</strong> reminders</span></p>`+
+ `<section class="decision-group" aria-labelledby="facts-title"><div class="block-title"><h2 id="facts-title">Facts to confirm</h2></div>${open.map(factCard).join('')||'<p class="empty">Nothing to confirm. New facts from research, your notes or your inboxes will appear here.</p>'}</section>`+
+ inboxSection(dash.inbox)+
+ (reminders.length?`<section class="decision-group quiet" aria-labelledby="reminders-title"><div class="block-title"><h2 id="reminders-title">Reminders</h2></div><p class="block-note">Notes the agents keep in mind. They are not facts, so they can only be dismissed.</p>${reminders.map(factCard).join('')}</section>`:'')+
+ recentDecisions(dash.recent_decisions);
+}
+document.addEventListener('click',e=>{
+ const t=e.target.closest('[data-fact-edit]');if(!t)return;e.preventDefault();
+ const form=document.querySelector(`form.fact-edit[data-id="${CSS.escape(t.dataset.factEdit)}"]`);if(!form)return;
+ form.hidden=!form.hidden;if(!form.hidden){const ta=form.querySelector('textarea');ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}
+});
+document.addEventListener('submit',async e=>{
+ if(!e.target.classList.contains('fact-edit'))return;e.preventDefault();
+ const body=new FormData(e.target).get('body'),btn=e.target.querySelector('button[type=submit]');
+ if(!confirm('Save this wording as a confirmed company fact?'))return;btn.disabled=true;
+ try{await api('/api/approval-edit',{approval_id:e.target.dataset.id,body,confirmed:true});await boot();toast('Saved your wording as a confirmed fact.');}catch(err){toast(err.message,true);}finally{btn.disabled=false;}
+});
 function routeContext(){
  const path=location.pathname,parent=path.startsWith('/pitch/')?'/pitches':path.startsWith('/material/')?'/materials':path.startsWith('/application-review/')||path.startsWith('/application/')?'/applications':path.startsWith('/opportunity/')?'/opportunities':path.startsWith('/run/')?'/activity':path;
  const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions'};

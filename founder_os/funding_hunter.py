@@ -402,12 +402,22 @@ class FundingHunter:
         self.db.execute('INSERT OR IGNORE INTO hunter_requests(id,request_key,reason,state,created_at,run_id) VALUES(?,?,?,\'QUEUED\',?,NULL)',(rid,key,reason,now()))
         return {'request_id':rid,'state':'QUEUED','runner':self.settings()['runner']}
 
+    def _grounding_changed(self,current,previous):
+        """A brief needs re-grounding only when a fact it relied on changed value or disappeared, not when the owner re-confirmed the same value."""
+        if set(current)!=set(previous):return True
+        for key,vid in current.items():
+            if vid==previous[key]:continue
+            old=self.db.execute('SELECT value_json FROM company_fact_values WHERE claim_version_id=? AND fact_key=?',(previous[key],key)).fetchone()
+            new=self.db.execute('SELECT value_json FROM company_fact_values WHERE claim_version_id=? AND fact_key=?',(vid,key)).fetchone()
+            if not old or not new or json.loads(old[0])!=json.loads(new[0]):return True
+        return False
+
     def detail(self,oid):
         r=self.store.one('SELECT * FROM funding_intelligence WHERE opportunity_id=?',(oid,))
         data=json.loads(r.pop('data_json'));saved=json.loads(r.pop('analysis_json'))
         analysis=self.analyze(data,oid)
         brief=analysis.get('founder_brief');previous_brief=saved.get('founder_brief')
-        if brief and previous_brief and brief['company_fact_versions']!=previous_brief.get('company_fact_versions',{}):
+        if brief and previous_brief and self._grounding_changed(brief['company_fact_versions'],previous_brief.get('company_fact_versions',{})):
             brief['basis']='unknown';brief['grounding_changed']=True
         analysis['credits']=credits_report(data)
         r.update(data=data,analysis=analysis,saved_analysis=saved,history=self.store.rows('SELECT * FROM program_history WHERE program_id=?',(r['program_id'],)),applications=self.store.rows('SELECT * FROM applications WHERE opportunity_id=?',(oid,)),outcomes=self.store.rows('SELECT * FROM funding_outcomes WHERE opportunity_id=? ORDER BY occurred_at DESC',(oid,)),decisions=self.store.rows('SELECT * FROM funding_decisions WHERE opportunity_id=? ORDER BY created_at DESC',(oid,)),source_provenance=self.store.rows('SELECT s.* FROM funding_sources s JOIN funding_source_links l ON l.source_id=s.id WHERE l.opportunity_id=?',(oid,)))
@@ -477,6 +487,49 @@ class FundingHunter:
         self.db.execute('INSERT OR IGNORE INTO funding_outcomes VALUES(?,?,?,?,?,?,?,?,?,?)',(eid,oid,application_id,submission_id,outcome,source_version_id,clean_url(evidence_url),note,when,now()))
         return eid
 
+    UNLOCKS={'incorporated':'programs that require a legal entity','us_company':'US-only programs','incorporation_date':'company-age limits',
+             'uses_ai':'AI programs and AI credit grants','product_stage':'stage-specific programs','customer_type':'consumer-focused programs',
+             'business_type':'business-model tracks','industry':'industry tracks','team_size':'team-size limits','self_funded':'bootstrapped-only credits',
+             'institutional_equity_funding':'"no VC funding" programs','funding_stage':'stage-of-funding limits','location':'regional programs',
+             'headquarters':'regional programs','previous_programs':'programs that exclude or favor past participants','revenue_usd':'revenue limits',
+             'annual_revenue':'revenue limits','founded_date':'company-age limits','monetized_product':'revenue-stage programs'}
+
+    def review_card(self,pending,memory):
+        """Plain-language view of one pending proposal: what it says, what approving changes, and the agent's suggestion."""
+        p=pending.get('proposal') or {};payload=json.loads(pending['payload_json'])
+        values={v['fact_key']:json.loads(v['value_json']) for v in payload.get('structured_values',[])}
+        unlocks=list(dict.fromkeys(self.UNLOCKS.get(k,k.replace('_',' ')) for k in values))
+        replaces=[{'fact':k,'current':memory[k]['value'],'proposed':v} for k,v in values.items() if k in memory and memory[k]['value']!=v]
+        status=p.get('evidence_status')
+        if pending['action']!='promote_claim':kind,why='ANSWER','This needs your decision.'
+        elif status in ('hypothesis','unknown') and not values:kind,why='REMINDER','This is a reminder, not a fact. Dismiss it once handled.'
+        elif status=='verified':kind,why='APPROVE','Comes from your own confirmation or an official source.'
+        elif status=='reported':kind,why='CHECK','Reported in your materials but not verified. Approve only if it is still true.'
+        else:kind,why='ANSWER','The evidence is unclear. Edit it into a true sentence or reject it.'
+        return {'id':pending['id'],'kind':kind,'why':why,'label':p.get('label') or pending['action'].replace('_',' '),'topic':p.get('topic'),
+                'sentence':p.get('body') or pending.get('decision_needed'),'unlocks':unlocks,'replaces':replaces,'values':values,
+                'source':p.get('original_path'),'locator':p.get('locator'),'requested_at':pending.get('requested_at'),'editable':pending['action']=='promote_claim'}
+
+    def owner_edit_claim(self,approval_id,body):
+        """Save the owner's corrected wording as a verified fact, approve it, and retire the original proposal."""
+        body=(body or '').strip()
+        if not body or len(body)>2000:raise ValueError('Write the corrected fact in one to a few sentences.')
+        a=self.store.one('SELECT * FROM approvals WHERE id=?',(approval_id,))
+        if a['state']!='pending' or a['action']!='promote_claim':raise PolicyError('Only a pending fact proposal can be edited')
+        old=self.store.one('SELECT v.*,c.topic,c.label FROM claim_versions v JOIN claims c ON c.id=v.claim_id WHERE v.id=?',(json.loads(a['payload_json'])['version_id'],))
+        folder=Path(self.store.path).parent/'owner-attestations';folder.mkdir(exist_ok=True)
+        stamp=now();path=folder/('fact-edit-'+digest([approval_id,body,stamp])[:16]+'.txt')
+        statement=f'Owner edited and approved on {stamp} via Founder OS Decisions.\nTopic: {old["topic"]} - {old["label"]}\nFact: {body}\nReplaces proposal: {old["body"]}\n'
+        path.write_text(statement,encoding='utf-8')
+        sv=self.store.import_source(path,'owner_confirmation','CANONICAL',text=statement,extraction='owner_statement')
+        vid=self.store.propose_claim(old['topic'],old['label'],body,'verified',sv,'owner edit in Founder OS Decisions',claim_id=old['claim_id'],last_verified_at=stamp)
+        for v in self.store.rows('SELECT fact_key,value_json FROM company_fact_values WHERE claim_version_id=?',(old['id'],)):
+            self.attach_fact_value(vid,v['fact_key'],json.loads(v['value_json']))
+        self.store.decide(approval_id,'rejected',owner_confirmation=True,note='Replaced by the owner\'s edited wording')
+        new=self.store.request_approval('promote_claim',{'version_id':vid,'decision_needed':'Owner-edited fact'},actor='founder')
+        self.store.decide(new,'approved',owner_confirmation=True,note='Owner edited and approved in Founder OS')
+        return {'claim_version_id':vid,'approval_id':new}
+
     def owner_outcome(self,oid,outcome,note='',evidence_url=None,application_id=None):
         """Record an outcome the owner reports from the website. Their statement is kept as a dated source file."""
         if outcome not in ('Applied','Advanced','Finalist','Won','Rejected','Accepted','Withdrawn'):raise ValueError('Unknown outcome')
@@ -536,13 +589,20 @@ class FundingHunter:
     def dashboard(self):
         all_items=self.list('All');runs=self.store.rows('SELECT * FROM funding_runs ORDER BY COALESCE(completed_at,started_at) DESC LIMIT 8')
         for r in runs:r['report']=json.loads(r.pop('report_json'));r['usage']=json.loads(r.pop('usage_json'))
-        pending=self.store.rows("SELECT id,action,payload_json FROM approvals WHERE state='pending'")
+        pending=self.store.rows("SELECT id,action,payload_json,requested_at FROM approvals WHERE state='pending' ORDER BY requested_at")
         for p in pending:
             payload=json.loads(p['payload_json']);v=payload.get('version_id')
             if p['action']=='promote_claim' and v:
                 p['proposal']=self.store.one('SELECT c.label,c.topic,v.body,v.evidence_status,v.last_verified_at,v.locator,s.original_path FROM claim_versions v JOIN claims c ON c.id=v.claim_id JOIN source_versions sv ON sv.id=v.source_version_id JOIN sources s ON s.id=sv.source_id WHERE v.id=?',(v,))
             p['decision_needed']=payload.get('decision_needed','Review this exact proposal and its source before deciding.')
-        return {'needs_decision':pending,'company_memory':self.company_memory(),'opportunities':all_items,'money_board':self.money_board(all_items),'high_fit':[d for d in all_items if d['fit_score'] is not None and d['fit_score']>=80 and d['recommendation'] not in ('SKIP','EXPIRED','REJECTED')],'new_opportunities':[d for d in all_items if stamp(d['discovered_at'])>=datetime.now(timezone.utc)-timedelta(days=7)],'upcoming_deadlines':[d for d in all_items if d['analysis']['scoring']['dates']['days_remaining'] is not None and 0<=d['analysis']['scoring']['dates']['days_remaining']<=21 and d['recommendation'] not in ('EXPIRED','SKIP','REJECTED')],'agent_activity':runs,'notifications':self.store.rows('SELECT * FROM funding_notifications WHERE read_at IS NULL ORDER BY created_at DESC'),'requests':self.store.rows("SELECT * FROM hunter_requests WHERE state IN ('QUEUED','RUNNING')"),'settings':self.settings(),'learning':{'decisions':self.store.rows('SELECT decision,count(*) n FROM funding_decisions GROUP BY decision'),'outcomes':self.store.rows('SELECT outcome,count(*) n FROM funding_outcomes GROUP BY outcome'),'search_families':self.store.rows('SELECT family,count(*) candidates FROM funding_candidates GROUP BY family ORDER BY candidates DESC'),'scoring_changes':'No automatic weight changes; propose a versioned review after enough outcomes'}}
+        memory=self.company_memory()
+        for p in pending:p['card']=self.review_card(p,memory['attributes'])
+        recent=self.store.rows("SELECT a.id,a.action,a.state,a.decided_at,a.payload_json FROM approvals a WHERE a.state IN ('approved','rejected') AND a.decided_at IS NOT NULL ORDER BY a.decided_at DESC LIMIT 8")
+        for r in recent:
+            v=json.loads(r.pop('payload_json')).get('version_id')
+            row=self.store.one('SELECT c.label,v.body FROM claim_versions v JOIN claims c ON c.id=v.claim_id WHERE v.id=?',(v,)) if v and r['action']=='promote_claim' else None
+            r['label']=row['label'] if row else r['action'].replace('_',' ');r['sentence']=(row['body'] if row else '')[:240]
+        return {'needs_decision':pending,'recent_decisions':recent,'company_memory':memory,'opportunities':all_items,'money_board':self.money_board(all_items),'high_fit':[d for d in all_items if d['fit_score'] is not None and d['fit_score']>=80 and d['recommendation'] not in ('SKIP','EXPIRED','REJECTED')],'new_opportunities':[d for d in all_items if stamp(d['discovered_at'])>=datetime.now(timezone.utc)-timedelta(days=7)],'upcoming_deadlines':[d for d in all_items if d['analysis']['scoring']['dates']['days_remaining'] is not None and 0<=d['analysis']['scoring']['dates']['days_remaining']<=21 and d['recommendation'] not in ('EXPIRED','SKIP','REJECTED')],'agent_activity':runs,'notifications':self.store.rows('SELECT * FROM funding_notifications WHERE read_at IS NULL ORDER BY created_at DESC'),'requests':self.store.rows("SELECT * FROM hunter_requests WHERE state IN ('QUEUED','RUNNING')"),'settings':self.settings(),'learning':{'decisions':self.store.rows('SELECT decision,count(*) n FROM funding_decisions GROUP BY decision'),'outcomes':self.store.rows('SELECT outcome,count(*) n FROM funding_outcomes GROUP BY outcome'),'search_families':self.store.rows('SELECT family,count(*) candidates FROM funding_candidates GROUP BY family ORDER BY candidates DESC'),'scoring_changes':'No automatic weight changes; propose a versioned review after enough outcomes'}}
 
     def research_context(self):
         # Context is consumed locally by Codex. Public search queries must not contain these private facts.

@@ -53,6 +53,12 @@ class CurationTests(unittest.TestCase):
         oid=self.h.upsert(d)['opportunity_id'];self.assertEqual(len(self.h.daily_shortlist()),1)
         self.approve_fact('funding_stage','seed')
         self.assertEqual(self.h.detail(oid)['analysis']['founder_brief']['basis'],'unknown');self.assertEqual(self.h.daily_shortlist(),[])
+    def test_reconfirming_same_fact_value_keeps_brief(self):
+        self.approve_fact('funding_stage','bootstrapped')
+        d=self.record();d['founder_brief']=brief(d['official_url']);d['founder_brief'].update(basis='approved_memory',company_fact_keys=['funding_stage'])
+        oid=self.h.upsert(d)['opportunity_id']
+        self.approve_fact('funding_stage','bootstrapped')
+        self.assertNotEqual(self.h.detail(oid)['analysis']['founder_brief']['basis'],'unknown');self.assertEqual(len(self.h.daily_shortlist()),1)
     def test_source_capture_timestamp_tie_uses_newest_import(self):
         self.approve_fact('funding_stage','bootstrapped')
         captured=self.s.one('SELECT captured_at FROM source_versions WHERE id=?',(self.src,))['captured_at']
