@@ -132,6 +132,21 @@ Rules: brown with yellow, or teal with yellow. Keep orange to a minimum. Never t
 - Photos as circular portraits or polaroid stacks with cream borders, never as decoration with no job.
 - Prefer figures, graphs, plots and tables over images. A meaningless image is worse than none.
 
+### 5b. Full decks: one idea per slide (the Oct 15 redesign)
+
+The quadrant density above is for **condensed editions** (3 slides or fewer), where every slide carries a whole section. A **full deck** (one slide per idea, like the 20-slide master deck) follows ARTiculate's composition in the MBC palette. Bao's verdict on the first full deck: "the small text and organizing are very off" next to his 3-slide deck and ARTiculate. Nothing in a full deck should read like a web dashboard.
+
+- **One focal structure per slide:** a row of photo bubbles, a big circle, a feature table, a donut, or three stat circles. Not four or five boxes competing.
+- **Title only.** No pill label above the title. 58–64px, top-left at y 84, the plain part in brown and the key phrase in gold. One line where possible, two at most.
+- **Type scale (px):** 64 title · 40–54 statement · 96–190 hero number · 28–34 labels and card titles · 24–27 body · 20 for the single source line only. Never a grey sub-line under every item.
+- **Words:** about 40 visible words per slide, numbers excluded. Everything else goes in the speaker notes, which carry the script.
+- **Sources:** one line, 20px, bottom-left, starting with `*` (ARTiculate's style). The full links live in the notes and on A3.
+- **Bubbles do the work:** circular photos with cream borders for people and moments, circles for stats (to scale when they show a share), numbered teal dots for steps, check, cross, half and ? marks for comparisons.
+- **Competition** is a feature table: needs as teal pills on the left, one column per company with a header bubble, A Story's column outlined in teal, and the deciding row highlighted in gold.
+- **Bleed:** a hero shape (teal circle or band) may run off one edge. Leave 96px margins for everything else.
+- **One statement per slide:** a bottom or side line at 40–54px, or a gold-bordered highlight card. It carries Bao's line, e.g. "When those stories fade, we lose them a second time."
+- **Illustration:** the warm window illustration (grandmother on a call, `grandma-window.png`) is the deck's human anchor on the market slide. Any new illustration must match its palette and style. Never generic clip art.
+
 ## 6. Slide patterns that worked (reuse these)
 
 | Pattern | Where it worked | When to use |
@@ -160,6 +175,7 @@ Rules: brown with yellow, or teal with yellow. Keep orange to a minimum. Never t
 - Photo disclaimers, "illustrative" labels, page-count claims about the book, war-era framing ("we're not selling to Vietnam War veterans").
 - Moving the strong why-now slides into the appendix.
 - Bottom footer lines; page numbers anywhere except the bottom right.
+- In full decks: small grey sub-lines under every item, pill eyebrows stacked on long headlines, four to six boxes per slide, and per-card source footnotes ("the small text… still circulate around", Oct 15 2026).
 
 ## 8. Tailoring to a competition (Pitch Tailor)
 
