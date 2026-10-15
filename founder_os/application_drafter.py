@@ -247,13 +247,13 @@ def application_list(store):
     for a in store.rows('SELECT * FROM applications ORDER BY created_at DESC'):
         intel=store.db.execute('SELECT p.canonical_name,i.recommendation FROM funding_intelligence i JOIN funding_programs p ON p.id=i.program_id WHERE i.opportunity_id=?',(a['opportunity_id'],)).fetchone()
         if not intel:continue
-        try:rec=h.detail(a['opportunity_id'])['recommendation']
-        except Exception:rec=intel['recommendation']
+        try:d=h.detail(a['opportunity_id']);rec=d['recommendation'];url=d['data'].get('application_url') or d['data'].get('official_url')
+        except Exception:rec=intel['recommendation'];url=None
         outcome=store.db.execute('SELECT outcome FROM funding_outcomes WHERE opportunity_id=? ORDER BY occurred_at DESC,created_at DESC LIMIT 1',(a['opportunity_id'],)).fetchone()
         qs=store.db.execute('SELECT COUNT(*) FROM questions WHERE application_id=?',(a['id'],)).fetchone()[0]
         answered=store.db.execute("SELECT COUNT(DISTINCT q.id) FROM questions q JOIN answer_versions v ON v.question_id=q.id JOIN answer_reviews r ON r.version_id=v.id WHERE q.application_id=? AND r.status!='rejected'",(a['id'],)).fetchone()[0]
         out.append({'application_id':a['id'],'opportunity_id':a['opportunity_id'],'program':intel['canonical_name'],'questions':qs,'answered':answered,
-                    'outcome':outcome[0] if outcome else None,'access':access_status(store,a['opportunity_id'],rec,outcome[0] if outcome else None)})
+                    'outcome':outcome[0] if outcome else None,'url':url,'access':access_status(store,a['opportunity_id'],rec,outcome[0] if outcome else None)})
     order={'READY':0,'DRAFTING':1,'BLOCKED':2,'NOT_CHECKED':3,'FINISHED':4}
     return sorted(out,key=lambda x:(order.get(x['access']['level'],9),x['program']))
 
