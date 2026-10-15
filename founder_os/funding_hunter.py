@@ -12,7 +12,7 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 from .store import now, js, digest, uid, PolicyError
-from .hunter_policy import FACT_KEYS, WEIGHTS, SCORING_VERSION, evaluate_eligibility, score, recommend
+from .hunter_policy import FACT_KEYS, WEIGHTS, SCORING_VERSION, evaluate_eligibility, score, recommend, money_profile
 from .credit_policy import BENEFIT_KEYS,credits_report
 
 RECOMMENDATIONS={'APPLY NOW','PREPARE','WATCH','REVIEW','SKIP','EXPIRED','ALREADY APPLIED','REJECTED','ACCEPTED'}
@@ -284,7 +284,7 @@ class FundingHunter:
         hours=materials['estimated_hours']
         roi=round(((cash*probability) if cash is not None and probability is not None else credit_value)/hours,2) if hours and (credit_value is not None or cash is not None and probability is not None) else None
         from .opportunity_curation import assessed_brief
-        return {'eligibility':eligibility,'scoring':scoring,'materials':materials,'recommended_action':recommendation,'strategic_value':data['why_fit'],'time_cost':hours,'probability_estimate':{'historical_base_rate':probability,'a_story_probability':None},'roi':{'estimated_value_per_hour':roi,'currency':data['funding'].get('currency'),'basis':'Expected cash from published historical base rate or confirmed usable credits; does not equate headline credits with cash'},'company_fact_versions':{k:v['claim_version_id'] for k,v in facts.items()},'missing_company_facts':eligibility['missing'],'why_fit':data['why_fit'],'why_not_fit':data['why_not_fit'],'risks':data['risks'],'founder_brief':assessed_brief(data,facts)}
+        return {'eligibility':eligibility,'scoring':scoring,'materials':materials,'recommended_action':recommendation,'money':money_profile(data),'strategic_value':data['why_fit'],'time_cost':hours,'probability_estimate':{'historical_base_rate':probability,'a_story_probability':None},'roi':{'estimated_value_per_hour':roi,'currency':data['funding'].get('currency'),'basis':'Expected cash from published historical base rate or confirmed usable credits; does not equate headline credits with cash'},'company_fact_versions':{k:v['claim_version_id'] for k,v in facts.items()},'missing_company_facts':eligibility['missing'],'why_fit':data['why_fit'],'why_not_fit':data['why_not_fit'],'risks':data['risks'],'founder_brief':assessed_brief(data,facts)}
 
     def daily_shortlist(self,instant=None):
         from .opportunity_curation import shortlist
@@ -440,7 +440,8 @@ class FundingHunter:
             if filters.get('min_cash') and (d['data']['funding']['cash_prize_max'] is None or d['data']['funding']['cash_prize_max']<float(filters['min_cash'])):continue
             if filters.get('deadline_before') and (not d['data']['dates']['deadline'] or d['data']['dates']['deadline'][:10]>filters['deadline_before']):continue
             items.append(d)
-        return sorted(items,key=lambda d:(d['recommendation'] in ('EXPIRED','SKIP','REJECTED'),-((d['fit_score'] if d['fit_score'] is not None else d['analysis']['scoring']['upper_bound']) or 0),d['data']['dates']['deadline'] or '9999'))
+        # Unrated programs rank by their midpoint estimate; ranking by upper bound rewarded missing evidence.
+        return sorted(items,key=lambda d:(d['recommendation'] in ('EXPIRED','SKIP','REJECTED'),-(d['analysis']['scoring']['estimate'] or 0),d['data']['dates']['deadline'] or '9999'))
 
     def decide(self,oid,decision,reason,actor='owner'):
         if actor!='owner':raise PolicyError('Funding Hunter cannot impersonate the owner')
@@ -476,6 +477,30 @@ class FundingHunter:
         self.db.execute('INSERT OR IGNORE INTO funding_outcomes VALUES(?,?,?,?,?,?,?,?,?,?)',(eid,oid,application_id,submission_id,outcome,source_version_id,clean_url(evidence_url),note,when,now()))
         return eid
 
+    def money_board(self,items):
+        """Cash first, then credits; one row per program. Applied and decided programs move to the tracker."""
+        closed=('EXPIRED','SKIP','REJECTED','ACCEPTED','ALREADY APPLIED')
+        active=[d for d in items if d['recommendation'] not in closed and not d.get('superseded_by') and d['data']['status']!='CLOSED' and not (d['decisions'] and d['decisions'][0]['decision']=='SKIP')]
+        def unique(rows):
+            seen=set();out=[]
+            for d in rows:
+                if d['program_id'] in seen:continue
+                seen.add(d['program_id']);out.append(d)
+            return out
+        def due(d):
+            days=d['analysis']['scoring']['dates']['days_remaining']
+            return days if days is not None and days>=0 else 10**6
+        cash=sorted([d for d in active if d['analysis']['money']['kind'] in ('CASH','INVESTMENT')],key=lambda d:(due(d),-d['analysis']['money']['rank'],-(d['analysis']['scoring']['estimate'] or 0)))
+        from .opportunity_curation import PRIORITIES
+        priority=lambda d:PRIORITIES.get((d['analysis'].get('founder_brief') or {}).get('priority') or 'UNKNOWN',0)
+        credits=sorted([d for d in active if d['analysis']['money']['kind']=='CREDITS'],key=lambda d:(-priority(d),due(d),-(d['analysis']['scoring']['estimate'] or 0)))
+        tracked=self.store.rows('SELECT o.opportunity_id,o.outcome,o.evidence_note note,o.occurred_at,p.canonical_name FROM funding_outcomes o JOIN funding_intelligence i ON i.opportunity_id=o.opportunity_id JOIN funding_programs p ON p.id=i.program_id ORDER BY o.occurred_at DESC')
+        seen=set();applied=[]
+        for t in tracked:
+            if t['canonical_name'] in seen:continue
+            seen.add(t['canonical_name']);applied.append(t)
+        return {'cash':unique(cash),'credits':unique(credits),'tracked':applied}
+
     def dashboard(self):
         all_items=self.list('All');runs=self.store.rows('SELECT * FROM funding_runs ORDER BY COALESCE(completed_at,started_at) DESC LIMIT 8')
         for r in runs:r['report']=json.loads(r.pop('report_json'));r['usage']=json.loads(r.pop('usage_json'))
@@ -485,7 +510,7 @@ class FundingHunter:
             if p['action']=='promote_claim' and v:
                 p['proposal']=self.store.one('SELECT c.label,c.topic,v.body,v.evidence_status,v.last_verified_at,v.locator,s.original_path FROM claim_versions v JOIN claims c ON c.id=v.claim_id JOIN source_versions sv ON sv.id=v.source_version_id JOIN sources s ON s.id=sv.source_id WHERE v.id=?',(v,))
             p['decision_needed']=payload.get('decision_needed','Review this exact proposal and its source before deciding.')
-        return {'needs_decision':pending,'company_memory':self.company_memory(),'opportunities':all_items,'high_fit':[d for d in all_items if d['fit_score'] is not None and d['fit_score']>=80 and d['recommendation'] not in ('SKIP','EXPIRED','REJECTED')],'new_opportunities':[d for d in all_items if stamp(d['discovered_at'])>=datetime.now(timezone.utc)-timedelta(days=7)],'upcoming_deadlines':[d for d in all_items if d['analysis']['scoring']['dates']['days_remaining'] is not None and 0<=d['analysis']['scoring']['dates']['days_remaining']<=21 and d['recommendation'] not in ('EXPIRED','SKIP','REJECTED')],'agent_activity':runs,'notifications':self.store.rows('SELECT * FROM funding_notifications WHERE read_at IS NULL ORDER BY created_at DESC'),'requests':self.store.rows("SELECT * FROM hunter_requests WHERE state IN ('QUEUED','RUNNING')"),'settings':self.settings(),'learning':{'decisions':self.store.rows('SELECT decision,count(*) n FROM funding_decisions GROUP BY decision'),'outcomes':self.store.rows('SELECT outcome,count(*) n FROM funding_outcomes GROUP BY outcome'),'search_families':self.store.rows('SELECT family,count(*) candidates FROM funding_candidates GROUP BY family ORDER BY candidates DESC'),'scoring_changes':'No automatic weight changes; propose a versioned review after enough outcomes'}}
+        return {'needs_decision':pending,'company_memory':self.company_memory(),'opportunities':all_items,'money_board':self.money_board(all_items),'high_fit':[d for d in all_items if d['fit_score'] is not None and d['fit_score']>=80 and d['recommendation'] not in ('SKIP','EXPIRED','REJECTED')],'new_opportunities':[d for d in all_items if stamp(d['discovered_at'])>=datetime.now(timezone.utc)-timedelta(days=7)],'upcoming_deadlines':[d for d in all_items if d['analysis']['scoring']['dates']['days_remaining'] is not None and 0<=d['analysis']['scoring']['dates']['days_remaining']<=21 and d['recommendation'] not in ('EXPIRED','SKIP','REJECTED')],'agent_activity':runs,'notifications':self.store.rows('SELECT * FROM funding_notifications WHERE read_at IS NULL ORDER BY created_at DESC'),'requests':self.store.rows("SELECT * FROM hunter_requests WHERE state IN ('QUEUED','RUNNING')"),'settings':self.settings(),'learning':{'decisions':self.store.rows('SELECT decision,count(*) n FROM funding_decisions GROUP BY decision'),'outcomes':self.store.rows('SELECT outcome,count(*) n FROM funding_outcomes GROUP BY outcome'),'search_families':self.store.rows('SELECT family,count(*) candidates FROM funding_candidates GROUP BY family ORDER BY candidates DESC'),'scoring_changes':'No automatic weight changes; propose a versioned review after enough outcomes'}}
 
     def research_context(self):
         # Context is consumed locally by Codex. Public search queries must not contain these private facts.

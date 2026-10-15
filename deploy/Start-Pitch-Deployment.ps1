@@ -13,6 +13,16 @@ $Config = Get-Content -LiteralPath $AccessConfig -Raw | ConvertFrom-Json
 if ($Config.hostname -ne 'pitch.gbaonvo.com' -or $Config.team_domain -ne 'astoryapp.cloudflareaccess.com' -or $Config.email -ne 'gbao.n.vo@gmail.com' -or $Config.audience -notmatch '^[a-fA-F0-9]{64}$') {
     throw 'Deployment must use the reviewed hostname, team, owner email and exact Access audience.'
 }
+# Keep origin dependencies outside the Codex runtime, which can be replaced by app updates.
+$DependencyDir = Join-Path $env:USERPROFILE '.cache\astory-deployment\pylib'
+$env:PYTHONPATH = $DependencyDir
+& $BundledPython -c 'import jwt' 2>$null
+if ($LASTEXITCODE -ne 0) {
+    if ($CheckOnly) { throw "PyJWT is missing from $DependencyDir; run this script without -CheckOnly to install it." }
+    & $BundledPython -m pip install --quiet --disable-pip-version-check --target $DependencyDir -r (Join-Path $ProjectRoot 'requirements.txt')
+    & $BundledPython -c 'import jwt' 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "PyJWT could not be installed into $DependencyDir." }
+}
 if ($CheckOnly) { Write-Output 'Deployment files and owner-only configuration are ready.'; exit 0 }
 $DeploymentMutex = New-Object System.Threading.Mutex($false, 'Local\AStoryPitchDeployment')
 if (-not $DeploymentMutex.WaitOne(0)) { exit 0 }

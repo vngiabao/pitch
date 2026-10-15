@@ -1,405 +1,65 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-04T20:49:18.7246617Z",
-  "title": "Design System: A Story Founder OS",
+  "generatedAt": "2026-10-15T01:07:08.261604+00:00",
+  "title": "Design System: A Story Founder OS - Bookbound",
   "extensions": {
     "colorMeta": {
-      "accent": {
+      "navy": {
         "role": "primary",
-        "displayName": "Workspace Teal",
-        "tonalRamp": [
-          "oklch(0.150 0.0771 185.35)",
-          "oklch(0.264 0.0771 185.35)",
-          "oklch(0.379 0.0771 185.35)",
-          "oklch(0.493 0.0771 185.35)",
-          "oklch(0.607 0.0771 185.35)",
-          "oklch(0.721 0.0771 185.35)",
-          "oklch(0.836 0.0771 185.35)",
-          "oklch(0.950 0.0771 185.35)"
-        ]
-      },
-      "accent-hover": {
-        "role": "primary",
-        "displayName": "Deep Action Teal",
-        "tonalRamp": [
-          "oklch(0.150 0.0685 182.38)",
-          "oklch(0.264 0.0685 182.38)",
-          "oklch(0.379 0.0685 182.38)",
-          "oklch(0.493 0.0685 182.38)",
-          "oklch(0.607 0.0685 182.38)",
-          "oklch(0.721 0.0685 182.38)",
-          "oklch(0.836 0.0685 182.38)",
-          "oklch(0.950 0.0685 182.38)"
-        ]
-      },
-      "ink": {
-        "role": "neutral",
-        "displayName": "Workspace Ink",
-        "tonalRamp": [
-          "oklch(0.150 0.0192 232.37)",
-          "oklch(0.264 0.0192 232.37)",
-          "oklch(0.379 0.0192 232.37)",
-          "oklch(0.493 0.0192 232.37)",
-          "oklch(0.607 0.0192 232.37)",
-          "oklch(0.721 0.0192 232.37)",
-          "oklch(0.836 0.0192 232.37)",
-          "oklch(0.950 0.0192 232.37)"
-        ]
-      },
-      "muted": {
-        "role": "neutral",
-        "displayName": "Quiet Text",
-        "tonalRamp": [
-          "oklch(0.150 0.0188 211.08)",
-          "oklch(0.264 0.0188 211.08)",
-          "oklch(0.379 0.0188 211.08)",
-          "oklch(0.493 0.0188 211.08)",
-          "oklch(0.607 0.0188 211.08)",
-          "oklch(0.721 0.0188 211.08)",
-          "oklch(0.836 0.0188 211.08)",
-          "oklch(0.950 0.0188 211.08)"
-        ]
-      },
-      "line": {
-        "role": "neutral",
-        "displayName": "Fine Divider",
-        "tonalRamp": [
-          "oklch(0.150 0.0076 186.88)",
-          "oklch(0.264 0.0076 186.88)",
-          "oklch(0.379 0.0076 186.88)",
-          "oklch(0.493 0.0076 186.88)",
-          "oklch(0.607 0.0076 186.88)",
-          "oklch(0.721 0.0076 186.88)",
-          "oklch(0.836 0.0076 186.88)",
-          "oklch(0.950 0.0076 186.88)"
-        ]
-      },
-      "bg": {
-        "role": "neutral",
-        "displayName": "Cool Field",
-        "tonalRamp": [
-          "oklch(0.150 0.0017 247.84)",
-          "oklch(0.264 0.0017 247.84)",
-          "oklch(0.379 0.0017 247.84)",
-          "oklch(0.493 0.0017 247.84)",
-          "oklch(0.607 0.0017 247.84)",
-          "oklch(0.721 0.0017 247.84)",
-          "oklch(0.836 0.0017 247.84)",
-          "oklch(0.950 0.0017 247.84)"
-        ]
+        "displayName": "Michigan Navy Bookcloth"
       },
       "paper": {
         "role": "neutral",
-        "displayName": "White Paper",
-        "tonalRamp": [
-          "oklch(0.150 0.0000 0.00)",
-          "oklch(0.264 0.0000 0.00)",
-          "oklch(0.379 0.0000 0.00)",
-          "oklch(0.493 0.0000 0.00)",
-          "oklch(0.607 0.0000 0.00)",
-          "oklch(0.721 0.0000 0.00)",
-          "oklch(0.836 0.0000 0.00)",
-          "oklch(0.950 0.0000 0.00)"
-        ]
+        "displayName": "Warm Paper"
       },
-      "sidebar": {
-        "role": "neutral",
-        "displayName": "Soft Sidebar",
-        "tonalRamp": [
-          "oklch(0.150 0.0045 179.73)",
-          "oklch(0.264 0.0045 179.73)",
-          "oklch(0.379 0.0045 179.73)",
-          "oklch(0.493 0.0045 179.73)",
-          "oklch(0.607 0.0045 179.73)",
-          "oklch(0.721 0.0045 179.73)",
-          "oklch(0.836 0.0045 179.73)",
-          "oklch(0.950 0.0045 179.73)"
-        ]
+      "brass-text": {
+        "role": "accent",
+        "displayName": "Brass Figures"
       },
-      "nav-text": {
-        "role": "neutral",
-        "displayName": "Navigation Text",
-        "tonalRamp": [
-          "oklch(0.150 0.0212 187.71)",
-          "oklch(0.264 0.0212 187.71)",
-          "oklch(0.379 0.0212 187.71)",
-          "oklch(0.493 0.0212 187.71)",
-          "oklch(0.607 0.0212 187.71)",
-          "oklch(0.721 0.0212 187.71)",
-          "oklch(0.836 0.0212 187.71)",
-          "oklch(0.950 0.0212 187.71)"
-        ]
+      "maize": {
+        "role": "accent",
+        "displayName": "Maize Mark"
       },
-      "nav-hover": {
-        "role": "neutral",
-        "displayName": "Navigation Hover",
-        "tonalRamp": [
-          "oklch(0.150 0.0080 177.31)",
-          "oklch(0.264 0.0080 177.31)",
-          "oklch(0.379 0.0080 177.31)",
-          "oklch(0.493 0.0080 177.31)",
-          "oklch(0.607 0.0080 177.31)",
-          "oklch(0.721 0.0080 177.31)",
-          "oklch(0.836 0.0080 177.31)",
-          "oklch(0.950 0.0080 177.31)"
-        ]
+      "urgent": {
+        "role": "semantic",
+        "displayName": "Closing Oxblood"
       },
-      "positive-surface": {
-        "role": "primary",
-        "displayName": "Pale Teal State",
-        "tonalRamp": [
-          "oklch(0.150 0.0120 184.08)",
-          "oklch(0.264 0.0120 184.08)",
-          "oklch(0.379 0.0120 184.08)",
-          "oklch(0.493 0.0120 184.08)",
-          "oklch(0.607 0.0120 184.08)",
-          "oklch(0.721 0.0120 184.08)",
-          "oklch(0.836 0.0120 184.08)",
-          "oklch(0.950 0.0120 184.08)"
-        ]
-      },
-      "review-surface": {
-        "role": "neutral",
-        "displayName": "Warm Review Surface",
-        "tonalRamp": [
-          "oklch(0.150 0.0332 77.61)",
-          "oklch(0.264 0.0332 77.61)",
-          "oklch(0.379 0.0332 77.61)",
-          "oklch(0.493 0.0332 77.61)",
-          "oklch(0.607 0.0332 77.61)",
-          "oklch(0.721 0.0332 77.61)",
-          "oklch(0.836 0.0332 77.61)",
-          "oklch(0.950 0.0332 77.61)"
-        ]
-      },
-      "review-text": {
-        "role": "neutral",
-        "displayName": "Warm Review Text",
-        "tonalRamp": [
-          "oklch(0.150 0.0955 66.24)",
-          "oklch(0.264 0.0955 66.24)",
-          "oklch(0.379 0.0955 66.24)",
-          "oklch(0.493 0.0955 66.24)",
-          "oklch(0.607 0.0955 66.24)",
-          "oklch(0.721 0.0955 66.24)",
-          "oklch(0.836 0.0955 66.24)",
-          "oklch(0.950 0.0955 66.24)"
-        ]
-      },
-      "warn": {
-        "role": "neutral",
-        "displayName": "Verification Warning",
-        "tonalRamp": [
-          "oklch(0.150 0.0976 66.76)",
-          "oklch(0.264 0.0976 66.76)",
-          "oklch(0.379 0.0976 66.76)",
-          "oklch(0.493 0.0976 66.76)",
-          "oklch(0.607 0.0976 66.76)",
-          "oklch(0.721 0.0976 66.76)",
-          "oklch(0.836 0.0976 66.76)",
-          "oklch(0.950 0.0976 66.76)"
-        ]
-      },
-      "notice-surface": {
-        "role": "neutral",
-        "displayName": "Confirmation Notice Surface",
-        "tonalRamp": [
-          "oklch(0.150 0.0171 84.59)",
-          "oklch(0.264 0.0171 84.59)",
-          "oklch(0.379 0.0171 84.59)",
-          "oklch(0.493 0.0171 84.59)",
-          "oklch(0.607 0.0171 84.59)",
-          "oklch(0.721 0.0171 84.59)",
-          "oklch(0.836 0.0171 84.59)",
-          "oklch(0.950 0.0171 84.59)"
-        ]
-      },
-      "notice-line": {
-        "role": "neutral",
-        "displayName": "Confirmation Notice Border",
-        "tonalRamp": [
-          "oklch(0.150 0.0468 82.02)",
-          "oklch(0.264 0.0468 82.02)",
-          "oklch(0.379 0.0468 82.02)",
-          "oklch(0.493 0.0468 82.02)",
-          "oklch(0.607 0.0468 82.02)",
-          "oklch(0.721 0.0468 82.02)",
-          "oklch(0.836 0.0468 82.02)",
-          "oklch(0.950 0.0468 82.02)"
-        ]
-      },
-      "notice-text": {
-        "role": "neutral",
-        "displayName": "Confirmation Notice Text",
-        "tonalRamp": [
-          "oklch(0.150 0.0607 74.32)",
-          "oklch(0.264 0.0607 74.32)",
-          "oklch(0.379 0.0607 74.32)",
-          "oklch(0.493 0.0607 74.32)",
-          "oklch(0.607 0.0607 74.32)",
-          "oklch(0.721 0.0607 74.32)",
-          "oklch(0.836 0.0607 74.32)",
-          "oklch(0.950 0.0607 74.32)"
-        ]
+      "good": {
+        "role": "semantic",
+        "displayName": "Eligible Green"
       }
     },
-    "typographyMeta": {
-      "headline": {
-        "purpose": "Inherited interface headline; 26px on mobile.",
-        "displayName": "Page Heading"
-      },
-      "title": {
-        "purpose": "Work panel headings.",
-        "displayName": "Section Heading"
-      },
-      "body": {
-        "purpose": "Readable operating information with a 75ch paragraph cap.",
-        "displayName": "Body"
-      },
-      "control": {
-        "purpose": "Buttons and desktop navigation.",
-        "displayName": "Control"
-      },
-      "score": {
-        "purpose": "Tabular values and unresolved bounds.",
-        "displayName": "Fit Score"
-      },
-      "label": {
-        "purpose": "Quiet supporting labels; weight depends on context.",
-        "displayName": "Supporting Label"
-      }
-    },
-    "shadows": [],
-    "motion": [],
-    "breakpoints": [
-      {
-        "value": "1080px",
-        "name": "compact-desktop"
-      },
-      {
-        "value": "720px",
-        "name": "mobile"
-      }
-    ],
-    "previewNotes": [
-      "OKLCH tonal ramps are synthesized metadata for the panel, not implemented application colors. The frontmatter remains normative.",
-      "No authored shadows, transitions or animations exist in the final stylesheet.",
-      "Static sample values illustrate components and do not represent company or funding facts."
-    ]
+    "provenance": {
+      "source": "Owner's gbaonvo identity 'The Turn' (Personal Website/Final Ver/DESIGN.md)",
+      "fonts": "Mona Sans and Brygada 1918, SIL OFL, copied with licenses to founder_os/ui/fonts/",
+      "rasters": "none shipped"
+    }
   },
   "components": [
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "A compact teal action using the inherited control styles.",
-      "html": "<button class=\"ds-primary\">Run now</button>",
-      "css": ".ds-primary{font:600 14px/1.5 \"Segoe UI\",Arial,sans-serif;background:var(--accent,#176b63);color:var(--paper,#fff);border:1px solid var(--accent,#176b63);border-radius:7px;padding:9px 15px;cursor:pointer}.ds-primary:hover{background:#125950}.ds-primary:focus-visible{outline:2px solid var(--accent,#176b63);outline-offset:4px}.ds-primary:disabled{opacity:.55;cursor:wait}"
+      "description": "Navy pill; forward links add the maize arrow capsule.",
+      "html": "<a class=\"button go primary\" href=\"#\">Review proposals<span class=\"cap\">&rarr;</span></a>"
     },
     {
-      "name": "Secondary Button",
-      "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "White bordered action for supporting operations.",
-      "html": "<button class=\"ds-secondary\">Watch</button>",
-      "css": ".ds-secondary{font:600 14px/1.5 \"Segoe UI\",Arial,sans-serif;background:var(--paper,#fff);color:var(--ink,#182329);border:1px solid var(--line,#dee5e4);border-radius:7px;padding:9px 15px;cursor:pointer}.ds-secondary:hover{background:#edf1f0}.ds-secondary:focus-visible{outline:2px solid var(--accent,#176b63);outline-offset:4px}.ds-secondary:disabled{opacity:.55;cursor:wait}"
+      "name": "Money contents line",
+      "kind": "list-item",
+      "refersTo": "toc-row",
+      "description": "Program in Brygada, dotted leader, brass tabular amount, days-left hairline, status words.",
+      "html": "<li class=\"toc-row\"><span class=\"toc-title\"><a href=\"#\">Next Era Founders Fellowship</a></span><span class=\"toc-figure\">Up to $3,000</span><span class=\"toc-meta\"><span class=\"days\"><span class=\"days-bar\"></span>Closes in 52 days &middot; Dec 5</span><span>Eligibility unverified</span><span class=\"tag review\">REVIEW</span></span></li>"
     },
     {
-      "name": "View Buttons",
-      "kind": "button",
-      "refersTo": "view-button",
-      "description": "Wrapping opportunity views with tonal selected state; these are buttons, not ARIA tabs.",
-      "html": "<div class=\"ds-views\" role=\"group\" aria-label=\"Opportunity views\"><button class=\"ds-view ds-selected\">Recommended</button><button class=\"ds-view\">New</button></div>",
-      "css": ".ds-views{display:flex;gap:7px;flex-wrap:wrap;border-bottom:1px solid var(--line,#dee5e4);padding-bottom:11px}.ds-view{font:600 14px/1.5 \"Segoe UI\",Arial,sans-serif;border:0;border-radius:7px;background:transparent;color:var(--muted,#59686b);padding:7px 10px;cursor:pointer}.ds-view:hover{background:transparent}.ds-view.ds-selected{background:#e6f1ef;color:var(--accent,#176b63)}.ds-view:focus-visible{outline:2px solid var(--accent,#176b63);outline-offset:4px}"
-    },
-    {
-      "name": "Labeled Filter",
-      "kind": "input",
-      "refersTo": "input-filter",
-      "description": "Native labeled numeric filter with teal keyboard focus.",
-      "html": "<label class=\"ds-filter\">Minimum fit<input class=\"ds-input\" type=\"number\" min=\"0\" max=\"100\" placeholder=\"Any\"></label>",
-      "css": ".ds-filter{display:grid;gap:4px;font:12px/1.5 \"Segoe UI\",Arial,sans-serif;color:var(--muted,#59686b)}.ds-input{font:15px/1.5 \"Segoe UI\",Arial,sans-serif;background:var(--paper,#fff);color:var(--ink,#182329);border:1px solid var(--line,#dee5e4);border-radius:6px;padding:7px 9px;min-width:110px;max-width:170px;caret-color:var(--accent,#176b63)}.ds-input:focus-visible{outline:2px solid var(--accent,#176b63);outline-offset:4px}"
-    },
-    {
-      "name": "Sidebar Navigation",
-      "kind": "nav",
-      "refersTo": "nav-link",
-      "description": "Tonal navigation with visual selected state; no aria-current behavior is implied.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Founder OS\"><a class=\"ds-link ds-active\" href=\"#\">Command center</a><a class=\"ds-link\" href=\"#\">Opportunities</a></nav>",
-      "css": ".ds-nav{display:grid;gap:4px;background:#edf1f0;padding:10px}.ds-link{font:600 14px/1.5 \"Segoe UI\",Arial,sans-serif;color:#4a5b59;padding:11px 12px;border-radius:8px;text-decoration:none}.ds-link:hover{background:#e1e8e6}.ds-link.ds-active{background:var(--paper,#fff);color:var(--accent,#176b63)}.ds-link:focus-visible{outline:2px solid var(--accent,#176b63);outline-offset:4px}@media(max-width:720px){.ds-nav{display:flex;overflow:auto}.ds-link{white-space:nowrap;font-size:12px;padding:8px 10px}}"
-    },
-    {
-      "name": "Review Tag",
-      "kind": "chip",
-      "refersTo": "tag-review",
-      "description": "Warm textual recommendation marker.",
-      "html": "<span class=\"ds-review\">REVIEW</span>",
-      "css": ".ds-review{display:inline-block;font:700 11px/1.5 \"Segoe UI\",Arial,sans-serif;letter-spacing:.025em;white-space:nowrap;padding:4px 7px;border-radius:4px;background:#fff0da;color:#805015}"
-    },
-    {
-      "name": "Positive Tag",
-      "kind": "chip",
-      "refersTo": "tag-positive",
-      "description": "Pale teal textual recommendation marker.",
-      "html": "<span class=\"ds-positive\">PREPARE</span>",
-      "css": ".ds-positive{display:inline-block;font:700 11px/1.5 \"Segoe UI\",Arial,sans-serif;letter-spacing:.025em;white-space:nowrap;padding:4px 7px;border-radius:4px;background:#e6f1ef;color:var(--accent,#176b63)}"
-    },
-    {
-      "name": "Work Panel",
-      "kind": "card",
-      "refersTo": "panel",
-      "description": "Flat white bordered container for operating information.",
-      "html": "<section class=\"ds-panel\"><h2 class=\"ds-title\">Sources &amp; verification</h2><p class=\"ds-text\">Current official verification is pending.</p></section>",
-      "css": ".ds-panel{background:var(--paper,#fff);color:var(--ink,#182329);border:1px solid var(--line,#dee5e4);border-radius:var(--radius,10px);padding:24px;margin-bottom:24px;font:15px/1.5 \"Segoe UI\",Arial,sans-serif}.ds-title{font-size:20px;line-height:1.3;margin:0 0 14px}.ds-text{color:var(--muted,#59686b);margin:0;max-width:75ch}@media(max-width:720px){.ds-panel{padding:18px}}"
-    },
-    {
-      "name": "Unresolved Fit",
-      "kind": "custom",
-      "description": "An honest fit range with self-contained meaning on desktop and mobile. The sample is illustrative only.",
-      "html": "<span class=\"ds-score\">20–80<small class=\"ds-caption\">A Story fit · unresolved / 100<br>Range includes unknown points</small></span>",
-      "css": ".ds-score{font:650 20px/1.25 \"Segoe UI\",Arial,sans-serif;color:var(--ink,#182329);font-variant-numeric:tabular-nums}.ds-caption{display:block;font-size:11px;font-weight:400;color:var(--muted,#59686b)}"
+      "name": "Stage strip",
+      "kind": "progress",
+      "refersTo": "stages",
+      "description": "Fixed-scale Found, Preparing, Applied, Decided.",
+      "html": "<ol class=\"stages\"><li class=\"reached current\">Found</li><li>Preparing</li><li>Applied</li><li>Decided</li></ol>"
     }
   ],
   "narrative": {
-    "northStar": "Inherited Pitch OS workspace",
-    "overview": "This is a scan of the finished Founder OS interface, preserving the established Pitch OS teal, light surfaces, sans typography and sidebar. The name describes the incumbent system; it does not introduce a new identity or an approved creative metaphor.\n\nThe interface uses flat work panels, compact data rows and readable labels. Brand expression comes from the teal actions and the A Story mark. Recommendation, uncertainty and evidence are presented as working information alongside the controls that act on them.",
-    "keyCharacteristics": [
-      "Teal actions on a light neutral workspace.",
-      "Flat, bordered white work panels.",
-      "A compact sans hierarchy with aligned numerals.",
-      "Status words and explicit uncertainty alongside values.",
-      "Sidebar navigation that becomes a horizontal mobile strip."
-    ],
-    "rules": [
-      {
-        "name": "The Status Words Rule",
-        "body": "Color supports readable status text; eligibility remains labeled Meets, Fails or Unknown.",
-        "section": "colors"
-      },
-      {
-        "name": "The Flat Workspace Rule",
-        "body": "Reuse the existing tonal surfaces and fine borders when extending this workspace.",
-        "section": "elevation"
-      },
-      {
-        "name": "The Visible Uncertainty Rule",
-        "body": "Keep unknown fit, eligibility, readiness, effort and usable value explicit in the relevant working component.",
-        "section": "components"
-      }
-    ],
-    "dos": [
-      "**Do** preserve the inherited teal, ink, light field, white panels and cool sidebar.",
-      "**Do** keep supporting status text beside semantic colors.",
-      "**Do** preserve unknown values, score ranges and the explanation of unresolved points.",
-      "**Do** show readable evidence dates while retaining exact timestamps.",
-      "**Do** keep owner proposal wording and the internal draft boundary visible beside the action.",
-      "**Do** retain visible keyboard focus, labeled fields and live action feedback."
-    ],
-    "donts": [
-      "**Don't** promote advertised benefits into confirmed usable value.",
-      "**Don't** hide uncertainty when replacing a table with mobile records.",
-      "**Don't** treat a design review as evidence that research or scheduling runs correctly.",
-      "**Don't** introduce a new brand identity or decorative display face into this ordinary extension."
-    ]
+    "northStar": "A founder's working book",
+    "overview": "Operate surface in the owner's gbaonvo identity: navy bookcloth rail, warm paper, brass money figures and a money table of contents on Today. Replaced the inherited teal Pitch OS system on 2026-10-14."
   }
 }

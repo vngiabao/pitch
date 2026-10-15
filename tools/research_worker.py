@@ -163,10 +163,15 @@ def research(h,request,probe=False):
     config=json.loads((ROOT/'funding-search-families.json').read_text(encoding='utf-8'))
     families=config['families']
     if request['reason']=='Daily free credits discovery':
-        families={k:v for k,v in families.items() if k in ('cloud_credits','voice_credits','creative_credits','bootstrap_credits')}
+        # Daily scan: two cash families and two credit families, rotating so every family is covered within three days.
+        day=datetime.now(timezone.utc).date().toordinal()
+        cash=('pitch_competitions','grants','michigan','midwest','vertical','ai_programs')
+        credit=('voice_credits','bootstrap_credits','cloud_credits','creative_credits')
+        chosen={cash[(2*day)%len(cash)],cash[(2*day+1)%len(cash)],credit[(2*day)%len(credit)],credit[(2*day+1)%len(credit)]}
+        families={k:v for k,v in families.items() if k in chosen}
         config={**config,'families':families}
     contract=(ROOT/'FUNDING-HUNTER-RUNBOOK.md').read_text(encoding='utf-8')
-    budget='This is a bounded live verification probe, not a full broad scan. Use only ONE public search query and ONE official program verification; return at most one opportunity. Do not report the deliberately narrow probe as a failure to cover all families.' if probe else 'Cover each of the '+str(len(families))+' configured search families with ONE query per family this run (maximum '+str(len(families))+' queries). Deduplicate results and deeply verify at most 8 promising programs. Prioritize free bootstrapped cloud/API/voice/creative credits alongside Michigan opportunities. Stay within 15 minutes; quality beats filling limits.'
+    budget='This is a bounded live verification probe, not a full broad scan. Use only ONE public search query and ONE official program verification; return at most one opportunity. Do not report the deliberately narrow probe as a failure to cover all families.' if probe else 'Cover each of the '+str(len(families))+' configured search families with ONE query per family this run (maximum '+str(len(families))+' queries). Deduplicate results and deeply verify at most 8 promising programs. Prioritize non-dilutive cash (pitch competitions, grants, fellowships) with open deadlines, then free credits for the voice and LLM providers A Story already uses. Michigan and student-founder programs come first. Stay within 15 minutes; quality beats filling limits.'
     if bounded.get('targeted_opportunity'):
         budget='This is a targeted re-verification, not broad discovery. Use at most ONE search query and TWO official source reads for targeted_opportunity. Return only that program; do not report missing family coverage as an error.'
     request_scope='If request_reason identifies an opportunity, focus on that program and verify changes. If it is a due-program recheck, focus on due_for_recheck. Otherwise perform broad discovery covering all eight families.'

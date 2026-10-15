@@ -94,7 +94,7 @@ class HunterTests(unittest.TestCase):
         r=self.h.upsert(d)
         self.assertIsNone(self.h.detail(r['opportunity_id'])['analysis']['scoring']['components']['value']['points'])
     def test_date_only_does_not_invent_time(self):
-        today=datetime.now(timezone.utc).date().isoformat()
+        from zoneinfo import ZoneInfo;today=datetime.now(ZoneInfo('America/New_York')).date().isoformat()
         r=date_info(today)
         self.assertFalse(r['expired']);self.assertEqual(r['precision'],'date_only');self.assertEqual(r['days_remaining'],0)
     def test_missing_timezone_exact_deadline_not_urgent(self):

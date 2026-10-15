@@ -43,6 +43,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.respond(200,html.encode(),'text/html',True)
         if route in ('/app.js','/pitch.js','/style.css'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
+        if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
+            return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
         if not self._authorized():return self.respond(403,{'error':'Open the Founder OS command center first'})
         s=Store(self.server.db_path)
         try:

@@ -74,9 +74,11 @@ def shortlist(items, limit=5, instant=None):
         days = d['analysis']['scoring']['dates']['days_remaining']
         action = d['recommendation'] in ('APPLY NOW', 'PREPARE') and d['analysis']['eligibility']['status'] == 'ELIGIBLE'
         hours = d['analysis']['materials']['estimated_hours']
-        return (int(action), d['fit_score'] if d['fit_score'] is not None else -1,
+        money = (d['analysis'].get('money') or {}).get('rank', 0)
+        # A closing deadline and real cash outrank editorial product relevance.
+        return (int(action), int(days is not None and 0 <= days <= 21), money,
+                d['fit_score'] if d['fit_score'] is not None else -1,
                 PRIORITIES[b['priority']], int(b['basis'] == 'approved_memory'),
-                int(days is not None and 0 <= days <= 21),
                 -(hours if hours is not None else 1000), d['last_verified'], d['opportunity_id'])
 
     # One underlying program per email; real future annual cycles stay in the DB.

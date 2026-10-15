@@ -1,240 +1,176 @@
 ---
-name: A Story Founder OS
-description: The inherited Pitch OS visual system as implemented in the local Founder workspace.
+name: A Story Founder OS - Bookbound
+description: A founder's working book in the owner's gbaonvo identity. Navy bookcloth rail, warm paper, brass figures, and a money table of contents.
 colors:
-  accent: "#176b63"
-  accent-hover: "#125950"
-  ink: "#182329"
-  muted: "#59686b"
-  line: "#dee5e4"
-  bg: "#f8f9fa"
-  paper: "#fff"
-  sidebar: "#edf1f0"
-  nav-text: "#4a5b59"
-  nav-hover: "#e1e8e6"
-  positive-surface: "#e6f1ef"
-  review-surface: "#fff0da"
-  review-text: "#805015"
-  warn: "#855417"
-  notice-surface: "#fff9ed"
-  notice-line: "#ead8b8"
-  notice-text: "#654c29"
+  navy: "oklch(27.1% 0.080 252)"
+  navy-2: "oklch(32.9% 0.093 254)"
+  navy-3: "oklch(38% 0.085 254)"
+  ink: "oklch(24.7% 0.050 251)"
+  paper: "oklch(95.9% 0.013 87)"
+  paper-2: "oklch(92.3% 0.021 86)"
+  soft: "oklch(98.0% 0.010 87)"
+  stone: "oklch(87.3% 0.025 83)"
+  muted: "oklch(48.0% 0.024 251)"
+  brass: "oklch(64.5% 0.124 80)"
+  brass-text: "oklch(48.0% 0.092 78)"
+  maize: "oklch(82.5% 0.120 86)"
+  maize-wash: "oklch(93.5% 0.050 88)"
+  rail-text: "oklch(86.3% 0.020 253)"
+  rail-quiet: "oklch(70% 0.030 253)"
+  rail-line: "oklch(86.3% 0.020 253 / .3)"
+  urgent: "oklch(43.5% 0.129 33)"
+  urgent-wash: "oklch(94% 0.030 40)"
+  good: "oklch(47.8% 0.083 157)"
+  good-wash: "oklch(94% 0.030 157)"
+  line: "oklch(24.7% 0.050 251 / .13)"
+  line-strong: "oklch(24.7% 0.050 251 / .24)"
 typography:
-  headline:
-    fontFamily: "Segoe UI, Arial, sans-serif"
-    fontSize: "30px"
-    fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: "-0.035em"
-  title:
-    fontFamily: "Segoe UI, Arial, sans-serif"
-    fontSize: "20px"
-    fontWeight: 700
-    lineHeight: 1.3
-  body:
-    fontFamily: "Segoe UI, Arial, sans-serif"
-    fontSize: "15px"
+  display:
+    fontFamily: "'Brygada 1918', 'Iowan Old Style', Georgia, serif"
+    fontSize: "2.25rem"
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.12
+    letterSpacing: "-0.012em"
+  title:
+    fontFamily: "'Brygada 1918', 'Iowan Old Style', Georgia, serif"
+    fontSize: "1.625rem"
+    fontWeight: 400
+    lineHeight: 1.2
+  body:
+    fontFamily: "'Mona Sans', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 400
+    lineHeight: 1.55
   control:
-    fontFamily: "Segoe UI, Arial, sans-serif"
-    fontSize: "14px"
-    fontWeight: 600
-    lineHeight: 1.5
-  score:
-    fontFamily: "Segoe UI, Arial, sans-serif"
-    fontSize: "20px"
-    fontWeight: 650
-    lineHeight: 1.25
+    fontFamily: "'Mona Sans', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 560
   label:
-    fontFamily: "Segoe UI, Arial, sans-serif"
-    fontSize: "12px"
-    lineHeight: 1.5
+    fontFamily: "'Mona Sans', 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "0.75rem"
+    fontWeight: 600
+  wordmark:
+    fontFamily: "'Brygada 1918', 'Iowan Old Style', Georgia, serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
+    letterSpacing: ".14em"
 rounded:
-  tag: "4px"
-  field: "6px"
-  button: "7px"
-  navigation: "8px"
-  surface: "10px"
+  hairline: "2px"
+  nav: "8px"
+  field: "10px"
+  panel: "14px"
+  pill: "999px"
 spacing:
-  compact: "4px"
-  control-gap: "9px"
-  field-gap: "12px"
-  panel-mobile: "18px"
-  panel: "24px"
+  1: "4px"
+  2: "8px"
+  3: "12px"
+  4: "16px"
+  5: "20px"
+  6: "24px"
+  8: "32px"
+  10: "40px"
+  12: "48px"
+  16: "64px"
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.paper}"
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.soft}"
     typography: "{typography.control}"
-    rounded: "{rounded.button}"
-    padding: "9px 15px"
-  button-primary-hover:
-    backgroundColor: "{colors.accent-hover}"
-    textColor: "{colors.paper}"
+    rounded: "{rounded.pill}"
+    padding: "8px 18px"
   button-secondary:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.soft}"
+    textColor: "{colors.navy}"
     typography: "{typography.control}"
-    rounded: "{rounded.button}"
-    padding: "9px 15px"
-  view-button:
-    backgroundColor: "transparent"
-    textColor: "{colors.muted}"
-    typography: "{typography.control}"
-    rounded: "{rounded.button}"
-    padding: "7px 10px"
-  view-button-selected:
-    backgroundColor: "{colors.positive-surface}"
-    textColor: "{colors.accent}"
-  input-filter:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.field}"
-    padding: "7px 9px"
-  nav-link:
-    textColor: "{colors.nav-text}"
-    typography: "{typography.control}"
-    rounded: "{rounded.navigation}"
-    padding: "11px 12px"
-  nav-link-selected:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.accent}"
+    rounded: "{rounded.pill}"
+    padding: "8px 18px"
+  arrow-capsule:
+    backgroundColor: "{colors.maize}"
+    textColor: "{colors.navy}"
+    rounded: "{rounded.pill}"
+  nav-link-active:
+    backgroundColor: "{colors.navy-3}"
+    textColor: "{colors.soft}"
+    rounded: "{rounded.nav}"
   tag-review:
-    backgroundColor: "{colors.review-surface}"
-    textColor: "{colors.review-text}"
-    rounded: "{rounded.tag}"
-    padding: "4px 7px"
-  tag-positive:
-    backgroundColor: "{colors.positive-surface}"
-    textColor: "{colors.accent}"
-    rounded: "{rounded.tag}"
-    padding: "4px 7px"
+    backgroundColor: "{colors.maize-wash}"
+    textColor: "{colors.brass-text}"
+    rounded: "{rounded.pill}"
+  tag-urgent:
+    backgroundColor: "{colors.urgent-wash}"
+    textColor: "{colors.urgent}"
+    rounded: "{rounded.pill}"
   panel:
-    backgroundColor: "{colors.paper}"
-    rounded: "{rounded.surface}"
+    backgroundColor: "{colors.soft}"
+    rounded: "{rounded.panel}"
     padding: "24px"
 ---
 
-# Design System: A Story Founder OS
+# Design System: A Story Founder OS - Bookbound
 
 ## Overview
 
-**Creative North Star: "Inherited Pitch OS workspace"**
+**Creative North Star: "A founder's working book"**
 
-This is a scan of the finished Founder OS interface, preserving the established Pitch OS teal, light surfaces, sans typography and sidebar. The name describes the incumbent system; it does not introduce a new identity or an approved creative metaphor.
+Founder OS is Bao's private command center at pitch.gbaonvo.com, so it wears his gbaonvo identity ("The Turn"): Michigan navy, warm paper, brass and maize, the open-folio mark, Mona Sans and Brygada 1918. It is an Operate surface. The world lends type, palette, density and one signature move; navigation, tables, tabs and forms stay standard web controls.
 
-The interface uses flat work panels, compact data rows and readable labels. Brand expression comes from the teal actions and the A Story mark. Recommendation, uncertainty and evidence are presented as working information alongside the controls that act on them.
+The signature move is the **money table of contents** on Today: each program is a contents line, with the name in Brygada, a dotted leader, and the amount right-aligned in brass tabular figures. Below it sit days-left words and a hairline whose length is the time remaining. Cash programs come first, soonest deadline first. Credits are a separate list. Finished programs move to the Applied & tracked list and print faded.
+
+Replaced on October 14, 2026: the inherited Pitch OS teal and Segoe UI system. That system's records, routes, approvals and evidence rules are unchanged.
 
 **Key Characteristics:**
-- Teal actions on a light neutral workspace.
-- Flat, bordered white work panels.
-- A compact sans hierarchy with aligned numerals.
-- Status words and explicit uncertainty alongside values.
-- Sidebar navigation that becomes a horizontal mobile strip.
+- A navy bookcloth rail with a maize active mark, on a warm paper ground.
+- Brygada 1918 (always roman) for page titles, program names and the wordmark; Mona Sans for everything you read or press.
+- Tabular brass figures for money. Unknown amounts stay as words.
+- Hairline rules and soft paper panels, with no shadows.
+- One fixed-scale stage strip on every opportunity: Found, Preparing, Applied, Decided.
 
 ## Colors
 
-The palette has one brand accent, cool neutrals and warm semantic review surfaces. The frontmatter records the implemented values; no secondary brand palette is inferred.
+Restrained-committed: the navy rail owns the left of every screen; paper owns the work area; colour elsewhere does jobs.
 
-### Primary
-- **Workspace Teal** (`accent`): primary actions, links, current navigation text, focus outlines and confirmed state text.
-- **Deep Action Teal** (`accent-hover`): primary button hover.
-- **Pale Teal State** (`positive-surface`): selected view buttons, positive recommendation tags and successful feedback.
-
-### Neutral
-- **Workspace Ink** (`ink`): headings, main content and secondary actions.
-- **Quiet Text** (`muted`): supporting dates, labels and explanatory text.
-- **Cool Field** (`bg`) and **White Paper** (`paper`): page ground and work panels.
-- **Soft Sidebar** (`sidebar`): navigation ground, secondary hover, quiet row divisions, neutral tags and progress track.
-- **Fine Divider** (`line`): major panel borders, input strokes and table headings.
-- **Navigation Text** (`nav-text`) and **Navigation Hover** (`nav-hover`): sidebar navigation defaults and hover.
-
-### Semantic review
-- **Warm Review** (`review-surface`, `review-text`): REVIEW badges and error feedback.
-- **Verification Warning** (`warn`): unknown eligibility status words.
-- **Confirmation Notice** (`notice-surface`, `notice-line`, `notice-text`): the early notice that company facts need owner review.
-
-**The Status Words Rule.** Color supports readable status text; eligibility remains labeled Meets, Fails or Unknown.
+- **Navy** (`navy`, `navy-2`, `navy-3`): the rail, primary actions, headings, and the selected navigation surface.
+- **Paper** (`paper`, `paper-2`, `soft`, `stone`): page ground, tonal hover, panels and dotted leaders.
+- **Brass** (`brass`, `brass-text`): deadline hairlines, focus rings, link underline on hover, and cash figures (`brass-text` for text, 5.9:1 on paper). `brass` itself is 3:1 and never carries text.
+- **Maize** (`maize`, `maize-wash`): the active-nav mark, the arrow capsule, the decision count, and REVIEW tags.
+- **States**: `urgent` (closing within a week, errors), `good` (eligible, success). Each always sits beside a status word.
 
 ## Typography
 
-**Body and interface font:** Segoe UI, Arial, sans-serif. The implementation uses the platform sans throughout and has no separate decorative display face.
-
-The hierarchy is compact rather than a mathematical scale. Page headings use the frontmatter headline role; section headings use title. Third-level headings are bold (16px). Body paragraphs cap their measure (75ch). Data rows and buttons are slightly smaller (14px), while supporting labels are compact (12px); score captions are smaller (11px).
-
-The page headline reduces on mobile (26px). Summary numbers are prominent (28px, weight 650), lead facts are medium (23px), and the mobile row score grows (22px). Tables, scores and summaries use tabular numerals. These are data emphasis treatments, not a new display typography identity.
+Two self-hosted OFL faces from the owner's site, served from `founder_os/ui/fonts/`. Brygada 1918 headings are always roman; italic headings are banned. Mona Sans carries body, controls, labels and data with tabular lining numerals. Scale: 2.25rem page title, 1.625rem section title, 1.25rem contents entries, 0.9375rem body, 0.8125rem controls, 0.75rem labels. Body measure is capped near 72ch.
 
 ## Layout
 
-The desktop shell has a fixed sidebar (236px) and a flexible content track. The sidebar is sticky, reaches the viewport height and uses a cool neutral ground. A white top bar separates workspace context from the main content. Content is centered with a maximum width (1440px) and desktop padding (32px 36px 60px).
-
-Panels use generous internal padding and a repeated separation (24px). The summary is a four-column grid. The detail page uses a wider narrative column and a narrower readiness/decision column (1.5fr and 1fr, with a 280px minimum on the latter); paired panels use equal tracks. Buttons and filters wrap as space changes.
-
-At a maximum width (1080px), the sidebar narrows (205px), content padding reduces (26px 24px), and detail becomes one column. At a maximum width (720px), the shell becomes a vertical flow, the sidebar loses sticky positioning, the side note and top bar hide, and navigation becomes a horizontally scrollable strip. Main content padding is compact (24px 16px), panels reduce padding, summary becomes two columns and paired panels stack.
-
-On mobile, opportunity table headings hide and each row becomes a two-column record with its program name spanning both columns. Fit captions remain self-contained. Value, Deadline and Founder work gain visible labels. Detail sections reorder so Application readiness appears before fit and eligibility, followed by scoring, sources, decision and history. This ordering is implemented for the current detail structure and must be reconsidered if sections change.
+A 248px sticky navy rail (216px under 1100px) beside a centred work area (max 1360px, 40px gutters). Today is a two-column contents page (1.75fr and 1fr): the money lists dominate, and the side column holds Waiting on you, Applied & tracked, Latest pitch and Agents. Detail pages are 1.5fr and 1fr. Below 1100px every split stacks. Below 760px the rail becomes a top bar with a Menu button opening grouped two-column navigation; contents lines drop their leaders and stack amount under name; tables become labelled two-column records. There is no horizontal scroll at 320 to 1440px.
 
 ## Elevation & Depth
 
-The implemented system has no box shadows. White panels, sidebar tone, warm notices and fine borders establish depth. Hover changes background or text color without movement. There are no authored animation or transition tokens.
+None. Depth comes from the navy rail against paper, soft panels on paper, and 1px hairlines (`line`, `line-strong`).
 
-**The Flat Workspace Rule.** Reuse the existing tonal surfaces and fine borders when extending this workspace.
+## Motion
 
-## Shapes
-
-Small rounded rectangles establish the form language. Panels and the A Story mark share the surface radius; navigation, buttons, fields and tags use the smaller frontmatter steps. Panel and control borders are fine (1px). Notices remain rectangular. Progress tracks are compact (9px high) with rounded ends (4px).
+Emil Kowalski rules: `--ease-out` cubic-bezier(.23,1,.32,1) at 140ms for press and 200ms for state. Buttons scale to .97 on press; the arrow capsule moves 3px on hover; toasts fade down 4px. Keyboard actions and navigation are not animated. `prefers-reduced-motion` removes movement and animations.
 
 ## Components
 
-### Buttons
-
-Compact and direct. Primary actions use white text on teal with a darker teal hover. Secondary actions use white paper, ink text and a divider border; hover shifts to the sidebar tone. View buttons have transparent default backgrounds and pale teal selected backgrounds. Buttons use the inherited control typography. Disabled action buttons reduce opacity (.55) and show the waiting cursor during a request.
-
-Interactive buttons, links and fields show a visible teal keyboard outline (2px) with an offset (4px). Action groups wrap; mobile action controls grow to use available width.
-
-### Chips
-
-Tags are compact status labels (11px, weight 700, letter spacing .025em) with no pill shape. Neutral, review and positive treatments repeat the semantic palette. Tags remain words rather than replacing state with a color or icon.
-
-### Cards / Containers
-
-Work panels use white paper, the surface radius and a divider border. Desktop and mobile padding follows the panel spacing tokens. Section titles align the heading with its related link or action. Records use dividing lines, and the final record removes its trailing divider.
-
-### Inputs / Fields
-
-Filters use visible labels, white fields, a fine border and the field radius. Desktop filter fields have a minimum width (110px) and maximum width (170px); mobile labels flex with a minimum width (125px), and controls fill their tracks. Decision selects and textareas fill the panel width; the reason textarea is required. Native select, number and date controls retain their browser behavior. Input and textarea caret color is teal.
-
-### Navigation
-
-Navigation links use medium-weight control text, soft corners and a tonal hover. The selected link uses white paper and teal text. Navigation is a semantic nav with the accessible name Founder OS; the mobile strip preserves the same destinations with smaller text and padding. Current selection is implemented by visual active styling.
-
-### Opportunity scores and evidence
-
-Fit values use aligned numerals with an explicit A Story fit caption. Unresolved fit displays the actual lower–upper range and the explanation “Range includes unknown points.” Detail scoring retains reasons, component weights, evidence coverage and unknown component points. Eligibility is separately labeled; a range is never represented as a confirmed score.
-
-Opportunity rows include official verification state and a last-checked date. Source details include linked evidence and readable timestamps; the time element retains the exact timestamp in its datetime attribute and title. Known benefit descriptions remain separate from usable value; unknown usable amounts remain visible rather than becoming zero or invented funding.
-
-**The Visible Uncertainty Rule.** Keep unknown fit, eligibility, readiness, effort and usable value explicit in the relevant working component.
-
-### Readiness and owner decisions
-
-Readiness uses native progress with an accessible label only when a percentage is known. Unknown requirements show explanatory text without a fabricated progress value. Materials are grouped as Ready, Needs adaptation and Missing.
-
-Owner proposals show the exact proposal, evidence status and verification context; raw evidence is behind optional disclosure. Approval controls name the exact proposal and use a native confirmation dialog. The Start application action is followed by text explaining that it creates an internal draft and that submission requires a separate owner action. Feedback is delivered through a polite live status region. These are documented UI boundaries; service enforcement, scheduling and research execution are outside design scope.
+- **Buttons:** pills. Primary is navy on paper; secondary is soft with a strong hairline. A primary link that moves you forward carries the maize arrow capsule (`.go .cap`).
+- **Contents line** (`.toc-row`): title, leader, figure, then a meta row (days and hairline, eligibility words, status tag) and an optional one-line why.
+- **Tags:** pill status words. Review is maize-wash, closing is urgent-wash, eligible is good-wash, and finished is faded.
+- **Stage strip** (`.stages`): four equal segments with a 3px top rule. Reached segments are navy and the current one is brass.
+- **Panels** (`.section`): soft paper, 14px radius, hairline.
+- **Inputs:** soft fill, strong hairline, 10px radius, brass focus ring, brass caret.
+- **Browser surfaces:** maize selection, thin stone scrollbars, underline offset 3px.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** preserve the inherited teal, ink, light field, white panels and cool sidebar.
-- **Do** keep supporting status text beside semantic colors.
-- **Do** preserve unknown values, score ranges and the explanation of unresolved points.
-- **Do** show readable evidence dates while retaining exact timestamps.
-- **Do** keep owner proposal wording and the internal draft boundary visible beside the action.
-- **Do** retain visible keyboard focus, labeled fields and live action feedback.
+- Do keep cash, credits and finished programs in separate lists; credits are never cash.
+- Do write unknown amounts, deadlines and eligibility as words.
+- Do reference colours and fonts only through the `--color-*` and `--font-*` tokens in `style.css`.
+- Do set any per-row CSS value through `style.setProperty`, never an inline `style=""`; the Content-Security-Policy blocks inline styles.
 
 ### Don't:
-- **Don't** promote advertised benefits into confirmed usable value.
-- **Don't** hide uncertainty when replacing a table with mobile records.
-- **Don't** treat a design review as evidence that research or scheduling runs correctly.
-- **Don't** introduce a new brand identity or decorative display face into this ordinary extension.
+- Don't use italic headings, eyebrows or kickers above headings, or section numbers.
+- Don't add shadows, gradients or glass.
+- Don't put brass on text, or show a score range as a confirmed score.
+- Don't reintroduce the retired teal.

@@ -15,7 +15,9 @@ def date_info(deadline, timezone_name=None, checked_now=None):
     try:
         if len(deadline)==10:
             target=datetime.fromisoformat(deadline).date()
-            days=(target-instant.date()).days
+            # A date-only deadline is a local calendar day, not a UTC day.
+            from zoneinfo import ZoneInfo
+            days=(target-instant.astimezone(ZoneInfo(timezone_name or 'America/New_York')).date()).days
             # Date-only is not an invented 23:59 deadline. Same-day remains REVIEW.
             precision='date_only';expired=days<0
         else:
@@ -97,7 +99,24 @@ def score(data, eligibility, readiness, facts, checked_now=None):
     low=round(sum(p['points'] or 0 for p in parts.values()),1)
     high=round(low+sum(p['weight'] for p in parts.values() if p['points'] is None),1)
     total=low if all(p['points'] is not None for p in parts.values()) else None
-    return {'version':SCORING_VERSION,'components':parts,'score':total,'lower_bound':low,'upper_bound':high,'coverage':round(100-sum(p['weight'] for p in parts.values() if p['points'] is None),1),'dates':dates,'tier':'EXCEPTIONAL' if total is not None and total>=90 else 'STRONG' if total is not None and total>=80 else 'POSSIBLE' if total is not None and total>=70 else 'WEAK' if total is not None and total>=50 else 'SKIP' if total is not None else 'UNRESOLVED'}
+    # Ranking only: unknown points count at half weight. Never shown as a confirmed score.
+    estimate=total if total is not None else round((low+high)/2,1)
+    return {'version':SCORING_VERSION,'components':parts,'score':total,'lower_bound':low,'upper_bound':high,'estimate':estimate,'coverage':round(100-sum(p['weight'] for p in parts.values() if p['points'] is None),1),'dates':dates,'tier':'EXCEPTIONAL' if total is not None and total>=90 else 'STRONG' if total is not None and total>=80 else 'POSSIBLE' if total is not None and total>=70 else 'WEAK' if total is not None and total>=50 else 'SKIP' if total is not None else 'UNRESOLVED'}
+
+CASH_TYPES={'pitch_competition','grant','fellowship','founder_fellowship','award','competition'}
+MONEY_RANK={'CASH':3,'INVESTMENT':2,'CREDITS':1,'SUPPORT':0,'UNKNOWN':0}
+
+def money_profile(data):
+    """What kind of money an opportunity offers. Credits are never treated as cash."""
+    funding=data.get('funding') or {};kind_type=str(data.get('opportunity_type') or '').lower()
+    cash=funding.get('cash_prize_max');credits=funding.get('credits_value');equity=funding.get('equity_required')
+    if cash:kind='INVESTMENT' if equity is True else 'CASH'
+    elif credits or 'credit' in kind_type:kind='CREDITS'
+    elif kind_type in CASH_TYPES:kind='CASH'
+    elif kind_type in ('accelerator','incubator'):kind='INVESTMENT' if equity is not False else 'SUPPORT'
+    elif kind_type in ('startup_support','startup_program'):kind='SUPPORT'
+    else:kind='UNKNOWN'
+    return {'kind':kind,'rank':MONEY_RANK[kind],'cash_max':cash,'credits_face_value':credits,'non_dilutive':None if equity is None else equity is False,'award_scope':funding.get('award_scope'),'amount_known':bool(cash or credits)}
 
 def recommend(data, eligibility, scoring, historical=None):
     if historical in ('ACCEPTED','REJECTED','ALREADY APPLIED'):return historical
