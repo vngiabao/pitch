@@ -2,7 +2,7 @@
 
 The standard every A Story pitch, deck and tailored version must meet. The quality bar is the Michigan Business Challenge 3-slide deck of October 14, 2026 (https://claude.ai/artifact/PgnB9KSionF1AVm5EdPF4c). Bao built it over 59 rounds of direct feedback. Pitch Tailor and Pitch Coach read this file before every run. Where this file and an older deck disagree, this file wins. Where this file and approved company facts disagree, the facts win.
 
-The full master deck in this system, built October 15, 2026, is at https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN. It has 17 main slides plus 3 appendix slides, and a snapshot for the agents is kept in `seed-data/master-deck-2026-10.json`. Every program edition is cut from it.
+**The core pitch deck** (approved by Bao on October 15, 2026) is at https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN. It has 21 main slides plus 3 appendix slides. A frozen copy of every slide is in `seed-data/core-deck-2026-10-15/`, and the titles and speaker notes the agents read are in `seed-data/master-deck-2026-10.json`. Every program edition is cut from this deck; never redesign its slides for an edition.
 
 Contents: 1. What the pitch must make a judge understand · 2. The story spine · 3. Content rules · 4. Evidence guardrails · 5. Design system · 6. Slide patterns · 7. What Bao has rejected · 8. Tailoring to a competition · 9. Coaching lens · 10. Pre-flight checklist
 
