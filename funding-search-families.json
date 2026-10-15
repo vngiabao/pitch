@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "families": {
     "pitch_competitions": [
       "startup pitch competition {year} applications open",
@@ -56,6 +56,41 @@
     "bootstrap_credits": [
       "Anthropic Claude startup program bootstrapped free credits {year}",
       "OpenAI Mistral Cohere Databricks startup credits no VC referral {year}"
+    ],
+    "big_pitch_competitions": [
+      "largest startup pitch competitions cash prize {year} applications open",
+      "national startup competition $100,000 grand prize early stage non dilutive {year}",
+      "consumer startup pitch competition grand prize no equity {year}"
+    ],
+    "local_pitch_nights": [
+      "5x5 Night pitch competition {year} Start Garden Muskegon Innovation Hub",
+      "monthly pitch night cash prize Grand Rapids Kalamazoo Detroit Ann Arbor {year}",
+      "PitchMI Accelerate Michigan Innovation Competition {year} applications"
+    ],
+    "founder_personal": [
+      "grants for individual founders no equity {year} Emergent Ventures Z Fellows",
+      "founder fellowship stipend no equity applications {year}",
+      "student entrepreneur fellowship cash award {year} Michigan"
+    ],
+    "agetech": [
+      "AgeTech pitch competition {year} AARP AgeTech Collaborative",
+      "aging caregiving family technology startup grant prize {year}",
+      "longevity aging in place startup challenge cash prize {year}"
+    ],
+    "federal_state_grants": [
+      "National Institute on Aging SBIR STTR small business solicitation {year}",
+      "SBIR Phase I consumer health aging technology deadline {year}",
+      "MEDC Michigan startup grant Michigan Emerging Technologies Fund {year}"
+    ],
+    "accelerators_with_cash": [
+      "pre-seed accelerator investment applications deadline {year} consumer AI",
+      "Michigan pre-seed fund Michigan Rise gener8tor Michigan Founders Fund {year}",
+      "angel investor group pitch application Michigan {year} Grand Rapids Ann Arbor"
+    ],
+    "hackathons": [
+      "AI hackathon cash prize {year} online voice agents",
+      "voice AI hackathon prize {year}",
+      "consumer AI app challenge cash prize {year}"
     ]
   },
   "directory_policy": "Discovery only. Follow through to official organizer/program and current cycle before asserting dates, benefits or eligibility.",
@@ -81,5 +116,20 @@
     "OpenAI",
     "Cohere"
   ],
-  "credit_policy": "Screenshots and directory maxima are discovery leads only. Verify current tier, referral/VC requirements, supported products, expiration, renewal, paid-account/deposit conditions and company-email rules. Never equate credits with cash, guarantee acceptance, or accept terms automatically."
+  "credit_policy": "Screenshots and directory maxima are discovery leads only. Verify current tier, referral/VC requirements, supported products, expiration, renewal, paid-account/deposit conditions and company-email rules. Never equate credits with cash, guarantee acceptance, or accept terms automatically.",
+  "program_seeds": [
+    "5x5 Night (Start Garden, GVSU Muskegon Innovation Hub)",
+    "PitchMI (MSU Research Foundation and MEDC)",
+    "Accelerate Michigan Innovation Competition",
+    "AARP AgeTech Collaborative pitch events (AgeTech After Dark at CES)",
+    "NIA SBIR/STTR small business programs",
+    "Michigan Rise Pre-Seed Fund",
+    "Michigan Founders Fund Pre-Accelerator (gener8tor)",
+    "Emergent Ventures",
+    "Z Fellows",
+    "Y Combinator",
+    "Techstars",
+    "Startup World Cup"
+  ],
+  "money_policy": "Any money that can reach the founders counts: cash prizes, grants, fellowships and stipends paid to individual founders, hackathon prizes, and investment programs. Rank non-dilutive cash first, then investment. Label investment and SAFE terms plainly and never call them grants. Founder-personal programs are judged on founder eligibility (age, student status, location), not company traction; leave unknown eligibility null. Report the next cycle when the current one has closed, with the date it is expected to reopen if published."
 }

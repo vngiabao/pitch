@@ -103,7 +103,7 @@ def score(data, eligibility, readiness, facts, checked_now=None):
     estimate=total if total is not None else round((low+high)/2,1)
     return {'version':SCORING_VERSION,'components':parts,'score':total,'lower_bound':low,'upper_bound':high,'estimate':estimate,'coverage':round(100-sum(p['weight'] for p in parts.values() if p['points'] is None),1),'dates':dates,'tier':'EXCEPTIONAL' if total is not None and total>=90 else 'STRONG' if total is not None and total>=80 else 'POSSIBLE' if total is not None and total>=70 else 'WEAK' if total is not None and total>=50 else 'SKIP' if total is not None else 'UNRESOLVED'}
 
-CASH_TYPES={'pitch_competition','grant','fellowship','founder_fellowship','award','competition'}
+CASH_TYPES={'pitch_competition','grant','fellowship','founder_fellowship','award','competition','hackathon','prize','pitch_night','sbir'}
 MONEY_RANK={'CASH':3,'INVESTMENT':2,'CREDITS':1,'SUPPORT':0,'UNKNOWN':0}
 
 def money_profile(data):

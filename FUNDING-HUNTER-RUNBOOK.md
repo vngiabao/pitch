@@ -57,3 +57,15 @@ Automatic actions are limited to research, internal records, recommendations, ex
 The broad default is Monday and Thursday at 8 AM America/New_York. The separate autonomy worker queues daily free-credit discovery at 7:30 AM. Preview-confirmed application execution and daily 9 AM email reports are separate workers described in APPLICATION-PILOT-RUNBOOK.md; those actions are not granted to the research model. A Windows Scheduled Task polls the durable queue every five minutes and at sign-in, without model calls when idle. It invokes the read-only Codex CLI using the existing ChatGPT login. This works while the Codex app and ChatGPT window are closed, provided the PC is awake and this Windows user is signed in. An offline or powered-off PC cannot run a local job. A future always-on host can use the same run contract and database service; no API vendor is hard-coded into the domain engine.
 
 The local command center can queue Run Now and Research More requests. A connected request watcher services them using this contract. Requests survive closing the UI. Research runs have leases, retained failures, source-level errors and bounded budgets. Credentials remain with the runner, never in opportunity records or browser responses. `SOURCE_UNAVAILABLE`, `ELIGIBILITY UNKNOWN`, `DEADLINE UNKNOWN`, `DUPLICATE_SUSPECTED` and `RESEARCH_INCOMPLETE` are real results, not invitations to guess.
+
+## Wider money scope (Oct 15, 2026)
+
+The owner wants every route to money, not only A Story grants:
+
+- **Big and local pitch competitions.** National grand prizes, plus Michigan pitch nights (5x5 Night, PitchMI, Accelerate Michigan). Small monthly prizes still count.
+- **Founder-personal money.** Fellowships, stipends and individual grants paid to Bao or Daniel. Judge these on founder eligibility, not company traction.
+- **AgeTech and aging.** A Story serves parents and grandparents, so AARP AgeTech Collaborative pitch events and NIA SBIR/STTR are in scope.
+- **Investment programs.** Accelerators and pre-seed funds with cash. Always label them as investment, never as grants.
+- **Hackathons.** Voice and consumer AI hackathons with cash prizes.
+
+When a cycle has closed, record the program with its expected next window. Big annual programs reopen on a calendar, and missing the window is the main way money is lost.
