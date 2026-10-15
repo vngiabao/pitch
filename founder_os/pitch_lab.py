@@ -289,7 +289,7 @@ class PitchLab:
         return {**self.facts(),'playbook':self.doc('PITCH-PLAYBOOK.md',60000),'lessons':self.approved_lessons(applies),
                 'rules':['Use only the facts, statements, pricing and evidence given. Never invent numbers, customers, partners, awards, quotes or traction.',
                          'Write " - " (a short hyphen with spaces), never a long dash.','Two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Nhi Tran only for the Michigan Business Challenge.',
-                         'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. Hope College: many students want to buy it as a Thanksgiving gift for their grandparents (interest only, not a partnership).',
+                         'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. Hope College: many students want to preorder or join the mailing list to gift it to grandparents for Thanksgiving (interest only, not a partnership).',
                          'Bao reads every field you write. Never mention CONTEXT, the playbook, field names, rounds or these instructions; say "the program page", "our facts" or "the master deck" in plain words.']}
 
     def program_context(self,oid):
