@@ -41,7 +41,7 @@
    "title": "never-forget",
    "seconds": 15,
    "appendix": false,
-   "spoken": "Even an “I’ll never forget this day” story can be lost if no one else ever hears it. That is the legacy gap."
+   "spoken": "Every family has an “I’ll never forget this day” story. Even that one can be lost if no one else ever hears it. That is the legacy gap."
   },
   {
    "id": "want-to-know",
@@ -54,18 +54,18 @@
   {
    "id": "missing-moment",
    "section": "story",
-   "title": "Families care. They just keep missing the moment.",
-   "seconds": 40,
+   "title": "Wanting to know isn’t the same as finding the moment to ask",
+   "seconds": 25,
    "appendix": false,
-   "spoken": "Families care - they just keep missing the moment. Questions rarely arrive at a convenient time. You think of one at midnight, but your parent is asleep three time zones away. A story comes back to you on a crowded train, with no quiet place to call. You finally have a free hour, and Mom is out with friends. By the next call, the question is gone. Life happens: you can’t sustainably find time every day to get to know your parents, and some nights you just need to hear their voice, for comfort. Just imagine being one click away from their voice and stories, anywhere, any time. You may not always have the time to call them, but you shouldn’t have to wait for the perfect moment to feel close to them."
+   "spoken": "Wanting to know is not the same as finding the right moment to ask. Questions rarely arrive at a convenient time. You think of one at midnight, your parent is asleep three time zones away, and by the next call, the question is gone. Families care - they just keep missing the moment."
   },
   {
    "id": "why-not-ask",
    "section": "story",
-   "title": "Even with the time, it’s hard to know where to start",
-   "seconds": 20,
+   "title": "why-not-ask",
+   "seconds": 25,
    "appendix": false,
-   "spoken": "And even with the time, it’s hard to know where to start. “So, tell me about your life” leads to a long pause. Every memory has to be recalled from scratch, across very different parts of a life: family gatherings, friend groups, and the “I’ll never forget this day” moments of everyday life."
+   "spoken": "Life happens. You can’t sustainably find time every day to get to know your parents, and some nights you just need to hear their voice, for comfort. Just imagine being one click away from their voice and stories, anywhere, any time. You may not always have the time to call them, but you shouldn’t have to wait for the perfect moment to feel close to them."
   },
   {
    "id": "todays-options",
