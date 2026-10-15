@@ -75,7 +75,7 @@ Every number on a slide must come from this table or from approved company facts
 | Median day-30 retention 3.3% across 93 mental-health apps | Baumel et al. 2019 | Analogy only. No competitor publishes completion rates. |
 | 80% of Remento purchases are gifts | Remento, company-reported 2025 | |
 | AI voice price cuts in 2026 (up to 55% on text-to-speech) | ElevenLabs 2026 | A 7–10 minute interview is about $0.32–0.45, **modeled** |
-| $124T passes between generations through 2048 | Cerulli 2024 | |
+| By 2030 every baby boomer is 65+ | U.S. Census Bureau | ($124T wealth-transfer stat dropped by Bao on Oct 15: off-topic) |
 | 132.7M U.S. households; 43.6M with someone 65+ | U.S. Census ACS 2024, B11007 | TAM $15.8B, SAM $5.19B at $119. These are ceilings, not validated demand. |
 | Pricing: Individual $119/yr, Family $229/yr, Express $79 one-time, Monthly $19.99 | astoryapp.com, captured Oct 14, 2026 | Yearly plans include one Classic Hardcover a year. Printed books from $39 (softcover); Classic Hardcover $69. |
 
