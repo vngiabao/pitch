@@ -553,11 +553,23 @@ class FundingHunter:
             versions=self.store.rows("SELECT a.id,a.body,a.created_at,a.provenance,r.status FROM answer_versions a JOIN answer_reviews r ON r.version_id=a.id WHERE a.question_id=? ORDER BY CASE r.status WHEN 'approved' THEN 0 WHEN 'draft' THEN 1 ELSE 2 END,a.created_at DESC",(q['id'],))
             questions.append({'id':q['id'],'ordinal':q['ordinal'],'prompt':q['prompt'],'limit':q['limit_value'],'unit':q['limit_unit'],'answer':versions[0] if versions else None,'versions':len(versions)})
         outcomes=self.store.rows('SELECT outcome,evidence_note note,occurred_at FROM funding_outcomes WHERE opportunity_id=? ORDER BY occurred_at DESC,created_at DESC',(app['opportunity_id'],))
+        from .application_drafter import access_status,ApplicationDrafter
+        ApplicationDrafter(self.store)
+        for q in questions:
+            m=re.search(r'type=(\w+)',self.db.execute('SELECT locator FROM questions WHERE id=?',(q['id'],)).fetchone()[0] or '')
+            q['type']=m.group(1) if m else 'text'
+            opts=re.search(r' \[(.*)\]$',q['prompt'])
+            q['options']=opts.group(1).split(', ') if opts else [];q['label']=q['prompt'][:opts.start()] if opts else q['prompt']
+            note=self.db.execute('SELECT note FROM draft_notes WHERE question_id=?',(q['id'],)).fetchone()
+            q['needs_you']=note[0] if note and not q['answer'] else None
+            if q['answer']:
+                q['answer']['notes']=json.loads(self.db.execute('SELECT unresolved_json FROM answer_versions WHERE id=?',(q['answer']['id'],)).fetchone()[0] or '[]')
         has_intel=self.db.execute('SELECT 1 FROM funding_intelligence WHERE opportunity_id=?',(app['opportunity_id'],)).fetchone()
         d=self.detail(app['opportunity_id']) if has_intel else None
         return {**app,'program':program['name'] if program else (legacy['program'] if legacy else app['title']),'cycle':program['cycle'] if program else (legacy['cycle'] if legacy else ''),
                 'questions':questions,'outcomes':outcomes,'official_url':d['data']['official_url'] if d else None,'application_url':d['data']['application_url'] if d else None,
-                'deadline':d['data']['dates']['deadline'] if d else None,'recommendation':d['recommendation'] if d else None}
+                'deadline':d['data']['dates']['deadline'] if d else None,'recommendation':d['recommendation'] if d else None,
+                'access':access_status(self.store,app['opportunity_id'],d['recommendation'] if d else None,outcomes[0]['outcome'] if outcomes else None)}
 
     def money_board(self,items):
         """Cash first, then credits; one row per program. Applied and decided programs move to the tracker."""

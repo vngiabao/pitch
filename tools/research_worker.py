@@ -128,6 +128,33 @@ def claim_work(h,scheduled=False,manual=False):
 
 PROGRAM_PREFIX='Research program: '
 
+def draft(h,request):
+    """Draft answers for an application's open questions from approved company material only. No web access."""
+    from founder_os.application_drafter import ApplicationDrafter,DRAFT_PREFIX
+    aid=request['reason'][len(DRAFT_PREFIX):];d=ApplicationDrafter(h.store);ctx=d.draft_context(aid)
+    if not ctx['questions']:return {'application_id':aid,'drafted':0}
+    cli=resolve_cli(h)
+    if not cli:raise RuntimeError('SOURCE_UNAVAILABLE: Codex runner executable is unavailable')
+    folders=ROOT/'reports/runs';folders.mkdir(parents=True,exist_ok=True)
+    stem='draft-'+digest(request['request_key'])[:16]+'-attempt-'+str(request['attempts']+1)
+    schema_path=folders/(stem+'-schema.json');out=folders/(stem+'-answers.json')
+    item={'type':'object','additionalProperties':False,'properties':{'question_id':{'type':'string'},'answer':{'type':'string'},'note':{'type':'string'}},'required':['question_id','answer','note']}
+    schema_path.write_text(json.dumps({'type':'object','additionalProperties':False,'properties':{'answers':{'type':'array','items':item}},'required':['answers']}),encoding='utf-8')
+    prompt=('You are the A Story Founder OS application drafter. Draft an answer for every question in CONTEXT.questions, '
+            'using ONLY CONTEXT. Follow CONTEXT.rules and CONTEXT.writing_guide. Prefer the owner wording from owner_written_answers and approved_answers when a question matches. '
+            'Return JSON matching the schema: one item per question_id. Use an empty answer plus a short note when the context cannot answer it. '
+            'Do not use shell, files, web, email or any tool.\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False))
+    disabled=('shell_tool','apps','plugins','browser_use','browser_use_external','computer_use','multi_agent','goals','workspace_dependencies','skill_search')
+    command=[cli,'-a','never']
+    for feature in disabled:command.extend(['--disable',feature])
+    command.extend(['exec','--ignore-user-config','--sandbox','read-only','--skip-git-repo-check','--ephemeral','--color','never','--output-schema',str(schema_path),'--output-last-message',str(out),'--json','-'])
+    result=subprocess.run(command,input=prompt,text=True,encoding='utf-8',capture_output=True,cwd=ROOT,env=safe_env(),timeout=900,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    if result.returncode or not out.exists():
+        import re
+        raise RuntimeError('Drafting runner failed: '+re.sub(r'sk-[\w-]+|Bearer\s+\S+','[REDACTED]',result.stderr[-800:]))
+    answers=json.loads(out.read_text(encoding='utf-8')).get('answers',[])
+    return {'application_id':aid,'drafted':d.save_drafts(aid,answers),'asked':len(ctx['questions'])}
+
 def research(h,request,probe=False):
     research_started_at=now()
     cli=resolve_cli(h)
@@ -228,6 +255,10 @@ def main():
     if not work:s.close();return 0
     request,token=work
     try:
+        if request['reason'].startswith('Draft application: '):
+            result=draft(h,request);print(json.dumps(result),flush=True)
+            s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
+            return 0
         report=research(h,request,args.probe)
         print(json.dumps({'run_id':report['run_id'],'state':'PARTIAL' if report['errors'] else 'COMPLETE','created':report['records_created'],'updated':report['records_updated'],'errors':len(report['errors'])}),flush=True)
         s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))

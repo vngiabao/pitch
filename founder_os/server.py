@@ -99,6 +99,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/opportunities':result=h.list(q.get('view',['Recommended'])[0],{k:v[0] for k,v in q.items() if k!='view'})
             elif route.startswith('/api/opportunity/'):result=h.detail(route.rsplit('/',1)[1])
             elif route.startswith('/api/application/'):result=h.application_view(route.rsplit('/',1)[1])
+            elif route=='/api/application-list':
+                from .application_drafter import application_list
+                result=application_list(s)
             elif route=='/api/applications':result=s.rows('SELECT a.*,o.program,o.cycle FROM applications a JOIN opportunities o ON o.id=a.opportunity_id')
             elif route=='/api/autonomy':
                 from .application_pilot import ApplicationPilot
@@ -142,6 +145,11 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/decision':result=h.decide(p['opportunity_id'],p['decision'],p['reason'])
             elif route=='/api/outcome':result=h.owner_outcome(p['opportunity_id'],p['outcome'],p.get('note',''),p.get('evidence_url'),p.get('application_id'))
             elif route=='/api/start-application':result={'application_id':h.start_application(p['opportunity_id']),'external_submission':False}
+            elif route=='/api/read-form':
+                from .application_drafter import ApplicationDrafter
+                from .form_reader import BrowserFormReader
+                result=ApplicationDrafter(s,BrowserFormReader(Path(self.server.db_path).parent/'browser-profile')).read_form(p['opportunity_id'])
+                if result.get('draft_queued'):self.start_worker()
             elif route=='/api/prepare-application':
                 from .application_pilot import ApplicationPilot
                 result=ApplicationPilot(s).build(p['opportunity_id'])

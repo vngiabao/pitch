@@ -424,3 +424,23 @@ progress.progress{display:block;width:100%;height:8px;margin:var(--space-3) 0 va
 .decided h2{font-size:var(--text-lg)}
 .decided-meta{display:flex;align-items:center;gap:var(--space-2);white-space:nowrap}
 @media (max-width:760px){.fact-card{padding:var(--space-4)}.fact-head{flex-direction:column;gap:var(--space-1)}.fact-sentence{font-size:var(--text-md)}}
+
+/* Applications: grouped by what the agent can actually reach */
+.app-group{margin:var(--space-6) 0 0}
+.app-group:first-of-type{margin-top:var(--space-2)}
+.app-group h3{display:flex;align-items:center;gap:var(--space-2);font:400 var(--text-lg)/1.3 var(--font-display);color:var(--color-navy);margin:0 0 var(--space-1)}
+.count-chip{font:600 var(--text-xs)/1 var(--font-body);padding:3px 8px;border-radius:var(--radius-pill);background:var(--color-paper-2);color:var(--color-muted)}
+.app-row .section-title{margin-bottom:var(--space-1)}
+.access-line{font-size:var(--text-sm);margin:0 0 var(--space-3);max-width:76ch;color:var(--color-ink)}
+.access-line strong{font-weight:650}
+.access-ready strong{color:var(--color-good)}
+.access-drafting strong{color:var(--color-brass-text)}
+.access-blocked strong{color:var(--color-urgent)}
+.access-not_checked strong,.access-finished strong{color:var(--color-muted)}
+.finished-apps summary{font-size:var(--text-sm)}
+.finished-apps .tracker{margin-top:var(--space-3)}
+.qa h3{font-size:var(--text-base);font-weight:620}
+.qa-options{margin:0 0 var(--space-2);overflow-wrap:anywhere}
+.qa-note{margin:var(--space-2) 0 0;color:var(--color-brass-text)}
+.qa-needs{margin:var(--space-2) 0 0;padding:var(--space-3) var(--space-4);border:1px dashed var(--color-line-strong);border-radius:var(--radius-field);font-size:var(--text-sm);color:var(--color-ink)}
+.qa-needs strong{color:var(--color-urgent)}

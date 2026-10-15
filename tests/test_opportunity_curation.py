@@ -81,7 +81,7 @@ class ReportCurationTests(unittest.TestCase):
         self.s.db.execute("INSERT INTO hunter_settings VALUES('mail_delivery',?)",(js({'mode':'gmail_connector'}),))
         r=copy.deepcopy(self.record);r['founder_brief']=brief(r['official_url']);self.h.upsert(r)
         reporter=DailyReporter(self.s);sample=reporter.render(sample=True)
-        self.assertIn('Why applicable:',sample['body']);self.assertIn('Agent next:',sample['body']);self.assertIn('Your decision:',sample['body'])
+        self.assertIn('NEEDS YOU TODAY',sample['body']);self.assertIn('ACCESS REPORT',sample['body']);self.assertIn('Nothing is submitted for you',sample['body'])
         self.assertNotIn('OPPORTUNITIES TO REVIEW',sample['body'])
         daily=reporter.prepare();out=ConnectorOutbox(self.s);claimed=out.claim('report',daily['id']);out.complete('report',daily['id'],claimed['message_sha256'],'fixture-day',OWNER)
         key=reporter.prepare_sample();claim=out.claim('supplement',key);out.complete('supplement',key,claim['message_sha256'],'fixture-sample',OWNER)

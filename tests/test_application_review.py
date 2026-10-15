@@ -27,9 +27,9 @@ class ReviewTests(unittest.TestCase):
         q=self.s.add_question(aid,1,'Describe your past traction',v,'paragraph 2');self.s.add_answer(q,'Old unconfirmed traction',[v],[],['Verify traction'])
         text=ApplicationReview(self.s).text();self.assertIn('Old unconfirmed traction',text);self.assertIn('SAVED DRAFT — NOT LIVE FORM',text);self.assertIn(str(f),text)
     def test_daily_attachment_is_hashed_frozen_and_sent_once(self):
-        o=self.enable();self.facts();self.p.inspect(self.oid,fixtures.FormsTransport());r=DailyReporter(self.s).prepare();claim=o.claim('report',r['id']);attachment=claim['message']['attachments'][0]
-        self.assertEqual(digest(attachment['content'].encode()),attachment['sha256']);self.assertIn('question-and-answer text preview is attached',r['body'])
-        self.assertIn('Company name',attachment['content']);self.assertIn('A Story',attachment['content']);self.assertEqual(o.complete('report',r['id'],claim['message_sha256'],'fixture',OWNER)['state'],'SENT')
+        o=self.enable();self.facts();self.p.inspect(self.oid,fixtures.FormsTransport());r=DailyReporter(self.s).prepare();claim=o.claim('report',r['id'])
+        # Owner, Oct 15 2026: no TXT attachments; questions and answers live on the website.
+        self.assertNotIn('attachments',claim['message']);self.assertNotIn('attached',r['body']);self.assertEqual(o.complete('report',r['id'],claim['message_sha256'],'fixture',OWNER)['state'],'SENT')
         self.assertEqual(DailyReporter(self.s).prepare()['body'],r['body'])
         with self.assertRaises(PolicyError):o.claim('report',r['id'])
     def test_supplement_does_not_change_daily_report_or_approve_submission(self):

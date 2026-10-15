@@ -8,6 +8,8 @@ from founder_os.store import Store,now,js,uid
 from founder_os.application_pilot import ApplicationPilot
 from founder_os.report_email import DailyReporter
 from founder_os.inbox_tracker import InboxTracker
+from founder_os.application_drafter import ApplicationDrafter
+from founder_os.form_reader import BrowserFormReader
 
 def poll(s):
     p=ApplicationPilot(s);h=p.h;instant=datetime.now(timezone.utc)
@@ -23,7 +25,10 @@ def poll(s):
         # Read-only inbox check last, so a slow mailbox never delays reports or applications.
         try:inbox=InboxTracker(s,h).poll(instant)
         except Exception as e:s.log('inbox.failed','autonomy_worker',{'error_type':type(e).__name__});inbox={'error':type(e).__name__}
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox}
+        # Read one official application form per cycle (read-only) and queue answer drafts.
+        try:forms=ApplicationDrafter(s,BrowserFormReader(ROOT/'data/browser-profile')).poll(limit=1)
+        except Exception as e:s.log('forms.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});forms={'error':type(e).__name__}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'forms':forms}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()
