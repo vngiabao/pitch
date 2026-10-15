@@ -30,10 +30,10 @@
   {
    "id": "retelling",
    "section": "story",
-   "title": "Every retelling changes the story",
+   "title": "Every retelling loses a little more",
    "seconds": 30,
    "appendix": false,
-   "spoken": "That is how family stories work. One person remembers one part, and someone else remembers another, so no one carries the whole story. With each retelling, details shift - the Elks Hall dance becomes “a dance in Toledo, I think,” then “a party?”, then nothing. If someone never passes their part on, no one else can recover it."
+   "spoken": "That is how family stories work. They pass by word of mouth: one person remembers one part, someone else remembers another, so no one carries the whole story. With each retelling, details shift - the Elks Hall dance becomes “a dance in Toledo, I think,” then “a party?”, then nothing. If someone never passes their part on, no one else can recover it."
   },
   {
    "id": "never-forget",
@@ -49,47 +49,39 @@
    "title": "For adult children, this is not a niche problem",
    "seconds": 25,
    "appendix": false,
-   "spoken": "For adult children, this is not a niche problem. 79% want to know more about their parents’ lives before parenthood, but only 37% know their mother’s early life. And 74% regret not learning more about relatives who have died."
+   "spoken": "For adult children, this is not a niche problem. 79% want to know more about their parents’ lives before parenthood, but only 37% know their mother’s life before she became a parent - most of her story before you is a part no one asked about. And 74% regret not learning more about relatives who have died, when it’s too late to ask."
   },
   {
    "id": "missing-moment",
    "section": "story",
-   "title": "Wanting to know is not the same as finding the right moment to ask",
-   "seconds": 25,
+   "title": "Families care. They just keep missing the moment.",
+   "seconds": 40,
    "appendix": false,
-   "spoken": "Wanting to know is not the same as finding the right moment to ask. Questions rarely arrive at a convenient time. You think of one at midnight, your parent is asleep three time zones away, and by the next call, the question is gone. Families care - they just keep missing the moment."
+   "spoken": "Families care - they just keep missing the moment. Questions rarely arrive at a convenient time. You think of one at midnight, but your parent is asleep three time zones away. A story comes back to you on a crowded train, with no quiet place to call. You finally have a free hour, and Mom is out with friends. By the next call, the question is gone. Life happens: you can’t sustainably find time every day to get to know your parents, and some nights you just need to hear their voice, for comfort. Just imagine being one click away from their voice and stories, anywhere, any time. You may not always have the time to call them, but you shouldn’t have to wait for the perfect moment to feel close to them."
   },
   {
    "id": "why-not-ask",
    "section": "story",
-   "title": "Even when they want to ask, two things get in the way",
-   "seconds": 35,
+   "title": "Even with the time, it’s hard to know where to start",
+   "seconds": 20,
    "appendix": false,
-   "spoken": "Even when families want to ask, two things get in the way. First, not knowing where to start: every memory has to be recalled from scratch, across family gatherings, friend groups, and the “I’ll never forget this day” moments of daily life. Second, life happens. You can’t sustainably find time every day to get to know your parents, and sometimes you need to hear their voice in the middle of the night, just for comfort. Just imagine being one click away from their voice and stories, anywhere, any time. You may not always have the time to call them, but you shouldn’t have to wait for the perfect moment to feel close to them."
+   "spoken": "And even with the time, it’s hard to know where to start. “So, tell me about your life” leads to a long pause. Every memory has to be recalled from scratch, across very different parts of a life: family gatherings, friend groups, and the “I’ll never forget this day” moments of everyday life."
   },
   {
    "id": "todays-options",
    "section": "story",
-   "title": "Most options fall into two categories. They keep pieces, not the story.",
-   "seconds": 25,
+   "title": "They keep pieces, not the story",
+   "seconds": 45,
    "appendix": false,
-   "spoken": "Most current options fall into two categories: photo albums and memoir services. Albums keep the pictures, but lose the life behind them. Memoir services, like Storyworth, try to solve this with weekly prompts toward a physical keepsake. But what’s supposed to be a meaningful gift turns out to be homework for the parents."
-  },
-  {
-   "id": "prompts-stall",
-   "section": "story",
-   "title": "A habit takes daily practice. Weekly prompts get about ten tries.",
-   "seconds": 25,
-   "appendix": false,
-   "spoken": "Habit research found a median of 66 days of daily repetition to form a habit. Weekly prompts allow only about ten attempts in that time, and many only move forward the first few before abandoning as life gets busy. And as the book is completed, the purpose is also gone. This goes against the philosophy of the valuable everyday."
+   "spoken": "Most current options fall into two categories: photo albums and memoir services. Albums keep the pictures, but lose the life behind them. Memoir services, like Storyworth, try to solve this with weekly prompts toward a physical keepsake. But what’s supposed to be a meaningful gift turns out to be homework for the parents. Habit research found a median of 66 days of daily repetition; weekly prompts allow only about ten attempts in that time, and many only move forward the first few before abandoning as life gets busy. And once the book is printed, the purpose is gone. The book ends. The everyday doesn’t - and that’s where most of a life’s stories happen."
   },
   {
    "id": "blank-page",
    "section": "story",
    "title": "blank-page",
-   "seconds": 10,
+   "seconds": 15,
    "appendix": false,
-   "spoken": "A lifetime of memories is hard to put on a blank page. Most people will never write an autobiography. But your life is too meaningful to be lost to memory."
+   "spoken": "No one remembers a whole life at once. Memories come back one at a time - through a photo, a place, a name, a question, a voice. So what if the right question came to them, one call at a time?"
   },
   {
    "id": "meet-a-story",
@@ -114,6 +106,14 @@
    "seconds": 40,
    "appendix": false,
    "spoken": "This is what makes A Story more than an app for interviewing grandparents. Other tools look backward - a memoir to finish before it’s too late. A Story never assumes the story is finished. Today is part of it too. The same model works for a grandparent’s whole life; for new parents capturing first words and the ordinary days childhood leaves behind; for a wedding told by everyone who was there; for a reunion, remembered by everyone at the table; for any ordinary day. Mom and Dad can start their child’s story today, so one day their child can return to those years through their parents’ eyes and voices. And when the family wants something physical, any chapter becomes a printed book - a chapter, not the finish line. A family tree brought to life."
+  },
+  {
+   "id": "living-memory",
+   "section": "product",
+   "title": "Other products end with a book. A Story becomes a habit.",
+   "seconds": 30,
+   "appendix": false,
+   "spoken": "This is the core of how we think about it. Other products are projects with an ending: prompts, a book, done. A Story is a habit. The phone rings at the time they chose, and they just answer - no homework. Every call, every photo, every relative’s version adds to the same living memory. A printed book is one chapter along the way, not the finish line. The story is never finished; today is part of it too."
   },
   {
    "id": "cant-wait",
@@ -177,7 +177,7 @@
    "title": "Two full-time founders, based in Michigan",
    "seconds": null,
    "appendix": false,
-   "spoken": "We are two full-time founders based in Michigan. I’m Bao Vo, COO. I lead operations, customer discovery and partnerships, and I chose our ten beta families from fifty leads. I came to A Story from a fully funded ECE doctoral fellowship at the University of Michigan, where I researched ultra-low-power implantable circuits, and from two years at miLEAD Consulting leading market-entry and pivot strategy for three pre-clinical biotech startups. Before that I taped out a 22nm chip at Faraday Technology with a top-10% evaluation. Daniel Hoang Nguyen, our CEO, leads product vision, fundraising and finance. He ranked first at BGSU in the Putnam Competition, is Phi Beta Kappa, and placed second at the 2025 BGSU Hackathon for an AI search framework. He started A Story after two uncles who carried his family’s history had strokes and struggled to find the words. We met in winter 2024 through the Vietnamese student community, and we’re a Delaware C-Corp based in Allendale, Michigan. (For the Michigan Business Challenge edition, Pitch Tailor adds Nhi Tran, CMO.)"
+   "spoken": "We are two full-time founders based in Michigan, and we bring two different reasons to believe we will make this work. I’m Bao Vo, COO. I run operations, customer discovery and partnerships, and I chose our ten beta families from fifty leads. Before A Story I built go-to-market strategy for three early-stage biotech startups at miLEAD Consulting, and as an engineer I taped out a 22nm chip on a 1.5-month deadline at Faraday Technology, with a top-10% evaluation. I was a fully funded ECE doctoral fellow at the University of Michigan. Daniel Hoang Nguyen, our CEO, lived the problem: the two uncles who carried his family’s history had strokes and struggled to find the words. He ranked first at BGSU in the Putnam Competition, is Phi Beta Kappa, placed second at the 2025 BGSU Hackathon for an AI search framework, and leads product vision, fundraising and finance. One founder who lived the problem, one who builds go-to-market for early ventures. We met in 2024 through the Vietnamese student community, and we’re a Delaware C-Corp based in Allendale, Michigan. (For the Michigan Business Challenge edition, Pitch Tailor adds Nhi Tran, CMO.)"
   },
   {
    "id": "close",
