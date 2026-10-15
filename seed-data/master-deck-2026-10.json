@@ -55,9 +55,9 @@
    "id": "missing-moment",
    "section": "story",
    "title": "Families care. They just keep missing the moment.",
-   "seconds": 30,
+   "seconds": 35,
    "appendix": false,
-   "spoken": "Families care - they just keep missing the moment. You think of a question at midnight - how did Mom and Dad actually meet? But she’s asleep, three time zones away. In the morning she asks what you wanted, and you’re already in your day: “Oh, nothing. I’ll ask you later.” Later rarely comes. Wanting to know isn’t the problem - finding the moment is. Just imagine being one click away from their voice and stories, anywhere, any time. You may not always have time to call them, but you shouldn’t have to wait for the perfect moment to feel close to them."
+   "spoken": "Families care - they just keep missing the moment. Stories don’t come out on request. They come out when something sparks them: around the table, one old photo - “wait, is that the lake house?” - and an hour of stories pours out. Apart, that spark never happens. And when you do call to ask, “so, tell me about your life” leads to a long pause - where do you even begin? Life happens: you can’t sustainably find time every day to get to know your parents, and some nights you just need to hear their voice. Just imagine being one click away from their voice and stories, anywhere, any time. You may not always have time to call them, but you shouldn’t have to wait for the perfect moment to feel close to them."
   },
   {
    "id": "todays-options",
@@ -108,20 +108,12 @@
    "spoken": "This is the core of how we think about it. Other products are projects with an ending: prompts, a book, done. A Story is a habit. The phone rings at the time they chose, and they just answer - no homework. Every call, every photo, every relative’s version adds to the same living memory. A printed book is one chapter along the way, not the finish line. The story is never finished; today is part of it too."
   },
   {
-   "id": "cant-wait",
-   "section": "proof",
-   "title": "America is aging - and families live further apart",
-   "seconds": 40,
-   "appendix": false,
-   "spoken": "And it can’t wait. America is aging: 11,200 Americans turn 65 every day through 2027 - about 467 an hour, roughly 8 a minute - and by 2030 every baby boomer will be 65 or older. Nearly 1 in 5 Americans is already 65+, 64.6 million people. At the same time, families live further apart. And $124 trillion will pass between generations through 2048. Families plan carefully how to pass on their money. Who’s planning how to pass on their stories? The stories that used to come up at Sunday dinner now need a reason - and a way - to be told."
-  },
-  {
    "id": "why-now",
    "section": "proof",
-   "title": "Now it’s affordable, familiar and one call away",
-   "seconds": 40,
+   "title": "America is aging, and the technology is finally ready",
+   "seconds": 50,
    "appendix": false,
-   "spoken": "Families have always wanted these stories. What changed is that ongoing interviews are now affordable, familiar and one call away. Affordable: after the 2026 voice price cuts - text-to-speech down up to 55% - the same dollar buys about 2.2 times as much voice (1 ÷ 0.45), and a 7–10 minute interview costs about $0.32–0.45 on our stack, modeled. Familiar: generative-AI use among adults 50+ went from 9% in 2023 to 30% in 2025 - 3.3 times in two years. One call away: 95% of adults 65+ own a cellphone. There is no app to learn; after setup, they just answer a scheduled call."
+   "spoken": "And it can’t wait. America is aging: 11,200 Americans turn 65 every day through 2027, and 64.6 million are already 65 or older. $124 trillion will pass between generations through 2048 - families plan carefully how to pass on their money; who is planning how to pass on their stories? At the same time, ongoing interviews are now affordable, familiar and one call away. Affordable: after the 2026 voice price cuts, the same dollar buys about 2.2 times as much voice, and a 7–10 minute interview costs about $0.32–0.45 on our stack, modeled. Familiar: generative-AI use among adults 50+ went from 9% in 2023 to 30% in 2025. One call away: 95% of adults 65+ own a cellphone; after setup, they just answer a scheduled call. Families have always wanted these stories. Now an ongoing interview fits in a phone call."
   },
   {
    "id": "traction",
