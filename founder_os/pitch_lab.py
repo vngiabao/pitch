@@ -17,14 +17,14 @@ MAX_ROUNDS=3
 PASS_SCORE=4
 WORDS_PER_MINUTE=140
 LLM_STAGES=('TAILOR','VOICE','COACH','LEARN')
-FLOW={'PITCH_EDITION':('TAILOR','FACT_CHECK','VOICE','FACT_RECHECK','COACH','FORMAT','READY'),
+FLOW={'PITCH_EDITION':('TAILOR','FACT_CHECK','VOICE','FACT_RECHECK','COACH','FORMAT','BUILD','SLIDE_QA','READY'),
       'PITCH_REVIEW':('FACT_CHECK','COACH','READY'),
       'APPLICATION_SET':('FACT_CHECK','VOICE','FACT_RECHECK','COACH','FORMAT','READY'),
       'GROWTH_DRAFT':('FACT_CHECK','VOICE','FACT_RECHECK','READY'),
       'OUTCOME_LESSON':('LEARN','READY'),
       'VOICE_RULES':('LEARN','READY')}
 STAGE_WORDS={'TAILOR':'Pitch Tailor is drafting','FACT_CHECK':'Fact Guard is checking','VOICE':'Bao’s Voice is editing','FACT_RECHECK':'Fact Guard is rechecking',
-             'COACH':'Pitch Coach is reviewing','FORMAT':'Checking time and limits','LEARN':'Learning from the result','READY':'Ready for you','APPROVED':'Approved by you','ARCHIVED':'Archived'}
+             'COACH':'Pitch Coach is reviewing','FORMAT':'Checking time and limits','BUILD':'Building the deck','SLIDE_QA':'Checking every slide','LEARN':'Learning from the result','READY':'Ready for you','APPROVED':'Approved by you','ARCHIVED':'Archived'}
 CRITERIA=('Clarity','Problem urgency','Insight','Why now','Evidence','Business','Defensibility','Team','The ask','Delivery')
 STORY_SLIDES=('cover','legacy-gap','retelling','want-to-know','cant-wait','todays-options','meet-a-story','every-narrator','the-everyday','why-now')
 HYPE=('leverage','leverages','empower','empowers','seamless','seamlessly','revolutionize','revolutionary','cutting-edge','game-changer','game changer','testament','tapestry','delve','robust','curated','journey')
@@ -219,6 +219,8 @@ class PitchLab:
                 return self.item(iid)
             if stage in ('FACT_CHECK','FACT_RECHECK'):self._fact_stage(it)
             elif stage=='FORMAT':self._format_stage(it)
+            elif stage=='BUILD':self._build_stage(it)
+            elif stage=='SLIDE_QA':self._qa_stage(it)
         return self.item(iid)
 
     def _fact_stage(self,it):
@@ -283,6 +285,48 @@ class PitchLab:
             p['feedback']={'from':'Format Check','fixes':issues};self._save(it['id'],'TAILOR',p,it['round']+1);return
         if issues:p['unresolved']=(p.get('unresolved') or [])+[{'from':'Format Check','text':x,'where':''} for x in issues]
         p['format_issues']=issues;self._save(it['id'],self.next_stage(it['kind'],it['stage']),p)
+
+    # ---------- Edition Builder and Slide QA (deterministic; slide_deck.py) ----------
+    def _build_stage(self,it):
+        from . import slide_deck
+        p=it['payload']
+        try:
+            m=slide_deck.build_edition(self.s,it['id'],it['round'],p['brief'],p.get('program',''),p.get('minutes',3))
+            p['edition']={k:m[k] for k in ('round','core','built_at','dir','new_slides')}|{'slides':[{k:x[k] for k in ('id','n','title','seconds','source')} for x in m['slides']]}
+            self.review(it['id'],'BUILDER','BUILT',{'slides':len(m['slides']),'new_slides':m['new_slides'],'core':m['core']})
+            self._save(it['id'],'SLIDE_QA',p)
+        except (ValueError,OSError,KeyError) as e:
+            p.pop('edition',None);p['unresolved']=[u for u in (p.get('unresolved') or []) if u.get('from')!='Edition Builder']+[{'from':'Edition Builder','text':'The deck could not be built: '+str(e)[:200],'where':''}]
+            self.review(it['id'],'BUILDER','FAILED',{'error':str(e)[:300]});self._save(it['id'],'READY',p)
+
+    def _qa_stage(self,it):
+        from . import slide_deck
+        p=it['payload'];m=self.edition_manifest(it)
+        qa=slide_deck.run_qa(m) if m else {'available':False,'reason':'No deck was built','slides':[],'blocking':0,'warnings':0}
+        p['slide_qa']=qa
+        p['unresolved']=[u for u in (p.get('unresolved') or []) if u.get('from')!='Slide QA']+[
+            {'from':'Slide QA','text':i['text'],'where':f"slide {s['n']} · {s['id']}"} for s in qa.get('slides',[]) for i in s['issues'] if i['severity']=='block']
+        if not p['unresolved']:p.pop('unresolved')
+        self.review(it['id'],'SLIDE_QA','PASS' if qa.get('available') and not qa.get('blocking') else 'FLAGS' if qa.get('available') else 'SKIPPED',
+                    {'blocking':qa.get('blocking',0),'warnings':qa.get('warnings',0),'reason':qa.get('reason'),
+                     'issues':[{'text':f"Slide {s['n']}: "+i['text'],'severity':i['severity']} for s in qa.get('slides',[]) for i in s['issues'] if i['severity']=='block'][:12]})
+        self._save(it['id'],self.next_stage(it['kind'],'SLIDE_QA'),p)
+
+    def edition_manifest(self,it):
+        e=(it['payload'] or {}).get('edition')
+        if not e or not e.get('dir'):return None
+        from pathlib import Path
+        f=Path(e['dir'])/'manifest.json'
+        return json.loads(f.read_text(encoding='utf-8')) if f.exists() else None
+
+    def build_now(self,iid):
+        """Build and check the deck for an edition that reached Bao before Edition Builder existed, without moving its stage."""
+        it=self.item(iid)
+        if it['kind']!='PITCH_EDITION' or not it['payload'].get('brief'):raise ValueError('Only a tailored pitch edition has a deck to build')
+        stage=it['stage'];self._build_stage(it);it=self.item(iid)
+        if it['stage']=='SLIDE_QA':self._qa_stage(it)
+        if stage!=self.item(iid)['stage']:self._save(iid,stage)
+        return self.item(iid)
 
     # ---------- AI stages (run by the worker with a Codex runner) ----------
     def base_context(self,applies):

@@ -1,8 +1,14 @@
 import json
+import os
 import unittest
+import zipfile
+import io
+# Slide QA launches a real browser; only the dedicated test below turns it on.
+os.environ.setdefault('FOUNDER_OS_SLIDE_QA','off')
 import test_funding_hunter as fixtures
 from founder_os.pitch_lab import PitchLab,FactGuard,PIPELINE_PREFIX
 from founder_os.money_map import MoneyMap,classify
+from founder_os import slide_deck
 
 
 def brief(text_by_slide,minutes=3):
@@ -157,3 +163,68 @@ class PitchLabTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+class EditionBuilderTests(unittest.TestCase):
+    setUp=fixtures.HunterTests.setUp
+    tearDown=fixtures.HunterTests.tearDown
+    record=fixtures.HunterTests.record
+    run_ai=PitchLabTests.run_ai
+
+    def ready_edition(self,script):
+        oid=self.h.upsert(self.record('Startup World Cup'))['opportunity_id'];lab=PitchLab(self.s)
+        b=brief(script);b['script'].append({'slide_id':'new-2','title':'The ask','seconds':20,'text':'Here is what we are raising.'});b['ask']='We are raising a pre-seed round. It funds the retention proof.'
+        runner=Runner(tailor=[b],voice=[{'segments':[],'notes':[]}],coach=[coach(5)])
+        it=lab.start_edition(oid,3)
+        for _ in range(3):it=self.run_ai(lab,it['id'],runner)
+        return lab,it
+
+    def test_edition_is_built_from_core_slides_in_order(self):
+        lab,it=self.ready_edition({'legacy-gap':'Eighty years of a life.','business':'Families pay $119 a year to keep the story growing.'})
+        self.assertEqual(it['stage'],'READY')
+        self.assertEqual([r['agent'] for r in it['reviews']][-2:],['BUILDER','SLIDE_QA'])
+        e=it['payload']['edition'];self.assertEqual([s['id'] for s in e['slides']],['legacy-gap','business','new-2']);self.assertEqual(e['new_slides'],['new-2'])
+        m=lab.edition_manifest(it);out,slides=slide_deck.edition_files(m)
+        deck=json.loads((out/'deck.json').read_text(encoding='utf-8'))
+        self.assertEqual(deck['order'],['legacy-gap','business','new-2']);self.assertEqual(deck['cover'],'legacy-gap')
+        self.assertTrue(all(v['start'] in deck['order'] for v in deck['sections'].values()))
+        # Core design untouched: same markup as the frozen slide apart from notes and page number.
+        _,_,core=slide_deck.load_core()
+        strip=lambda h:slide_deck.PAGE_NO.sub('',slide_deck.ASIDE.sub('',h))
+        self.assertEqual(strip(slides['business']),strip(core['business']))
+        self.assertIn('<aside>~0:30 · Families pay $119 a year',slides['business'])
+        self.assertRegex(slides['business'],r'bottom:\s*40px[^"]*">02</p>')
+        self.assertIn('data-draft="true"',slides['new-2']);self.assertIn('We are raising a pre-seed round.',slides['new-2'])
+        self.assertEqual(it['payload']['slide_qa']['available'],False)
+        z=zipfile.ZipFile(io.BytesIO(slide_deck.edition_zip(m)))
+        names=z.namelist();self.assertIn('project/deck.json',names);self.assertIn('project/slides/business.html',names)
+        self.assertTrue(any(n.startswith('assets/') for n in names),'images travel with the deck')
+        page=slide_deck.preview_page(m,it['payload']['slide_qa'],it['title'])
+        self.assertIn('/edition-asset/',page);self.assertNotIn('/_blob/',page);self.assertIn('/vendor/gsap.min.js',page)
+
+    def test_build_now_keeps_an_approved_editions_stage(self):
+        lab,it=self.ready_edition({'legacy-gap':'Eighty years of a life.'})
+        lab.approve(it['id']);p=lab.item(it['id'])['payload'];p.pop('edition');lab._save(it['id'],payload=p)
+        it=lab.build_now(it['id'])
+        self.assertEqual(it['stage'],'APPROVED');self.assertEqual(it['payload']['edition']['slides'][0]['id'],'legacy-gap')
+        with self.assertRaises(ValueError):lab.build_now(lab.create('GROWTH_DRAFT','x',{'body':'Hello','title':'x'})['id'])
+
+    @unittest.skipUnless(slide_deck.find_browser(),'needs Edge or Chrome')
+    def test_slide_qa_catches_broken_layouts(self):
+        lab,it=self.ready_edition({'legacy-gap':'Eighty years of a life.','business':'Families pay $119 a year.'})
+        m=lab.edition_manifest(it);out=__import__('pathlib').Path(m['dir'])
+        bad=('<section id="business" style="background:#f3ebde">'
+             '<p style="position:absolute; top:100px; left:100px; width:900px; font-size:60px; font-weight:800">Two lines that collide with each other here</p>'
+             '<p style="position:absolute; top:110px; left:120px; width:900px; font-size:60px; font-weight:800">Another title placed on top of it</p>'
+             '<div style="position:absolute; top:400px; left:100px; width:500px; height:80px; background:#2e5163"></div>'
+             '<p style="position:absolute; top:410px; left:120px; width:460px; font-size:40px; color:#fff">This text is far too long for the small box it sits in</p>'
+             '<p style="position:absolute; top:900px; left:1700px; width:400px; font-size:40px">Runs off the slide</p><aside>notes</aside></section>')
+        (out/'slides'/'business.html').write_text(bad,encoding='utf-8')
+        os.environ['FOUNDER_OS_SLIDE_QA']='on'
+        try:qa=slide_deck.run_qa(m)
+        finally:os.environ['FOUNDER_OS_SLIDE_QA']='off'
+        self.assertTrue(qa['available'],qa.get('reason'))
+        by={s['id']:{i['rule'] for i in s['issues'] if i['severity']=='block'} for s in qa['slides']}
+        self.assertEqual(by['legacy-gap'],set(),'an approved core slide passes')
+        self.assertTrue({'TEXT_OVERLAP','TEXT_SPILL','OFF_SLIDE'}<=by['business'],by['business'])
+        self.assertTrue(any(i['rule']=='NEW_SLIDE' for s in qa['slides'] for i in s['issues']))

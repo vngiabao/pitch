@@ -404,8 +404,18 @@ document.addEventListener('submit',async e=>{
 });
 // ---------- Pitch Lab: tailor, fact-check, voice and coach every pitch (AGENT-SYSTEM.md) ----------
 const LAB_KIND_WORDS={PITCH_EDITION:'Program edition',PITCH_REVIEW:'Pitch review',APPLICATION_SET:'Application answers',GROWTH_DRAFT:'Outreach draft',OUTCOME_LESSON:'Lessons from a result',VOICE_RULES:'Lessons from your edits'};
-const LAB_AGENTS=[['TAILOR','Pitch Tailor','Reads the program’s rules and builds the edition from the master deck'],['FACT_CHECK','Fact Guard','Every number and claim traced to approved facts'],['VOICE','Bao’s Voice','Rewrites the wording the way you write'],['FACT_RECHECK','Fact Guard','Makes sure the voice edit changed no facts'],['COACH','Pitch Coach','Scores it like a YC partner and sends fixes back'],['FORMAT','Format Check','Time, slide and word limits'],['READY','You','Edit, approve, and submit it yourself']];
-const AGENT_WORDS={TAILOR:'Pitch Tailor',FACT_GUARD:'Fact Guard',VOICE:'Bao’s Voice',COACH:'Pitch Coach',FORMAT:'Format Check',OWNER:'You',LEARNER:'Outcome Learner'};
+const LAB_AGENTS=[['TAILOR','Pitch Tailor','Reads the program’s rules and builds the edition from the master deck'],['FACT_CHECK','Fact Guard','Every number and claim traced to approved facts'],['VOICE','Bao’s Voice','Rewrites the wording the way you write'],['FACT_RECHECK','Fact Guard','Makes sure the voice edit changed no facts'],['COACH','Pitch Coach','Scores it like a YC partner and sends fixes back'],['FORMAT','Format Check','Time, slide and word limits'],['BUILD','Edition Builder','Builds the deck from the core deck’s own slides'],['SLIDE_QA','Slide QA','Renders every slide and checks the layout'],['READY','You','Edit, approve, and submit it yourself']];
+const AGENT_WORDS={TAILOR:'Pitch Tailor',FACT_GUARD:'Fact Guard',VOICE:'Bao’s Voice',COACH:'Pitch Coach',FORMAT:'Format Check',BUILDER:'Edition Builder',SLIDE_QA:'Slide QA',OWNER:'You',LEARNER:'Outcome Learner'};
+function deckSection(it,id){
+ const e=it.payload.edition,q=it.payload.slide_qa;
+ if(!e)return `<section class="section deck-box"><div class="section-title"><h2>The deck</h2></div><p class="small">This edition was made before Edition Builder existed. Build it from the core deck’s own slides and check every slide.</p><div class="actions"><button class="primary" type="button" data-lab-build="${E(id)}">Build the deck</button></div></section>`;
+ const issues=(q&&q.slides||[]).flatMap(s=>s.issues.map(i=>({...i,n:s.n,sid:s.id})));
+ const head=q&&q.available?(q.blocking?`${plural(q.blocking,'layout problem')} to fix`:'No layout problems')+(q.warnings?` · ${plural(q.warnings,'thing')} to look at`:''):'Slide QA did not run'+(q&&q.reason?': '+q.reason:'');
+ return `<section class="section deck-box"><div class="section-title"><h2>The deck</h2><span class="count-chip">${e.slides.length} slides</span></div>`+
+  `<p class="deck-summary${q&&q.blocking?' bad':''}">${E(head)}</p><p class="small">Built from the core deck (${E(e.core)}) in round ${E(e.round)}. Core slides keep their design; only order, notes and page numbers change.${e.new_slides&&e.new_slides.length?` ${plural(e.new_slides.length,'new slide')} drafted from a plain template: design ${e.new_slides.length>1?'them':'it'} before you present.`:''}</p>`+
+  `<div class="actions"><a class="button primary" href="/edition/${E(id)}" target="_blank" rel="noopener">Open the deck preview</a><a class="button" href="/api/lab/${E(id)}/edition.zip">Download the deck files</a><button type="button" data-lab-build="${E(id)}">Rebuild and check again</button></div>`+
+  (issues.length?`<ul class="qa-list">${issues.slice(0,12).map(i=>`<li class="${E(i.severity)}"><b>Slide ${i.n}</b> ${E(i.text)}</li>`).join('')}</ul>${issues.length>12?`<p class="small">${issues.length-12} more in the preview.</p>`:''}`:'')+`</section>`;
+}
 function stageChip(it){const done=['READY','APPROVED'].includes(it.stage);return `<span class="stage-chip${done?' done':''}${it.error?' failed':''}">${E(it.error?'Stopped: needs a retry':it.stage_words)}${it.round>1&&!done?' · round '+it.round:''}</span>`;}
 function scoreDots(n){return `<span class="score-dots" aria-label="${n} of 5">${[1,2,3,4,5].map(i=>`<span class="${i<=n?'on':''}${i<=n&&n<4?' low':''}"></span>`).join('')}</span>`;}
 function assemblyLine(stages){
@@ -450,7 +460,8 @@ async function pitchLabItem(id){
  app.innerHTML=`<p class="back-link"><a href="/pitch-lab">← Pitch Lab</a></p>`+heading(it.title,(LAB_KIND_WORDS[it.kind]||it.kind)+' · round '+it.round)+progressLine(it)+
  (it.error?`<div class="notice"><strong>An agent step stopped</strong><p>${E(it.error.slice(0,300))}</p></div>`:'')+
  (!ready&&!it.error?`<div class="all-clear working"><h2>${E(it.stage_words)}</h2><p class="small">This page fills in as each agent finishes. One step runs every few minutes.</p></div>`:'')+
- (ready?`<section class="section ready-bar"><div><p class="ready-title">${it.stage==='APPROVED'?'You approved this':'Ready for you'}</p><p class="small">${it.kind==='PITCH_EDITION'?'Save the script to Pitch Studio to rehearse and edit it. Your edits teach Bao’s Voice.':'Copy what you need. Your own rewrites teach Bao’s Voice.'}</p>${(it.payload.unresolved||[]).length?`<div class="lab-unresolved"><p class="ready-title">Still needs your eyes</p><ul>${it.payload.unresolved.map(u=>`<li><strong>${E(u.from)}</strong> ${E(u.text)}${u.where?` <span class="muted">(${E(u.where)})</span>`:''}</li>`).join('')}</ul><p class="small muted">The agents ran out of revision rounds. Fix these yourself or run another round.</p></div>`:''}</div><div class="actions">${it.kind==='PITCH_EDITION'?`<button class="primary" type="button" data-lab-save="${E(id)}">Save script to Pitch Studio</button>`:''}${it.stage==='READY'?`<button type="button" data-lab-approve="${E(id)}">Approve</button>`:''}</div></section>`:'')+
+ (ready?`<section class="section ready-bar"><div><p class="ready-title">${it.stage==='APPROVED'?'You approved this':'Ready for you'}</p><p class="small">${it.kind==='PITCH_EDITION'?'Save the script to Pitch Studio to rehearse and edit it. Your edits teach Bao’s Voice.':'Copy what you need. Your own rewrites teach Bao’s Voice.'}</p>${(it.payload.unresolved||[]).length?`<div class="lab-unresolved"><p class="ready-title">Still needs your eyes</p><ul>${it.payload.unresolved.map(u=>`<li><strong>${E(u.from)}</strong> ${E(u.text)}${u.where?` <span class="muted">(${E(u.where)})</span>`:''}</li>`).join('')}</ul><p class="small muted">The agents could not fix these on their own. Fix them yourself or run another round.</p></div>`:''}</div><div class="actions">${it.kind==='PITCH_EDITION'?`<button class="primary" type="button" data-lab-save="${E(id)}">Save script to Pitch Studio</button>`:''}${it.stage==='READY'?`<button type="button" data-lab-approve="${E(id)}">Approve</button>`:''}</div></section>`:'')+
+ (it.kind==='PITCH_EDITION'&&brief.script&&ready?deckSection(it,id):'')+
  coachCard(it.coach)+
  (it.kind==='PITCH_EDITION'&&brief.script?
   `<section class="section"><div class="section-title"><h2>The program’s rules</h2>${rules.minutes?`<span class="count-chip">${E(rules.minutes)} min</span>`:''}</div><dl class="fact-list">`+
@@ -505,8 +516,9 @@ document.addEventListener('submit',async e=>{
  }catch(err){toast(err.message,true);}finally{btn.disabled=false;}
 });
 document.addEventListener('click',async e=>{
- const b=e.target.closest('[data-lab-save],[data-lab-approve],[data-lesson],[data-move],[data-lab-app]');if(!b)return;e.preventDefault();b.disabled=true;
+ const b=e.target.closest('[data-lab-save],[data-lab-approve],[data-lab-build],[data-lesson],[data-move],[data-lab-app]');if(!b)return;e.preventDefault();b.disabled=true;
  try{
+  if(b.dataset.labBuild){b.textContent='Building and checking…';await api('/api/lab-build',{id:b.dataset.labBuild});return pitchLabItem(b.dataset.labBuild);}
   if(b.dataset.labSave){const r=await api('/api/lab-save',{id:b.dataset.labSave});location.href='/pitch/'+r.pitch_id;return;}
   if(b.dataset.labApprove){await api('/api/lab-approve',{id:b.dataset.labApprove});await boot();toast('Approved. Submit it yourself when you’re ready.');}
   else if(b.dataset.lesson){await api('/api/lesson',{id:b.dataset.lesson,decision:b.dataset.decision});await boot();toast(b.dataset.decision==='APPROVED'?'Every agent follows this from now on.':'Lesson rejected.');}

@@ -652,3 +652,11 @@ details.add-person{margin:0 0 var(--space-8);padding:var(--space-4) var(--space-
 /* Pitch Lab: checks the agents could not clear in their last round */
 .lab-unresolved{margin-top:14px;padding:12px 14px;border-left:3px solid var(--color-urgent);background:var(--color-urgent-wash);border-radius:var(--radius-field)}
 .lab-unresolved ul{margin:6px 0 6px 18px;padding:0}.lab-unresolved li{margin:3px 0}
+
+/* Edition Builder and Slide QA */
+.deck-box .deck-summary{font-weight:700;margin:4px 0 6px;color:var(--teal,#2e5163)}
+.deck-box .deck-summary.bad{color:#b23b25}
+.qa-list{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.qa-list li{padding:8px 12px;border-radius:10px;background:#fff7e6;font-size:.92rem}
+.qa-list li.block{background:#fbe7e3}
+.qa-list li b{margin-right:6px}

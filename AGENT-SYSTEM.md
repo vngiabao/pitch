@@ -17,6 +17,8 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 | Check | **Bao's Voice** | Rewrites wording into Bao's voice (BAO-VOICE.md). Never changes facts. | Yes | No |
 | Check | **Pitch Coach** | YC-partner review: 10-point scorecard, hard questions, the three fixes that matter most | Yes | No |
 | Check | **Format Check** | Word and character limits, time at 130–150 wpm, required sections | No (rules) | No |
+| Build | **Edition Builder** | Turns the slide plan into a real deck from the frozen core deck's own slides (`seed-data/core-deck-*`): order, speaker notes and page numbers change, the design never does. New slides (`new-1`, `new-2`) are drafted from one plain template and flagged. | No (rules) | No |
+| Check | **Slide QA** | Renders every slide in headless Edge and measures it: text overlapping text, text running past its box, anything off the slide, rows a few pixels out of line, text under 18px, missing images and notes. Problems go to Bao under "Still needs your eyes". | No (rules) | No |
 | Decide | **Bao** | Edits, approves or rejects. Submits himself. | - | - |
 | Learn | **Outcome Learner** | Turns results and Bao's edits into proposed lessons | Yes | No |
 | Report | **Daily Report and Today** | One list of what needs Bao, every morning | No | No |
@@ -45,6 +47,12 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
  Format Check                          (limits, timing)
             │
             ▼
+ Edition Builder                       (pitch editions: the deck itself, from core slides)
+            │
+            ▼
+ Slide QA                              (renders and measures every slide)
+            │
+            ▼
  READY FOR BAO   → Today, the daily email, and the item's page
             │
    Bao edits ──► his edit becomes a voice example (feeds Bao's Voice and Coach)
@@ -57,7 +65,7 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
  Outcome Learner ──► proposed lessons in Decisions ──► approved lessons join the playbook context
 ```
 
-**Stages** (stored on each work item): `DRAFT → FACT_CHECK → VOICE → FACT_RECHECK → COACH → (REVISE → DRAFT …) → FORMAT → READY → APPROVED → SUBMITTED → RESULT`.
+**Stages** (stored on each work item): `DRAFT → FACT_CHECK → VOICE → FACT_RECHECK → COACH → (REVISE → DRAFT …) → FORMAT → BUILD → SLIDE_QA → READY → APPROVED → SUBMITTED → RESULT`.
 
 **Loop limits.** At most two revision rounds. On round 3 the item goes to Bao anyway, with the Coach's open concerns attached. Bao's time is the bottleneck, so the system never loops silently forever, and never hides a weak score.
 
@@ -83,3 +91,8 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 - **Pitch Lab:** program editions, with the Coach scorecard, hard questions with suggested answers, the timed script and the slide plan.
 - **Each application page:** answers with Fact Guard and Voice notes, plus the Coach's scorecard for the whole set.
 - **Agent activity:** the assembly line, live: what each agent is doing and every item's stage.
+
+
+## Program edition decks
+
+Each pitch edition gets a real deck at `data/editions/<item>/round-<n>/` (`deck.json`, `slides/`, `manifest.json`). Bao opens it at `/edition/<item>`: every slide at half size, with Slide QA's notes numbered on the slide (animated with GSAP, which honours reduced motion). "Download the deck files" gives a zip with the Slides files and the images, ready to publish as a Slides deck. Editions made before Edition Builder existed get a "Build the deck" button. The core deck's images live in `seed-data/core-deck-*/assets/`, so editions and QA work without claude.ai. Slide QA turns off with `FOUNDER_OS_SLIDE_QA=off` and skips itself, with a note, when no browser is installed.

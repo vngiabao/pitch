@@ -26,11 +26,11 @@ class Handler(BaseHTTPRequestHandler):
     def _authorized(self):
         cookie=SimpleCookie();cookie.load(self.headers.get('Cookie',''))
         return bool(cookie.get('founder_session') and secrets.compare_digest(cookie['founder_session'].value,self.server.token))
-    def respond(self,status,data,mime='application/json',cookie=False,filename=None):
+    def respond(self,status,data,mime='application/json',cookie=False,filename=None,csp=None):
         raw=data if isinstance(data,bytes) else json.dumps(data,ensure_ascii=False).encode()
         self.send_response(status);self.send_header('Content-Type',mime+'; charset=utf-8');self.send_header('Content-Length',str(len(raw)))
         self.send_header('Cache-Control','no-store');self.send_header('X-Content-Type-Options','nosniff');self.send_header('X-Frame-Options','DENY')
-        self.send_header('Referrer-Policy','no-referrer');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'self'")
+        self.send_header('Referrer-Policy','no-referrer');self.send_header('Content-Security-Policy',csp or "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'self'")
         if filename:self.send_header('Content-Disposition',"attachment; filename*=UTF-8''"+quote(filename,safe=''))
         if cookie:self.send_header('Set-Cookie',f'founder_session={self.server.token}; Path=/; HttpOnly; SameSite=Strict'+('; Secure' if self.server.access else ''))
         self.end_headers();self.wfile.write(raw)
@@ -41,14 +41,27 @@ class Handler(BaseHTTPRequestHandler):
         if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
-        if route in ('/app.js','/pitch.js','/style.css'):
+        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
         if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
         if not self._authorized():return self.respond(403,{'error':'Open the Founder OS command center first'})
+        if route.startswith('/edition-asset/'):
+            from . import slide_deck
+            f=slide_deck.asset_path(route.rsplit('/',1)[1])
+            if not f:return self.respond(404,{'error':'Image not found'})
+            return self.respond(200,f.read_bytes(),slide_deck.MIME.get(f.suffix.lower(),'application/octet-stream'))
         s=Store(self.server.db_path)
         try:
             h=FundingHunter(s);q=parse_qs(p.query)
+            if route.startswith('/edition/') or (route.startswith('/api/lab/') and route.endswith('/edition.zip')):
+                from .pitch_lab import PitchLab
+                from . import slide_deck
+                lab=PitchLab(s);iid=route.split('/')[2] if route.startswith('/edition/') else route.split('/')[3];it=lab.item(iid);m=lab.edition_manifest(it)
+                if not m:return self.respond(404,{'error':'This edition has no deck yet'})
+                if route.endswith('/edition.zip'):return self.respond(200,slide_deck.edition_zip(m),'application/zip',filename='A-Story-'+iid+'-round-'+str(m['round'])+'.zip')
+                page=slide_deck.preview_page(m,it['payload'].get('slide_qa'),it['title'])
+                return self.respond(200,page.encode('utf-8'),'text/html',csp="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; form-action 'none'")
             if route=='/api/pitches':
                 from .pitch_studio import PitchStudio
                 result=PitchStudio(s).list(q.get('q',[''])[0],q.get('audience',[''])[0],q.get('scenario',[''])[0],q.get('duration',[''])[0],q.get('archived',[''])[0]=='yes')
@@ -231,7 +244,7 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result=g.queue_draft(p['kind'],p['id'],manual=True) if route=='/api/growth-draft' else g.request_press_discovery()
                     self.start_worker()
-            elif route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun','/api/lab-approve','/api/lab-save','/api/lesson'):
+            elif route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun','/api/lab-approve','/api/lab-save','/api/lab-build','/api/lesson'):
                 from .pitch_lab import PitchLab
                 lab=PitchLab(s)
                 if route=='/api/lab-edition':result=lab.start_edition(p['opportunity_id'],p.get('minutes',3),p.get('slide_limit') or None,p.get('note',''))
@@ -240,6 +253,7 @@ class Handler(BaseHTTPRequestHandler):
                 elif route=='/api/lab-rerun':result=lab.rerun(p['id'],p.get('note',''))
                 elif route=='/api/lab-approve':result=lab.approve(p['id'])
                 elif route=='/api/lab-save':result=lab.save_to_studio(p['id'])
+                elif route=='/api/lab-build':result={k:v for k,v in lab.build_now(p['id']).items() if k!='payload'}
                 else:result=lab.decide_lesson(p['id'],p['decision'])
                 if route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun'):
                     result={k:v for k,v in result.items() if k!='payload'};self.start_worker()
