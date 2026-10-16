@@ -110,6 +110,17 @@ class PitchLabTests(unittest.TestCase):
         self.assertNotIn('—',it['payload']['brief']['ask'])
         self.assertTrue(any('need your eyes' in a['title'] for a in lab.alerts()))
 
+    def test_last_round_block_that_voice_fixed_is_not_left_open(self):
+        oid=self.h.upsert(self.record('Startup World Cup'))['opportunity_id'];lab=self.lab()
+        bad=brief({'traction':'Hope College is our first partner campaign.'})
+        fixed=[{'key':'traction','text':'Many Hope College students want to preorder or join our mailing list.','changed':True}]
+        runner=Runner(tailor=[bad,bad,bad],voice=[{'segments':fixed,'notes':[]}],coach=[coach(5)])
+        it=lab.start_edition(oid,3)
+        for _ in range(5):it=self.run_ai(lab,it['id'],runner)
+        self.assertEqual(it['stage'],'READY')
+        self.assertNotIn('unresolved',it['payload'])
+        self.assertEqual([r['verdict'] for r in it['reviews'] if r['agent']=='FACT_GUARD'][-2:],['BLOCK','PASS'])
+
     def test_format_check_sends_long_scripts_back(self):
         oid=self.h.upsert(self.record('Five By Five Night'))['opportunity_id'];lab=self.lab()
         long={'legacy-gap':' '.join(['story']*400)}

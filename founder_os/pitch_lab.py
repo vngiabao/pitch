@@ -256,6 +256,11 @@ class PitchLab:
             elif it['kind']=='APPLICATION_SET':
                 for a in payload['answers']:
                     if a['question_id'] in bad:a.pop('suggested',None)
+        if it['stage']=='FACT_RECHECK':
+            # A last-round block that Voice's wording fixed is no longer open; one the recheck still finds stays.
+            still={(i['where'],i['text']) for i in result['issues']}
+            payload['unresolved']=[u for u in (payload.get('unresolved') or []) if u.get('from')!='Fact Guard' or (u.get('where'),u.get('text')) in still]
+            if not payload['unresolved']:payload.pop('unresolved')
         self.review(it['id'],'FACT_GUARD','BLOCK' if result['blocking'] else 'PASS',{'issues':result['issues']})
         if it['stage']=='FACT_CHECK' and result['blocking'] and 'TAILOR' in FLOW[it['kind']] and it['round']<MAX_ROUNDS:
             payload['feedback']={'from':'Fact Guard','fixes':[i['text']+' ('+i['where']+')' for i in result['issues'] if i['severity']=='block']}
