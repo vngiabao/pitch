@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
-        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
+        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/product.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
         if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
@@ -147,6 +147,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/money':
                 from .money_map import MoneyMap
                 result=MoneyMap(s).board()
+            elif route=='/api/product':
+                from .product_desk import ProductDesk
+                result=ProductDesk(s).board()
             elif route=='/api/applications':result=s.rows('SELECT a.*,o.program,o.cycle FROM applications a JOIN opportunities o ON o.id=a.opportunity_id')
             elif route=='/api/autonomy':
                 from .application_pilot import ApplicationPilot
@@ -280,6 +283,14 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/money-move':
                 from .money_map import MoneyMap
                 result=MoneyMap(s).set_move(p['id'],p['state'])
+            elif route in ('/api/family','/api/family-update','/api/family-event','/api/family-event-delete','/api/metrics-import'):
+                from .product_desk import ProductDesk
+                d=ProductDesk(s)
+                if route=='/api/family':result=d.add_family(p)
+                elif route=='/api/family-update':result=d.update_family(p['id'],p)
+                elif route=='/api/family-event':result=d.log_event(p)
+                elif route=='/api/family-event-delete':result=d.delete_event(p['id'])
+                else:result=d.import_file(p['file'],p['provider'],p.get('note',''))
             elif route=='/api/notification-read':
                 s.db.execute('UPDATE funding_notifications SET read_at=datetime(\'now\') WHERE id=?',(p['id'],));result={'read':True}
             else:return self.respond(404,{'error':'Action not available'})

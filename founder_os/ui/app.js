@@ -241,6 +241,7 @@ async function boot(){
  if(path==='/pitch-lab')return pitchLab();
  if(path==='/money')return moneyMap();
  if(path==='/growth')return growthDesk();
+ if(path==='/families')return betaFamilies();
  if(path.startsWith('/pitch/'))return pitchEditor(path.split('/').at(-1));
  if(path==='/pitches')return pitchLibrary();
  if(path.startsWith('/material/')){await material(path.split('/').at(-1));try{app.querySelector('.page-heading a').href=sessionStorage.getItem('astory-materials-list')||'/materials';}catch{}return;}

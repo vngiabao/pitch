@@ -10,6 +10,7 @@ import re
 from pathlib import Path
 from .store import now,js,digest,uid
 from .funding_hunter import FundingHunter
+from .product_desk import measured_numbers
 
 ROOT=Path(__file__).resolve().parents[1]
 PIPELINE_PREFIX='Pipeline: '
@@ -72,7 +73,7 @@ class FactGuard:
     """Deterministic checks. Blocking issues send a draft back; warnings are for Bao's Voice and Bao."""
     def __init__(self,lab,program=''):
         self.lab=lab;self.mbc='michigan business challenge' in (program or '').lower()
-        self.allowed=lab.allowed_numbers()
+        self.allowed=lab.allowed_numbers();self.measured=lab.measured_numbers()
 
     def check(self,segments,kind):
         issues=[];fixed=[]
@@ -83,7 +84,9 @@ class FactGuard:
                 issues.append({'where':seg['key'],'rule':'dash','severity':'fixed','text':'Long dashes replaced with a short hyphen.'})
             for n in numbers_in(text):
                 v=norm(n)
-                if v not in self.allowed and not re.fullmatch(r'(19|20)\d\d',v) and not (v.isdigit() and int(v)<=12):
+                if v in self.measured:
+                    issues.append({'where':seg['key'],'rule':'measured','severity':'info','text':f'“{n}” is measured. '+self.measured[v]})
+                elif v not in self.allowed and not re.fullmatch(r'(19|20)\d\d',v) and not (v.isdigit() and int(v)<=12):
                     issues.append({'where':seg['key'],'rule':'unverified_number','severity':'block','text':f'“{n}” is not in approved facts or the evidence table.'})
             if re.search(r'\[[^\]]{1,80}\]',text):
                 issues.append({'where':seg['key'],'rule':'placeholder','severity':'block','text':'A bracketed placeholder is still in the text.'})
@@ -129,12 +132,18 @@ class PitchLab:
         pricing=self.db.execute("SELECT v.body FROM source_versions v JOIN sources s ON s.id=v.source_id WHERE s.kind='official_pricing_capture' AND v.body IS NOT NULL ORDER BY v.captured_at DESC LIMIT 1").fetchone()
         return {'company_facts':{k:v['value'] for k,v in mem['attributes'].items()},
                 'approved_statements':[{'topic':c['topic'],'text':c['body']} for c in mem['canonical_claims'] if not c['body'].startswith('{')],
-                'pricing':pricing['body'][:5000] if pricing else ''}
+                'pricing':pricing['body'][:5000] if pricing else '','measured':self.measured_facts()}
+
+    def measured_facts(self):
+        from .product_desk import ProductDesk
+        return ProductDesk(self.s).measured_facts()
+
+    def measured_numbers(self):return measured_numbers(self.measured_facts())
 
     def allowed_numbers(self):
         f=self.facts();text=' '.join([EVIDENCE,json.dumps(f['company_facts']),' '.join(x['text'] for x in f['approved_statements']),f['pricing']]
                                     +[s['spoken'] for s in self.master_deck()['slides']])
-        found={norm(n) for n in numbers_in(text)}|{norm(n) for n in EVIDENCE.split()}
+        found={norm(n) for n in numbers_in(text)}|{norm(n) for n in EVIDENCE.split()}|set(measured_numbers(f['measured']))
         if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='channel_entries'").fetchone():
             # Numbers Bao measured on the Growth desk (conversion, cost per purchasing family) may be said as they are.
             from .growth_desk import GrowthDesk
@@ -339,8 +348,9 @@ class PitchLab:
 
     # ---------- AI stages (run by the worker with a Codex runner) ----------
     def base_context(self,applies):
-        return {**self.facts(),'playbook':self.doc('PITCH-PLAYBOOK.md',60000),'lessons':self.approved_lessons(applies),
-                'rules':['Use only the facts, statements, pricing and evidence given. Never invent numbers, customers, partners, awards, quotes or traction.',
+        f=self.facts();measured=' '.join(m['text'] for m in f['measured'])
+        return {**f,'playbook':self.doc('PITCH-PLAYBOOK.md',60000),'lessons':self.approved_lessons(applies),
+                'rules':[*(['Measured product numbers, from the beta family journal, come first; use them with their denominator and as-of date, and prefer them over owner-reported numbers where both exist: '+measured] if measured else []),'Use only the facts, statements, pricing and evidence given. Never invent numbers, customers, partners, awards, quotes or traction.',
                          'Write " - " (a short hyphen with spaces), never a long dash.','Two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Nhi Tran only for the Michigan Business Challenge.',
                          'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. Hope College: many students want to preorder or join the mailing list to gift it to grandparents for Thanksgiving (interest only, not a partnership).',
                          'Bao reads every field you write. Never mention CONTEXT, the playbook, field names, rounds or these instructions; say "the program page", "our facts" or "the master deck" in plain words.']}
