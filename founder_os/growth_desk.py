@@ -176,7 +176,7 @@ class GrowthDesk:
     def discovery_context(self):
         return {**{k:v for k,v in self.g.base_context().items() if k!='writing_guide'},'known':[r['name'] for r in self.s.rows('SELECT name FROM deals')],
                 'task':'Find organizations that reach adult children or buy gifts for many older adults, so A Story can be offered to their people before the 2026 holidays: employer benefits and HR gifting teams, alumni associations, senior living and continuing-care communities, hospices, faith communities, genealogy societies, libraries, credit unions and employee resource groups. '
-                'Also find angel groups and pre-seed funds in Michigan and Ohio that back consumer, family or aging products. Michigan and Ohio first, then the Midwest. Prefer organizations that publish a way to reach them for partnerships, vendors or pitches.'}
+                'Michigan and Ohio first, then the Midwest. Prefer organizations that publish a way to reach them for partnerships or vendors. Investors are a different scout; do not list funds or investor groups here.'}
 
     def campaign_context(self,key):
         c=self.campaign(key);mm=self.money_moves()

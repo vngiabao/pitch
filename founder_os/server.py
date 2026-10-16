@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
-        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/product.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
+        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/scouts.js','/product.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
         if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
@@ -115,6 +115,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/application-list':
                 from .application_drafter import application_list
                 result=application_list(s)
+            elif route=='/api/scouts':
+                from .scouts import Scouts
+                result=Scouts(s).status()
             elif route=='/api/growth':
                 from .growth_desk import GrowthDesk
                 result=GrowthDesk(s).board()
@@ -280,6 +283,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:result=lab.decide_lesson(p['id'],p['decision'])
                 if route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun'):
                     result={k:v for k,v in result.items() if k!='payload'};self.start_worker()
+            elif route=='/api/scout-run':
+                from .scouts import Scouts
+                result=Scouts(s).request_run(p['key']);self.start_worker()
             elif route=='/api/money-move':
                 from .money_map import MoneyMap
                 result=MoneyMap(s).set_move(p['id'],p['state'])

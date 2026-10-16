@@ -16,4 +16,10 @@
 .desk-tiles small{display:block;color:var(--color-muted);font-size:var(--text-sm)}
 .formula{font-size:var(--text-sm);color:var(--color-muted);margin:0 0 var(--space-4)}
 .chan-table td,.chan-table th{font-variant-numeric:tabular-nums}
-@media (max-width:640px){.deal-grid,.plan-channels{grid-template-columns:1fr}}
+.scout-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--space-4);margin:0 0 var(--space-6)}
+.scout-grid .section{margin:0}
+.scout-card h3{margin:0;font-size:1.05rem}
+.scout-card.running{border-color:#d1902c}
+.scout-facts{margin:var(--space-3) 0 0}
+.deal-filters{margin:0 0 var(--space-4)}
+@media (max-width:640px){.deal-grid,.plan-channels,.scout-grid{grid-template-columns:1fr}}

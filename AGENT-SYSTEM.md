@@ -6,7 +6,13 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 
 | Layer | Agent | Job | Uses AI? | Web? |
 |---|---|---|---|---|
-| Find | **Funding Hunter** | Finds and verifies programs and money (19 search families) | Yes | Yes |
+| Find | **Competition Scout** | Pitch competitions, pitch nights and hackathons with cash prizes (4 search families). Monday and Thursday. Lands in the Money map. | Yes | Yes |
+| Find | **Grant Scout** | Non-dilutive grants: foundations, SBIR/STTR, MEDC, AgeTech and family-tech funds (4 families). Tuesday and Friday. | Yes | Yes |
+| Find | **Founder Money Scout** | Fellowships, stipends and awards paid to Bao or Daniel personally; judged on founder eligibility (3 families). Wednesday. | Yes | Yes |
+| Find | **Accelerator Scout** | Pre-seed accelerators and corporate or AI programs that put cash in, terms labelled plainly (4 families). Saturday. | Yes | Yes |
+| Find | **Credits Scout** | Free voice, AI and cloud credits with their conditions (4 credit families, rotating). Daily at 7:30. | Yes | Yes |
+| Find | **Investor Scout** | Angel groups, pre-seed funds, university and alumni funds and syndicates with a published way in; thesis fit, check size and stage as published. Wednesday. Lands on the deal board as investor deals. | Yes | Yes |
+| Find | **Funding Hunter (broad sweep)** | All 19 search families at once, kept as a weekly safety net behind the scouts; also runs targeted re-verifications | Yes | Yes |
 | Find | **Press Scout** | Finds gift guides, newsletters and outlets | Yes | Yes |
 | Find | **Partner Scout** | Finds organizations that reach adult children or buy for many older adults (employers, alumni groups, senior living, faith communities, libraries) and Michigan and Ohio angels. Each lands on the deal board as Found, with the public route it publishes. Tuesday mornings until mid-December. | Yes | Yes |
 | Find | **Form Reader** | Opens official application forms and reads the questions | No | Yes (read-only) |

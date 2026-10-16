@@ -4,7 +4,7 @@ const DEAL_MOVES={FOUND:[['SENT','I sent it']],DRAFTED:[['SENT','I sent it']],SE
 const usd=v=>v===null||v===undefined?'':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v);
 function dealCard(d){
  const moves=DEAL_MOVES[d.stage]||[],showDraft=['FOUND','DRAFTED','SENT'].includes(d.stage),last=d.events[0];
- return `<article class="section deal-card${d.due?' due':''}" id="deal-${E(d.id)}"><div class="section-title"><div><h3>${E(d.name)}</h3><p class="small">${E([d.kind_words,d.region].filter(Boolean).join(' · '))}${d.value_usd?' · '+E(usd(d.value_usd)):''}${d.value_note?' · '+E(d.value_note):''}</p></div><span class="credit-status${d.due?' due':''}">${E(d.due?'Due: '+(d.next_step||d.stage_words):d.stage_words)}${d.next_on&&!d.due&&d.open?' · '+E(fmtDay(d.next_on)):''}</span></div>`+
+ return `<article class="section deal-card${d.due?' due':''}" id="deal-${E(d.id)}" data-kind="${E(d.kind)}"><div class="section-title"><div><h3>${E(d.name)}</h3><p class="small">${E([d.kind_words,d.region].filter(Boolean).join(' · '))}${d.value_usd?' · '+E(usd(d.value_usd)):''}${d.value_note?' · '+E(d.value_note):''}</p></div><span class="credit-status${d.due?' due':''}">${E(d.due?'Due: '+(d.next_step||d.stage_words):d.stage_words)}${d.next_on&&!d.due&&d.open?' · '+E(fmtDay(d.next_on)):''}</span></div>`+
  (d.why?`<p>${E(d.why)}</p>`:'')+(d.angle?`<p class="small">Open with: ${E(d.angle)}</p>`:'')+
  `<p class="small">${d.contact_route?'Reach them: '+E(d.contact_route):''}${d.url?` <a href="${E(d.url)}" target="_blank" rel="noopener noreferrer">Their page ↗</a>`:''}${d.source_url&&d.source==='partner_scout'?` <a href="${E(d.source_url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>`:''}</p>`+
  (last?`<p class="small">Last: ${E(fmtDay(last.occurred_on))}, ${E(last.summary)}</p>`:'')+
@@ -55,11 +55,18 @@ async function growthDesk(){
  `<p class="small press-last">${b.last_run?`Partner Scout last ran ${E(readableDate(b.last_run.at))}: ${b.last_run.found} new.`:'Partner Scout runs Tuesday mornings until mid-December, or now on request.'}${b.searching?' A search is running now; new deals appear in about 15 minutes.':''}</p>`+
  (next.length?`<section class="do-next" aria-labelledby="deal-next"><h2 id="deal-next">Do next</h2><ol>${next.map((x,i)=>`<li><div><strong>${E(x.title)}</strong><p class="small">${E(x.detail)}</p></div><a class="button${i===0?' primary':''}" href="${E(x.href)}">${E(x.label)}</a></li>`).join('')}</ol></section>`:'')+
  `<section aria-labelledby="deals-title"><div class="block-title"><h2 id="deals-title">Deals</h2><span class="small">${openStages.map(s=>`${s.deals.length} ${s.label.toLowerCase()}`).join(' · ')}</span></div>`+
+ `<div class="tabs deal-filters" role="group" aria-label="Deal types"><button type="button" class="active" data-deal-kind="">All</button>${b.kinds.map(k=>`<button type="button" data-deal-kind="${E(k.key)}">${E(k.label)}</button>`).join('')}</div>`+
  (b.open?openStages.filter(s=>s.deals.length).map(s=>`<h3 class="list-head stage-head">${E(s.label)} <span class="count-chip">${s.deals.length}</span></h3><div class="deal-grid">${s.deals.map(dealCard).join('')}</div>`).join(''):'<div class="all-clear"><h2>No deals yet</h2><p class="small">Add the organizations you already talk to, or let Partner Scout find who reaches adult children and gift buyers near you.</p></div>')+
  addDealForm(b,!b.open)+(closedN?`<details class="more finished-apps"><summary>Won, lost or parked (${closedN})</summary>${closed.map(s=>s.deals.length?`<h3 class="list-head">${E(s.label)}</h3><div class="deal-grid">${s.deals.map(dealCard).join('')}</div>`:'').join('')}</details>`:'')+`</section>`+
  `<div id="campaigns"><div class="block-title"><h2>Campaigns</h2><span class="small">A dated plan you can run alone. Messages go through Fact Guard and Bao’s Voice.</span></div>${b.campaigns.map(campaignCard).join('')}</div>`+
  mathSection(b.math,b.measured,b.channel_words);
 }
+document.addEventListener('click',e=>{
+ const f=e.target.closest('[data-deal-kind]');if(!f)return;const kind=f.dataset.dealKind;
+ document.querySelectorAll('[data-deal-kind]').forEach(x=>x.classList.toggle('active',x===f));
+ document.querySelectorAll('.deal-card').forEach(c=>{c.hidden=!!kind&&c.dataset.kind!==kind;});
+ document.querySelectorAll('.deal-grid').forEach(g=>{const head=g.previousElementSibling;const any=[...g.children].some(c=>!c.hidden);g.hidden=!any;if(head&&head.classList.contains('stage-head'))head.hidden=!any;});
+});
 document.addEventListener('click',async e=>{
  const b=e.target.closest('[data-deal-stage],[data-deal-draft],[data-growth-discover],[data-campaign-state],[data-entry-delete]');if(!b)return;e.preventDefault();
  try{
