@@ -8,15 +8,19 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 |---|---|---|---|---|
 | Find | **Funding Hunter** | Finds and verifies programs and money (19 search families) | Yes | Yes |
 | Find | **Press Scout** | Finds gift guides, newsletters and outlets | Yes | Yes |
+| Find | **Partner Scout** | Finds organizations that reach adult children or buy for many older adults (employers, alumni groups, senior living, faith communities, libraries) and Michigan and Ohio angels. Each lands on the deal board as Found, with the public route it publishes. Tuesday mornings until mid-December. | Yes | Yes |
 | Find | **Form Reader** | Opens official application forms and reads the questions | No | Yes (read-only) |
 | Find | **Inbox Tracker** | Reads both inboxes for results (read-only) | No | No |
 | Draft | **Application Drafter** | Answers form questions from approved facts | Yes | No |
 | Draft | **Pitch Tailor** | Reads a program's rules and builds the program edition: slide plan, timed script, materials checklist, ask | Yes | Official rules page only |
 | Draft | **Follow-up and Press Drafters** | Notes to people and outlets | Yes | No |
+| Draft | **Deal Drafter** | The first note or follow-up for a deal, from approved facts and pricing only. Goes through Fact Guard and Bao's Voice like every growth draft. Bao sends it and presses "I sent it"; only he moves a deal forward. | Yes | No |
+| Draft | **Campaign Planner** | Turns pricing, the calendar, known outlets, deals and channel math into a dated plan for the holiday gift-pass campaign: per channel, what, when, the lead message, the success measure and what Bao must supply. Fact Guard checks its words; Bao's Voice rewrites its messages. | Yes | No |
 | Check | **Fact Guard** | Every number and claim traces to approved facts or the evidence table. Applies the team, traction and pricing rules. | No (rules) | No |
 | Check | **Bao's Voice** | Rewrites wording into Bao's voice (BAO-VOICE.md). Never changes facts. | Yes | No |
 | Check | **Pitch Coach** | YC-partner review: 10-point scorecard, hard questions, the three fixes that matter most | Yes | No |
 | Check | **Format Check** | Word and character limits, time at 130–150 wpm, required sections | No (rules) | No |
+| Check | **Channel Math** | Visits, signups, purchases, spend and revenue Bao records per channel per week become conversion, cost per purchasing family and revenue per dollar, with the dates they cover. Fact Guard allows these measured numbers in a pitch. | No (rules) | No |
 | Build | **Edition Builder** | Turns the slide plan into a real deck from the frozen core deck's own slides (`seed-data/core-deck-*`): order, speaker notes and page numbers change, the design never does. New slides (`new-1`, `new-2`) are drafted from one plain template and flagged. | No (rules) | No |
 | Check | **Slide QA** | Renders every slide in headless Edge and measures it: text overlapping text, text running past its box, anything off the slide, rows a few pixels out of line, text under 18px, missing images and notes. Problems go to Bao under "Still needs your eyes". | No (rules) | No |
 | Decide | **Bao** | Edits, approves or rejects. Submits himself. | - | - |

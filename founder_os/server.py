@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
-        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
+        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
         if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
@@ -115,6 +115,13 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/application-list':
                 from .application_drafter import application_list
                 result=application_list(s)
+            elif route=='/api/growth':
+                from .growth_desk import GrowthDesk
+                result=GrowthDesk(s).board()
+            elif route=='/api/growth-alerts':
+                from .growth_agents import Growth
+                from .growth_desk import GrowthDesk
+                result=Growth(s).alerts()+GrowthDesk(s).alerts()
             elif route in ('/api/credits','/api/people','/api/press','/api/growth-alerts'):
                 from .growth_agents import Growth
                 g=Growth(s);result={'/api/credits':g.credits,'/api/people':g.contacts,'/api/press':g.press,'/api/growth-alerts':g.alerts}[route]()
@@ -243,6 +250,19 @@ class Handler(BaseHTTPRequestHandler):
                 elif route=='/api/press-state':result=g.set_press_state(p['id'],p['state'])
                 else:
                     result=g.queue_draft(p['kind'],p['id'],manual=True) if route=='/api/growth-draft' else g.request_press_discovery()
+                    self.start_worker()
+            elif route in ('/api/deal','/api/deal-update','/api/deal-stage','/api/deal-event','/api/deal-draft','/api/partner-discover','/api/campaign-plan','/api/campaign-state','/api/channel-entry','/api/channel-entry-delete'):
+                from .growth_desk import GrowthDesk
+                desk=GrowthDesk(s)
+                if route=='/api/deal':result=desk.add_deal(p)
+                elif route=='/api/deal-update':result=desk.update_deal(p['id'],p)
+                elif route=='/api/deal-stage':result=desk.set_stage(p['id'],p['stage'],p.get('note',''),p.get('next_on'))
+                elif route=='/api/deal-event':result=desk.log_event(p['id'],p)
+                elif route=='/api/campaign-state':result=desk.set_campaign_state(p['key'],p['state'])
+                elif route=='/api/channel-entry':result=desk.add_entry(p)
+                elif route=='/api/channel-entry-delete':result=desk.delete_entry(p['id'])
+                else:
+                    result=desk.queue_deal_draft(p['id'],manual=True) if route=='/api/deal-draft' else desk.request_partner_discovery() if route=='/api/partner-discover' else desk.request_plan(p['key'],p.get('note'))
                     self.start_worker()
             elif route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun','/api/lab-approve','/api/lab-save','/api/lab-build','/api/lesson'):
                 from .pitch_lab import PitchLab

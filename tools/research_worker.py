@@ -322,6 +322,11 @@ def main():
             print(json.dumps(lab_step(h,request)),flush=True)
             s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
             return 0
+        from founder_os import growth_desk
+        if growth_desk.handles(request['reason']):
+            print(json.dumps(growth_desk.run(h,request,codex_json)),flush=True)
+            s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
+            return 0
         if request['reason'].startswith('Draft application: ') or growth:
             result=(press_discovery(h,request) if request['reason']=='Press and gift-guide discovery' else growth_draft(h,request)) if growth else draft(h,request)
             print(json.dumps(result),flush=True)

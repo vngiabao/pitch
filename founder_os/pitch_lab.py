@@ -135,6 +135,10 @@ class PitchLab:
         f=self.facts();text=' '.join([EVIDENCE,json.dumps(f['company_facts']),' '.join(x['text'] for x in f['approved_statements']),f['pricing']]
                                     +[s['spoken'] for s in self.master_deck()['slides']])
         found={norm(n) for n in numbers_in(text)}|{norm(n) for n in EVIDENCE.split()}
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='channel_entries'").fetchone():
+            # Numbers Bao measured on the Growth desk (conversion, cost per purchasing family) may be said as they are.
+            from .growth_desk import GrowthDesk
+            found|={norm(str(f['value'])) for f in GrowthDesk(self.s).measured_facts()}
         # A spoken pitch rounds: $24.12 may be said as "about $24", $8.61 as "about $9".
         rounded=set()
         for v in found:
