@@ -89,10 +89,14 @@ def build_edition(store,item_id,round_no,brief,program,minutes):
     for sid in deck['order']:
         current=starts.get(sid,current);section_of[sid]=current
     order=[];slides=[];last_section=None
+    designed=editions_root(store)/item_id/'designed'
     for x in brief.get('script',[]):
         sid=x.get('slide_id')
         if not sid or sid in order:continue
         if sid in core:body,source=core[sid],'core'
+        elif re.fullmatch(r'new-\d+',sid) and (designed/(sid+'.html')).exists():
+            # A new slide Bao (or I) already designed: keep it through every rebuild instead of redrafting it.
+            body,source=(designed/(sid+'.html')).read_text(encoding='utf-8'),'designed'
         elif re.fullmatch(r'new-\d+',sid):
             is_ask='ask' in (x.get('title') or '').lower() or sid=='new-2'
             lines=sentences(brief.get('ask') if is_ask and brief.get('ask') else x.get('text'),3) or [x.get('title','')]

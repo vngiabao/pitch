@@ -202,6 +202,15 @@ class EditionBuilderTests(unittest.TestCase):
         page=slide_deck.preview_page(m,it['payload']['slide_qa'],it['title'])
         self.assertIn('/edition-asset/',page);self.assertNotIn('/_blob/',page);self.assertIn('/vendor/gsap.min.js',page)
 
+    def test_a_designed_new_slide_survives_a_rebuild(self):
+        lab,it=self.ready_edition({'legacy-gap':'Eighty years of a life.'})
+        d=slide_deck.editions_root(self.s)/it['id']/'designed';d.mkdir(parents=True)
+        (d/'new-2.html').write_text('<section id="new-2" style="background:#f3ebde"><h2>Our ask</h2><p style="position:absolute; bottom:40px; right:64px">09</p><aside>old</aside></section>',encoding='utf-8')
+        it=lab.build_now(it['id']);m=lab.edition_manifest(it);_,slides=slide_deck.edition_files(m)
+        self.assertIn('<h2>Our ask</h2>',slides['new-2']);self.assertNotIn('data-draft',slides['new-2'])
+        self.assertIn('>02</p>',slides['new-2']);self.assertIn('<aside>~0:20 · Here is what we are raising.',slides['new-2'])
+        self.assertEqual(it['payload']['edition']['new_slides'],[])
+
     def test_build_now_keeps_an_approved_editions_stage(self):
         lab,it=self.ready_edition({'legacy-gap':'Eighty years of a life.'})
         lab.approve(it['id']);p=lab.item(it['id'])['payload'];p.pop('edition');lab._save(it['id'],payload=p)
