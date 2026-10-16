@@ -18,7 +18,8 @@
 .chan-table td,.chan-table th{font-variant-numeric:tabular-nums}
 .scout-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--space-4);margin:0 0 var(--space-6)}
 .scout-grid .section{margin:0}
-.scout-card h3{margin:0;font-size:1.05rem}
+.scout-card h3{margin:0;font-size:1.05rem;overflow-wrap:normal;word-break:normal}
+.scout-card .section-title{flex-wrap:wrap;gap:var(--space-2) var(--space-4)}
 .scout-card.running{border-color:#d1902c}
 .scout-facts{margin:var(--space-3) 0 0}
 .deal-filters{margin:0 0 var(--space-4)}
