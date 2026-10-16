@@ -118,8 +118,16 @@ class GrowthDesk:
             self.db.execute("UPDATE deals SET stage='DRAFTED',updated_at=? WHERE id=? AND stage='FOUND'",(now(),did));d['stage']='DRAFTED'
         d['open']=d['stage'] in OPEN_STAGES
         d['due']=bool(d['open'] and d['next_on'] and d['next_on']<=t)
+        # The Inbox Tracker may have noticed the organization's reply; it waits on Decisions until Bao confirms it.
+        d['reply_proposal']=self._reply_proposal(did)
         d['stage_words']=STAGE_WORDS[d['stage']];d['kind_words']=KIND_WORDS[d['kind']]
         return d
+
+    def _reply_proposal(self,did):
+        if not self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='inbox_messages'").fetchone():return None
+        if 'deal_id' not in {r[1] for r in self.db.execute('PRAGMA table_info(inbox_messages)')}:return None
+        row=self.db.execute("SELECT id,sender,account,subject,received_at,snippet FROM inbox_messages WHERE deal_id=? AND state='PROPOSED' ORDER BY received_at DESC LIMIT 1",(did,)).fetchone()
+        return dict(row) if row else None
 
     def deals(self):
         ids=[r['id'] for r in self.s.rows("SELECT id FROM deals ORDER BY CASE WHEN stage IN ('WON','LOST','PARKED') THEN 1 ELSE 0 END,COALESCE(next_on,'9999'),created_at DESC")]

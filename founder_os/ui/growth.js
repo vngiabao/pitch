@@ -8,6 +8,7 @@ function dealCard(d){
  (d.why?`<p>${E(d.why)}</p>`:'')+(d.angle?`<p class="small">Open with: ${E(d.angle)}</p>`:'')+
  `<p class="small">${d.contact_route?'Reach them: '+E(d.contact_route):''}${d.url?` <a href="${E(d.url)}" target="_blank" rel="noopener noreferrer">Their page ↗</a>`:''}${d.source_url&&d.source==='partner_scout'?` <a href="${E(d.source_url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>`:''}</p>`+
  (last?`<p class="small">Last: ${E(fmtDay(last.occurred_on))}, ${E(last.summary)}</p>`:'')+
+ (d.reply_proposal?`<p class="qa-needs"><strong>A reply may be in your inbox.</strong> ${E(d.reply_proposal.sender)} wrote "${E(d.reply_proposal.subject)}" on ${E(fmtDay(d.reply_proposal.received_at.slice(0,10)))}. Nothing moves until you confirm it. <a href="/decisions">Confirm it in Decisions</a></p>`:'')+
  (showDraft?(d.draft?draftBlock(d.draft):`<p class="qa-needs">${d.drafting?'<strong>Drafting.</strong> The agent is writing this note now.':`<strong>No note yet.</strong> <button class="link-button" type="button" data-deal-draft="${E(d.id)}">Draft it now</button>`}</p>`):'')+
  (d.open?`<div class="actions">${moves.map(([s,l],i)=>`<button type="button" class="${i===0&&(s!=='SENT'||d.draft)?'primary':''}" data-deal-stage="${s}" data-id="${E(d.id)}">${l}</button>`).join('')}</div>`:'')+
  `<details class="more"><summary>Log, edit or move</summary>`+

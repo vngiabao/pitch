@@ -1,6 +1,8 @@
 """Read-only inbox tracker for the owner's two application inboxes.
 
 Finds program emails (received, advanced, accepted, rejected) and PROPOSES outcomes.
+Also notices a reply to a deal note the owner sent (Growth desk, stage SENT) and PROPOSES
+"They replied"; the deal moves only when the owner confirms, through GrowthDesk.set_stage.
 Nothing is recorded until the owner confirms each one. The mailbox is opened with
 EXAMINE (read-only) and bodies are fetched with BODY.PEEK, so nothing is sent,
 deleted, moved, labelled or marked read. Passwords stay in Windows Credential Manager.
@@ -21,6 +23,9 @@ SCHEMA='''CREATE TABLE IF NOT EXISTS inbox_messages(
  snippet TEXT NOT NULL, opportunity_id TEXT, proposed_outcome TEXT, state TEXT NOT NULL, reason TEXT,
  source_version_id TEXT, outcome_id TEXT, created_at TEXT NOT NULL, decided_at TEXT,
  UNIQUE(account,message_id));'''
+# Added after the first release: which Growth desk deal an email answers. Older databases get the column on open.
+DEAL_COLUMN='ALTER TABLE inbox_messages ADD COLUMN deal_id TEXT'
+REPLIED='Replied'
 
 OUTCOMES=('Applied','Advanced','Finalist','Accepted','Rejected')
 RANK={'Applied':1,'Advanced':2,'Finalist':3,'Accepted':4,'Won':4,'Rejected':4,'Withdrawn':4}
@@ -121,6 +126,7 @@ class InboxTracker:
     def __init__(self,store,hunter=None,inboxes=None):
         from .funding_hunter import FundingHunter
         self.s=store;self.db=store.db;self.h=hunter or FundingHunter(store);self.db.executescript(SCHEMA)
+        if 'deal_id' not in {r[1] for r in self.db.execute('PRAGMA table_info(inbox_messages)')}:self.db.execute(DEAL_COLUMN)
         self.inboxes=inboxes
         self.db.execute('INSERT OR IGNORE INTO hunter_settings VALUES(?,?)',('inbox_tracker',js({'enabled':True,'accounts':list(INBOX_ACCOUNTS),'interval_minutes':30,'first_lookback_days':90,'state':{}})))
 
@@ -160,6 +166,43 @@ class InboxTracker:
             if len(words)>=3:pats.append(re.compile(r'\b'+''.join(w[0] for w in words)+r'\b'))
         return pats
 
+    # ---- deal index (Growth desk) ------------------------------------------
+    def deals(self):
+        """Deals in SENT with a dated sent event: the organization's domain, its name and the subject of the note Bao sent."""
+        if not self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='deals'").fetchone():return []
+        out=[]
+        for d in self.s.rows("SELECT id,name,url FROM deals WHERE stage='SENT'"):
+            sent=self.db.execute("SELECT max(occurred_on) v FROM deal_events WHERE deal_id=? AND (kind='sent' OR (kind='stage' AND summary LIKE 'Sent, waiting%'))",(d['id'],)).fetchone()['v']
+            if not sent:continue
+            domain=registrable(urlsplit(d['url']).hostname or '') if d['url'] else ''
+            draft=self.db.execute("SELECT title FROM growth_drafts WHERE subject_kind='deal' AND subject_id=? ORDER BY created_at DESC LIMIT 1",(d['id'],)).fetchone()
+            subject=re.sub(r'\s+',' ',(draft['title'] if draft else '') or '').strip().lower()
+            out.append({'deal_id':d['id'],'name':d['name'],'sent_on':sent,'domain':domain if domain and domain not in SHARED else None,'patterns':self._patterns({d['name']}),'subject':subject if len(subject)>=6 else None})
+        return out
+
+    @staticmethod
+    def _subject_key(subject):
+        """A reply subject without its Re:/Fwd: prefixes, for comparing with the subject of the note Bao sent."""
+        s=re.sub(r'\s+',' ',subject or '').strip()
+        while True:
+            stripped=re.sub(r'^(?:re|fw|fwd|aw|sv|tr)\s*(?:\[\d+\])?\s*:\s*','',s,flags=re.I)
+            if stripped==s:return s.lower()
+            s=stripped
+
+    def match_deal(self,deals,domain,subject,text,received):
+        """One SENT deal this email answers: by the organization's domain, by the note's subject line, or by the organization's name. Only after the note was sent."""
+        from .growth_agents import ET
+        try:on=datetime.fromisoformat(received).astimezone(ET).date().isoformat()
+        except ValueError:on=received[:10]
+        pool=[d for d in deals if on>=d['sent_on']]
+        key=self._subject_key(subject)
+        # Each signal narrows the candidates; the email is proposed only when exactly one deal is left.
+        for pick in ((lambda d:bool(d['domain']) and d['domain']==domain),(lambda d:bool(d['subject']) and d['subject'] in key),(lambda d:any(x.search(text) for x in d['patterns']))):
+            hit=[d for d in pool if pick(d)]
+            if len(hit)==1:return hit[0]
+            if hit:pool=hit
+        return None
+
     def match(self,programs,domain,text):
         by_domain=[p for p in programs if domain in p['domains']]
         named=lambda pool:[p for p in pool if any(x.search(text) for x in p['patterns'])]
@@ -172,37 +215,53 @@ class InboxTracker:
         return None,('Mentions several tracked programs' if hit else 'Sender is not a tracked program')
 
     # ---- scanning --------------------------------------------------------
-    def prefilter(self,programs):
+    def prefilter(self,programs,deals=()):
         domains=set().union(*(p['domains'] for p in programs)) if programs else set()
+        domains|={d['domain'] for d in deals if d['domain']}
         def keep(head):
             sender=parseaddr(header_text(head.get('From')))[1].lower()
             if sender in INBOX_ACCOUNTS:return False
             subject=header_text(head.get('Subject'))
             if registrable(sender.rpartition('@')[2]) in domains:return True
             if classify(subject,'',bool(head.get('List-Unsubscribe'))):return True
-            return any(x.search(subject) for p in programs for x in p['patterns'])
+            if any(x.search(subject) for p in programs for x in p['patterns']):return True
+            key=self._subject_key(subject)
+            return any((d['subject'] and d['subject'] in key) or any(x.search(subject) for x in d['patterns']) for d in deals)
         return keep
 
-    def ingest(self,account,msg,programs):
+    def ingest(self,account,msg,programs,deals=()):
         if account not in INBOX_ACCOUNTS:raise PolicyError('Mailbox is outside owner authorization')
         sender=parseaddr(header_text(msg.get('From')))[1].lower()
         if not sender or sender in INBOX_ACCOUNTS:return None
         message_id=(msg.get('Message-ID') or '').strip() or 'no-id-'+digest([sender,msg.get('Date'),msg.get('Subject')])[:24]
         mid='inbox-'+digest([account,message_id])[:24]
         if self.db.execute('SELECT 1 FROM inbox_messages WHERE id=?',(mid,)).fetchone():return None
-        subject=header_text(msg.get('Subject'))[:300];body=body_text(msg)
-        outcome=classify(subject,body,bool(msg.get('List-Unsubscribe')))
-        if not outcome:return None
+        subject=header_text(msg.get('Subject'))[:300];body=body_text(msg);bulk=bool(msg.get('List-Unsubscribe'))
         domain=registrable(sender.rpartition('@')[2])
-        program,why=self.match(programs,domain,subject+' \n '+body[:4000])
-        if not program and (msg.get('List-Unsubscribe') or not re.search(PROGRAM_WORDS,subject+' '+body[:1000],re.I)):return None
         try:received=parsedate_to_datetime(msg.get('Date')).astimezone(timezone.utc).isoformat()
         except (TypeError,ValueError,IndexError):received=now()
+        outcome=classify(subject,body,bulk)
+        program,why=(self.match(programs,domain,subject+' \n '+body[:4000]) if outcome else (None,None))
+        if not (outcome and program):
+            # Not a program result: is it the organization answering a deal note Bao sent? Mailing-list mail is never a reply.
+            deal=None if bulk else self.match_deal(deals,domain,subject,subject+' \n '+body[:4000],received)
+            if deal:
+                state,reason=self._compare_deal(deal['deal_id'])
+                self.db.execute('INSERT INTO inbox_messages(id,account,message_id,sender,sender_domain,subject,received_at,snippet,opportunity_id,proposed_outcome,state,reason,created_at,deal_id) VALUES(?,?,?,?,?,?,?,?,NULL,?,?,?,?,?)',
+                                (mid,account,message_id,sender,domain,subject,received,body[:600],REPLIED,state,reason,now(),deal['deal_id']))
+                return {'id':mid,'state':state,'outcome':REPLIED,'program':None,'deal':deal['name']}
+        if not outcome:return None
+        if not program and (bulk or not re.search(PROGRAM_WORDS,subject+' '+body[:1000],re.I)):return None
         state,reason='REVIEW',why
         if program:
             state,reason=self._compare(program['opportunity_id'],outcome,received)
-        self.db.execute('INSERT INTO inbox_messages VALUES(?,?,?,?,?,?,?,?,?,?,?,?,NULL,NULL,?,NULL)',(mid,account,message_id,sender,domain,subject,received,body[:600],program and program['opportunity_id'],outcome,state,reason,now()))
+        self.db.execute('INSERT INTO inbox_messages(id,account,message_id,sender,sender_domain,subject,received_at,snippet,opportunity_id,proposed_outcome,state,reason,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',(mid,account,message_id,sender,domain,subject,received,body[:600],program and program['opportunity_id'],outcome,state,reason,now()))
         return {'id':mid,'state':state,'outcome':outcome,'program':program and program['name']}
+
+    def _compare_deal(self,did):
+        if self.db.execute("SELECT 1 FROM inbox_messages WHERE deal_id=? AND state='PROPOSED'",(did,)).fetchone():
+            return 'ALREADY_TRACKED','Another email already proposes this reply'
+        return 'PROPOSED',None
 
     def _compare(self,oid,outcome,received):
         from .funding_hunter import stamp
@@ -219,7 +278,7 @@ class InboxTracker:
     def poll(self,instant=None,force=False):
         instant=instant or datetime.now(timezone.utc);cfg=self.settings()
         if not cfg.get('enabled'):return {'paused':True}
-        programs=self.programs();report={}
+        programs=self.programs();deals=self.deals();report={}
         for account in cfg.get('accounts',[]):
             if account not in INBOX_ACCOUNTS:continue
             state=cfg.setdefault('state',{}).setdefault(account,{})
@@ -231,12 +290,12 @@ class InboxTracker:
                 state.update(connected=False,last_error='Not connected; run Connect-Inbox.ps1');report[account]={'connected':False};continue
             since=datetime.fromisoformat(state['scanned_through'])-timedelta(days=2) if state.get('scanned_through') else instant-timedelta(days=int(cfg.get('first_lookback_days',90)))
             try:
-                found=[r for r in (self.ingest(account,m,programs) for m in inbox.fetch(since,self.prefilter(programs))) if r]
+                found=[r for r in (self.ingest(account,m,programs,deals) for m in inbox.fetch(since,self.prefilter(programs,deals))) if r]
             except Exception as e:
                 state.update(connected=True,last_error=type(e).__name__+': could not read this inbox; nothing was changed in it')
                 self.s.log('inbox.scan_failed','inbox_tracker',{'account':account,'error_type':type(e).__name__});report[account]={'error':type(e).__name__};continue
             state.update(connected=True,last_checked=instant.isoformat(),scanned_through=instant.isoformat(),last_error=None)
-            self.s.log('inbox.scanned','inbox_tracker',{'account':account,'new':len(found),'proposed':sum(r['state']=='PROPOSED' for r in found),'read_only':True})
+            self.s.log('inbox.scanned','inbox_tracker',{'account':account,'new':len(found),'proposed':sum(r['state']=='PROPOSED' for r in found),'deal_replies':sum(bool(r.get('deal')) for r in found),'read_only':True})
             report[account]={'new':len(found)}
         self._save(cfg)
         return report
@@ -250,6 +309,7 @@ class InboxTracker:
             self.db.execute("UPDATE inbox_messages SET state='DISMISSED',decided_at=? WHERE id=? AND state IN ('PROPOSED','REVIEW')",(now(),mid))
             self.s.log('inbox.dismissed',actor,{'id':mid});return {'state':'DISMISSED'}
         if decision!='confirm':raise ValueError('Unknown decision')
+        if m['deal_id']:return self._confirm_reply(m,actor)
         outcome=outcome or m['proposed_outcome']
         if outcome not in OUTCOMES:raise ValueError('Unknown outcome')
         if not m['opportunity_id']:raise PolicyError('Open the program and record the outcome there; this email is not matched to a program')
@@ -266,14 +326,30 @@ class InboxTracker:
             self.s.log('inbox.outcome_confirmed',actor,{'id':mid,'opportunity_id':m['opportunity_id'],'outcome':outcome,'outcome_id':eid})
         return {'state':'CONFIRMED','outcome_id':eid,'recommendation':self.h.detail(m['opportunity_id'])['recommendation']}
 
+    def _confirm_reply(self,m,actor):
+        """Owner confirmed: the deal moves to REPLIED through the Growth desk, with the email logged as the event. A deal Bao already moved past Sent only gets the email logged."""
+        from .growth_desk import GrowthDesk
+        desk=GrowthDesk(self.s);d=self.s.one('SELECT id,name,stage FROM deals WHERE id=?',(m['deal_id'],))
+        summary=('Email from '+m['sender']+' to '+m['account']+' on '+m['received_at'][:10]+': "'+m['subject']+'"'+(' - '+m['snippet'][:400] if m['snippet'] else ''))[:1900]
+        folder=Path(self.s.path).parent/'inbox-evidence';folder.mkdir(exist_ok=True)
+        (folder/(m['id']+'.txt')).write_text(f'Email reply confirmed by the owner on {now()}\nInbox: {m["account"]}\nFrom: {m["sender"]}\nDate: {m["received_at"]}\nSubject: {m["subject"]}\nMessage-ID: {m["message_id"]}\nDeal: {d["name"]} ({d["id"]})\n\nExcerpt:\n{m["snippet"]}\n',encoding='utf-8')
+        moved=d['stage']=='SENT'
+        # set_stage and log_event run their own transactions; the row is marked confirmed right after.
+        if moved:deal=desk.set_stage(d['id'],'REPLIED',summary)
+        else:deal=desk.log_event(d['id'],{'summary':summary,'kind':'reply','occurred_on':m['received_at'][:10]})
+        self.db.execute("UPDATE inbox_messages SET state='CONFIRMED',decided_at=? WHERE id=?",(now(),m['id']))
+        self.s.log('inbox.reply_confirmed',actor,{'id':m['id'],'deal_id':d['id'],'moved':moved})
+        return {'state':'CONFIRMED','deal_id':d['id'],'stage':deal['stage'],'moved':moved}
+
     # ---- views -----------------------------------------------------------
     def dashboard(self):
         cfg=self.settings();accounts=[]
         for a in INBOX_ACCOUNTS:
             st=(cfg.get('state') or {}).get(a,{})
             accounts.append({'account':a,'connected':credential_present(a),'last_checked':st.get('last_checked'),'last_error':st.get('last_error')})
-        pending=self.s.rows("SELECT m.*,p.canonical_name program FROM inbox_messages m LEFT JOIN funding_intelligence i ON i.opportunity_id=m.opportunity_id LEFT JOIN funding_programs p ON p.id=i.program_id WHERE m.state IN ('PROPOSED','REVIEW') ORDER BY m.state,m.received_at DESC")
-        return {'enabled':bool(cfg.get('enabled')),'accounts':accounts,'pending':pending,'proposed':sum(p['state']=='PROPOSED' for p in pending),'review':sum(p['state']=='REVIEW' for p in pending)}
+        deal_join=' LEFT JOIN deals d ON d.id=m.deal_id' if self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='deals'").fetchone() else ''
+        pending=self.s.rows("SELECT m.*,p.canonical_name program"+(',d.name deal,d.stage deal_stage' if deal_join else ',NULL deal,NULL deal_stage')+" FROM inbox_messages m LEFT JOIN funding_intelligence i ON i.opportunity_id=m.opportunity_id LEFT JOIN funding_programs p ON p.id=i.program_id"+deal_join+" WHERE m.state IN ('PROPOSED','REVIEW') ORDER BY m.state,m.received_at DESC")
+        return {'enabled':bool(cfg.get('enabled')),'accounts':accounts,'pending':pending,'proposed':sum(p['state']=='PROPOSED' for p in pending),'review':sum(p['state']=='REVIEW' for p in pending),'deal_replies':sum(bool(p['deal_id']) for p in pending)}
 
     def export_csv(self):
         """One row per tracked program: latest status, first application date and evidence."""
