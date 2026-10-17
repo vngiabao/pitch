@@ -105,7 +105,7 @@ async function home(){
  const lastRun=dash.agent_activity[0];
  app.innerHTML=heading('Today',today+'. What needs you, what pays, and what closes first.')+
  `<p class="state-line"><span class="${todo.length?'urgent':''}"><strong>${todo.length}</strong> need you</span><span><strong>${board.cash.length}</strong> cash programs open</span><span class="${closingSoon?'urgent':''}"><strong>${closingSoon}</strong> closing this week</span><span><strong>${waiting}</strong> waiting on results</span></p>`+
- doNextList(todo)+(window.applyFirst&&applyFirstRows?applyFirst(applyFirstRows,{compact:true}):'')+
+ doNextList(todo)+(window.assumptionLine?assumptionLine(growth):'')+(window.applyFirst&&applyFirstRows?applyFirst(applyFirstRows,{compact:true}):'')+
  `<div class="today"><div><section aria-labelledby="cash-title"><div class="block-title"><h2 id="cash-title">Cash on the table</h2><a href="/opportunities">Full pipeline</a></div><p class="block-note">Prizes, grants and fellowships, soonest deadline first. A pool size is not your award.</p><ol class="toc">${board.cash.slice(0,8).map(d=>tocRow(d,true,byOpp[d.opportunity_id])).join('')||'<li class="empty">No open cash programs are verified right now. Run research to look for new competitions and grants.</li>'}</ol></section>`+
  `<section class="credits" aria-labelledby="credit-title"><div class="block-title"><h2 id="credit-title">Credits that cut real costs</h2></div><p class="block-note">Credits are not cash. Ranked by how directly they cover the voice and AI services A Story runs on.</p><ol class="toc">${board.credits.slice(0,6).map(d=>tocRow(d,false,byOpp[d.opportunity_id])).join('')||'<li class="empty">No open credit programs.</li>'}</ol></section></div>`+
  `<div class="side">`+waitingSection(board.tracked)+
@@ -227,7 +227,7 @@ document.addEventListener('submit',async e=>{
 });
 function routeContext(){
  const path=location.pathname,parent=path.startsWith('/pitch-lab/')?'/pitch-lab':path.startsWith('/pitch/')?'/pitches':path.startsWith('/material/')?'/materials':path.startsWith('/application-review/')||path.startsWith('/application/')?'/applications':path.startsWith('/opportunity/')?'/opportunities':path.startsWith('/run/')?'/activity':path;
- const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/plans':'Plans','/drive':'Reservation drive','/founder-profile':'Founder profile'};
+ const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/plans':'Plans','/drive':'Reservation drive','/founder-profile':'Founder profile','/assumptions':'Assumptions'};
  document.querySelectorAll('#workspace-nav a').forEach(a=>{const active=a.getAttribute('href')===parent;a.classList.toggle('active',active);active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#breadcrumbs').innerHTML='<a href="/">A Story</a> / '+(parent!==path?'<a href="'+E(parent)+'">'+E(names[parent]||'Workspace')+'</a> / Detail':E(names[parent]||'Workspace'));
  document.querySelector('#workspace-location').textContent=location.hostname==='pitch.gbaonvo.com'?'Owner sign-in protected':'On this PC';document.title=(names[parent]||'Workspace')+' | A Story';
@@ -249,6 +249,7 @@ async function boot(){
  if(path==='/families')return betaFamilies();
  if(path==='/founder-profile')return founderProfile();
  if(path==='/drive')return reservationDrive();
+ if(path==='/assumptions')return assumptionsPage();
  if(path.startsWith('/pitch/'))return pitchEditor(path.split('/').at(-1));
  if(path==='/pitches')return pitchLibrary();
  if(path.startsWith('/material/')){await material(path.split('/').at(-1));try{app.querySelector('.page-heading a').href=sessionStorage.getItem('astory-materials-list')||'/materials';}catch{}return;}

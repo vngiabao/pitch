@@ -363,8 +363,11 @@ class PitchLab:
     # ---------- AI stages (run by the worker with a Codex runner) ----------
     def base_context(self,applies):
         f=self.facts();measured=' '.join(m['text'] for m in f['measured'])
-        return {**f,'playbook':self.doc('PITCH-PLAYBOOK.md',60000),'lessons':self.approved_lessons(applies),
+        from .assumption_coach import AssumptionCoach
+        assumptions=AssumptionCoach(self.s).for_agents()
+        return {**f,'playbook':self.doc('PITCH-PLAYBOOK.md',60000),'lessons':self.approved_lessons(applies),'assumptions':assumptions,
                 'rules':[*(['Measured product numbers, from the beta family journal, come first; use them with their denominator and as-of date, and prefer them over owner-reported numbers where both exist: '+measured] if measured else []),'Use only the facts, statements, pricing and evidence given. Never invent numbers, customers, partners, awards, quotes or traction.',
+                         assumptions['rule']+' CONTEXT.assumptions lists every number the deck depends on with its status and how to say it.',
                          'Write " - " (a short hyphen with spaces), never a long dash.','Two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Nhi Tran only for the Michigan Business Challenge.',
                          'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. Hope College: many students want to preorder or join the mailing list to gift it to grandparents for Thanksgiving (interest only, not a partnership).',
                          'Bao reads every field you write. Never mention CONTEXT, the playbook, field names, rounds or these instructions; say "the program page", "our facts" or "the master deck" in plain words.']}
@@ -437,7 +440,8 @@ class PitchLab:
             task=('You are Pitch Coach: a YC partner who knows A Story well. Kind, direct and specific; never flattering. Score CONTEXT.content on every criterion in CONTEXT.rubric (1-5) using '
                   'the coaching lens in CONTEXT.playbook section 9, judged for CONTEXT.program and its format. Numbers in CONTEXT.appendix are approved modeled figures (said rounded in the pitch); question how they are framed, not whether they exist. For each score give why and the one concrete fix that would raise it. '
                   'Write 6-8 hard_questions a judge or investor would ask this exact pitch, each with the best honest answer from CONTEXT facts (say "we don’t know yet - here is the test" when true) and gap = what proof is missing. '
-                  'top_fixes: the 3 changes that matter most, most important first. verdict PASS only when every score is 4 or higher. Never invent facts.'
+                  'top_fixes: the 3 changes that matter most, most important first. verdict PASS only when every score is 4 or higher. Never invent facts. '
+                  'CONTEXT.assumptions.items lists every number the pitch depends on with its status, weakest first (CONTEXT.assumptions.weakest): ask about the weakest ones in hard_questions, and where no proof exists the honest answer names that assumption’s cheapest_test.'
                   +(' CONTEXT.win_brief describes this program’s judges, criteria, past winners and other companies: score as those judges would, weight the criteria as win_brief.criteria says, and add the hard questions they or the listed competitors would prompt.' if ctx.get('win_brief') else '')
                   +(' CONTEXT.customer_voice is what families say online this week (themes, thread counts, quotes with URLs): judge Problem urgency and Evidence against it, ask whether the pitch speaks in those words and answers the listed objections, and suggest a cited quote where proof is thin. It is evidence about the market, not about A Story; never treat it as our traction or our customers.' if ctx.get('customer_voice') else ''))
             return task+'\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False),schema,'coach',False

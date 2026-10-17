@@ -54,10 +54,15 @@ def poll(s):
         # Growth desk: one deal note per cycle, Partner Scout on Tuesday mornings.
         try:desk=GrowthDesk(s).poll(limit=1)
         except Exception as e:s.log('growth_desk.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});desk={'error':type(e).__name__}
+        # Assumption Coach: measured numbers flip statuses every cycle; the weekly challenge is queued after Monday 7:30 Eastern.
+        try:
+            from founder_os.assumption_coach import AssumptionCoach
+            assumptions=AssumptionCoach(s).poll(instant)
+        except Exception as e:s.log('assumptions.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});assumptions={'error':type(e).__name__}
         # Pitch Lab: harvest Bao's edits and results, start reviews, keep every item moving.
         try:lab=PitchLab(s).poll()
         except Exception as e:s.log('lab.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});lab={'error':type(e).__name__}
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'prepared':prepared,'forms':forms,'growth':growth,'growth_desk':desk,'scouts':scouts,'win':win,'plan':plan,'lab':lab}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'prepared':prepared,'forms':forms,'growth':growth,'growth_desk':desk,'scouts':scouts,'win':win,'plan':plan,'assumptions':assumptions,'lab':lab}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()
