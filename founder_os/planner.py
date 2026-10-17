@@ -25,12 +25,12 @@ THEME={'navy':'#00274c','navy2':'#0d3a66','ink':'#1b2733','paper':'#f5f1e8','pap
 # The model sees the desks as CONTEXT.state keys; Bao reads desk names.
 SOURCE_WORDS=(('state.today_brief','Today brief'),('state.win_briefs','Win brief'),('state.pitch_lab','Pitch Lab'),('state.growth.channel_math','Channel math'),('state.growth.campaigns','Campaigns'),
               ('state.growth','Deals board'),('state.reservation_drive','Reservation drive'),('state.measured_retention','Families page'),('state.credits_and_costs','Credits page'),('state.scouts','Scouts'),
-              ('state.assumptions','Assumptions'),('state.customer_voice','Customer voice'),('state.','Founder OS '))
+              ('state.assumptions','Assumptions'),('state.customer_voice','Customer voice'),('state.found_this_week','Funding pipeline'),('state.agent_runs','Agent activity'),('state.','Founder OS '))
 
 
 def plain_sources(text):
     for k,v in SOURCE_WORDS:text=text.replace(k,v)
-    return re.sub(r'(Today brief|Win brief|Pitch Lab|Channel math|Campaigns|Deals board|Reservation drive|Families page|Credits page|Scouts|Assumptions|Customer voice)(\.[\w]+)+',r'\1',text)
+    return re.sub(r'(Today brief|Win brief|Pitch Lab|Channel math|Campaigns|Deals board|Reservation drive|Families page|Credits page|Scouts|Assumptions|Customer voice|Funding pipeline|Agent activity)(\.[\w]+)+',r'\1',text)
 
 
 def _s(v,n=600):return plain_sources((str(v) if v is not None else '')[:n].strip())
@@ -109,6 +109,33 @@ class Planner:
             if not self.db.execute("SELECT 1 FROM sqlite_master WHERE name='assumptions'").fetchone():return None
             return self.s.rows('SELECT * FROM assumptions LIMIT 30')
         part('assumptions',assumptions)
+        def voice():
+            from .customer_voice import CustomerVoice
+            c=CustomerVoice(self.s).current();rep=c.get('report') or {}
+            return {'run_on':c.get('run_on'),'movement_words':c.get('movement_words'),'themes':[{k:t.get(k) for k in ('theme','count','quotes')} for t in (rep.get('themes') or [])[:6]],'objections':(rep.get('objections') or [])[:5],'willing_to_pay':rep.get('willing_to_pay')} if rep else None
+        part('customer_voice',voice)
+        def found():
+            # What the scouts and the sweep added to the pipeline in the last seven days, with where each one landed.
+            from .money_map import classify,CATEGORIES
+            titles=dict((k,t) for k,t,_ in CATEGORIES);out=[]
+            for d in self.h.list('All'):
+                r=self.db.execute('SELECT discovered_at FROM funding_intelligence WHERE opportunity_id=?',(d['opportunity_id'],)).fetchone()
+                if not r or not r['discovered_at'] or (datetime.now(timezone.utc)-datetime.fromisoformat(r['discovered_at'].replace('Z','+00:00'))).days>7:continue
+                m=d['analysis']['money']
+                out.append({'name':d['data']['canonical_name'],'group':titles.get(classify(d),'Other'),'amount':m.get('cash_max') or m.get('credits_face_value'),'deadline':d['data']['dates'].get('deadline'),'recommendation':d['recommendation'],'found_on':r['discovered_at'][:10]})
+            return sorted(out,key=lambda x:x['found_on'],reverse=True)[:40]
+        part('found_this_week',found)
+        def runs():
+            # Every agent job that finished in the last seven days, by agent, with failures named.
+            rows=self.s.rows("SELECT reason,state,last_error,created_at FROM hunter_requests WHERE created_at>=datetime('now','-7 days') ORDER BY created_at DESC LIMIT 200");by={}
+            for r in rows:
+                agent=r['reason'].split(':')[0] if ':' in r['reason'] else r['reason'];a=by.setdefault(agent,{'agent':agent,'runs':0,'complete':0,'queued':0,'failed':0,'last':None})
+                a['runs']+=1;a['last']=a['last'] or r['created_at']
+                if r['state']=='COMPLETE':a['complete']+=1
+                elif r['state'] in ('QUEUED','RUNNING'):a['queued']+=1
+                elif r['last_error']:a['failed']+=1
+            return sorted(by.values(),key=lambda a:-a['runs'])
+        part('agent_runs',runs)
         state['gather_errors']=errors
         return state
 
