@@ -61,6 +61,11 @@ class PlannerTests(unittest.TestCase):
         self.assertTrue(pl.poll(mon)['queued']);self.assertFalse(pl.poll(mon)['queued'])
         self.assertEqual(pl.reports()['items'][0]['auto'],1)
 
+    def test_sources_read_as_desks_not_field_paths(self):
+        from founder_os.planner import clean
+        c=clean({'title':'x','answer':['Zero reservations. Sources: state.reservation_drive.counts.reserved, state.today_brief.needs_you.'],'numbers':[{'label':'Open','value':'5','source':'state.growth.channel_math.totals'}]})
+        self.assertEqual(c['answer'][0],'Zero reservations. Sources: Reservation drive, Today brief.');self.assertEqual(c['numbers'][0]['source'],'Channel math')
+
     def test_render_escapes_and_handles_empty_sections(self):
         page=render_html({'title':'<b>x</b>','answer':[],'plan':[],'numbers':[],'questions_for_bao':[],'risks':[]},'q <script>',datetime(2026,10,16,tzinfo=ET))
         self.assertIn('&lt;b&gt;x&lt;/b&gt;',page);self.assertNotIn('<script>',page);self.assertNotIn('The plan',page)

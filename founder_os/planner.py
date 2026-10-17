@@ -22,7 +22,18 @@ SCHEMA='CREATE TABLE IF NOT EXISTS planner_reports(id TEXT PRIMARY KEY,question 
 THEME={'navy':'#00274c','navy2':'#0d3a66','ink':'#1b2733','paper':'#f5f1e8','paper2':'#ede6d8','soft':'#fbf9f4','stone':'#d9d0bf','muted':'#5c6670','brass':'#b58420','brass_text':'#7a5612','maize':'#e8c064','maize_wash':'#f6ecd0','urgent':'#8c3a22','good':'#2f6b4a'}
 
 
-def _s(v,n=600):return (str(v) if v is not None else '')[:n].strip()
+# The model sees the desks as CONTEXT.state keys; Bao reads desk names.
+SOURCE_WORDS=(('state.today_brief','Today brief'),('state.win_briefs','Win brief'),('state.pitch_lab','Pitch Lab'),('state.growth.channel_math','Channel math'),('state.growth.campaigns','Campaigns'),
+              ('state.growth','Deals board'),('state.reservation_drive','Reservation drive'),('state.measured_retention','Families page'),('state.credits_and_costs','Credits page'),('state.scouts','Scouts'),
+              ('state.assumptions','Assumptions'),('state.customer_voice','Customer voice'),('state.','Founder OS '))
+
+
+def plain_sources(text):
+    for k,v in SOURCE_WORDS:text=text.replace(k,v)
+    return re.sub(r'(Today brief|Win brief|Pitch Lab|Channel math|Campaigns|Deals board|Reservation drive|Families page|Credits page|Scouts|Assumptions|Customer voice)(\.[\w]+)+',r'\1',text)
+
+
+def _s(v,n=600):return plain_sources((str(v) if v is not None else '')[:n].strip())
 
 
 def clean(data):
@@ -162,6 +173,7 @@ class Planner:
         return {'question':r['question'],'state':state,'already_asked_of_bao':self.open_questions(state),
                 'task':'You are the Planner for A Story Founder OS. Answer CONTEXT.question for Bao using ONLY CONTEXT.state. Write like a sharp chief of staff: plain sentences, no staging ("not X but Y", "here is the thing"), no triads for rhythm, no inflated words, no em dashes, no bold labels. '
                        'answer: 2 to 5 short paragraphs that answer the question directly, numbers only from CONTEXT with their source. plan: the dated next moves in order (when, what, why, who: Bao, Daniel or agents, link from CONTEXT when one applies), at most 10, the first three being what matters most this week. '
+                       'Name a source by its desk in plain words (Today brief, Deals board, Win brief for Columbus, Pitch Lab, Channel math), never by a field path, and never write "state." in the report. '
                        'numbers: up to 6 figures that frame the week, each with its source. questions_for_bao: the decisions and facts only he can supply, drawn from already_asked_of_bao and the state, each one sentence, no duplicates. risks: up to 4, specific. Never invent a program, a number, a person or a date.'},state
 
 
