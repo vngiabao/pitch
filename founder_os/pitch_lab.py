@@ -365,6 +365,10 @@ class PitchLab:
                          'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. Hope College: many students want to preorder or join the mailing list to gift it to grandparents for Thanksgiving (interest only, not a partnership).',
                          'Bao reads every field you write. Never mention CONTEXT, the playbook, field names, rounds or these instructions; say "the program page", "our facts" or "the master deck" in plain words.']}
 
+    def win_brief(self,oid):
+        from .win_scout import WinScout
+        return WinScout(self.s).for_agents(oid)
+
     def program_context(self,oid):
         if not oid:return None
         try:d=self.h.detail(oid)
@@ -379,7 +383,7 @@ class PitchLab:
             program=self.program_context(it['opportunity_id'])
             first=it['round']==1 and not p.get('brief')
             ctx={**self.base_context('TAILOR'),'program':program,'minutes':p.get('minutes'),'slide_limit':p.get('slide_limit'),'owner_note':p.get('owner_note',''),
-                 'master_deck':self.master_deck()['slides'],'previous_edition':p.get('brief'),'feedback':p.get('feedback'),'voice_guide':self.doc('BAO-VOICE.md',6000)}
+                 'master_deck':self.master_deck()['slides'],'previous_edition':p.get('brief'),'feedback':p.get('feedback'),'voice_guide':self.doc('BAO-VOICE.md',6000),'win_brief':self.win_brief(it['opportunity_id'])}
             slide=({'type':'object','additionalProperties':False,'properties':{'slide_id':{'type':'string'},'title':{'type':'string'},'seconds':{'type':'integer'},'text':{'type':'string'}},'required':['slide_id','title','seconds','text']})
             plan={'type':'object','additionalProperties':False,'properties':{'slide_id':{'type':'string'},'action':{'type':'string','enum':['keep','change','add','cut']},'change':{'type':'string'},'why':{'type':'string'}},'required':['slide_id','action','change','why']}
             rules={'type':'object','additionalProperties':False,'properties':{'minutes':{'type':['number','null']},'slide_limit':{'type':['integer','null']},'format':{'type':'string'},
@@ -394,7 +398,8 @@ class PitchLab:
                   'Write the timed spoken script in Bao’s voice (CONTEXT.voice_guide), one entry per slide, reusing Bao’s own lines from master_deck.spoken. Total words must fit minutes × 140. '
                   'If CONTEXT.feedback exists, fix every point and say how in answers_to_feedback. If CONTEXT.previous_edition exists, revise it rather than starting over. '
                   'Put anything only Bao can supply (the ask amount, a credential) in open_questions, never as a bracketed placeholder in the script. '
-                  'rules.deadline is a plain date YYYY-MM-DD or null; put any caveat about the rules in rules.format. Use null for anything the official pages do not state.')
+                  +('If CONTEXT.win_brief exists, build the edition to win this exact program: weight and order the slides by win_brief.criteria, make every how_we_win move visible on a slide or in the script, answer each unstated expectation, and prepare for the named judges. win_brief describes the program and other companies; take no fact about A Story from it. ' if ctx.get('win_brief') else '')
+                  +'rules.deadline is a plain date YYYY-MM-DD or null; put any caveat about the rules in rules.format. Use null for anything the official pages do not state.')
             return task+'\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False),schema,'tailor',first and bool(program)
         if st=='VOICE':
             segs=[s for s in self.segments(it) if s.get('editable')]
@@ -409,7 +414,7 @@ class PitchLab:
         if st=='COACH':
             content=[{k:s[k] for k in ('key','title','text')} for s in self.segments(it)]
             if it['kind']=='APPLICATION_SET':content=[{**c,'text':it['payload']['answers'][i].get('suggested') or c['text']} for i,c in enumerate(content)]
-            ctx={**self.base_context('COACH'),'program':self.program_context(it['opportunity_id']),'kind':it['kind'],'minutes':it['payload'].get('minutes'),'content':content,
+            ctx={**self.base_context('COACH'),'program':self.program_context(it['opportunity_id']),'win_brief':self.win_brief(it['opportunity_id']),'kind':it['kind'],'minutes':it['payload'].get('minutes'),'content':content,
                  'rubric':list(CRITERIA),'appendix':[{'id':x['id'],'notes':x['spoken']} for x in self.master_deck()['slides'] if x.get('appendix')],'earlier_reviews':[r['detail'].get('top_fixes') for r in it['reviews'] if r['agent']=='COACH']}
             score={'type':'object','additionalProperties':False,'properties':{'criterion':{'type':'string','enum':list(CRITERIA)},'score':{'type':'integer','minimum':1,'maximum':5},'why':{'type':'string'},'fix':{'type':'string'}},'required':['criterion','score','why','fix']}
             q={'type':'object','additionalProperties':False,'properties':{'question':{'type':'string'},'answer':{'type':'string'},'gap':{'type':'string'}},'required':['question','answer','gap']}
@@ -418,7 +423,8 @@ class PitchLab:
             task=('You are Pitch Coach: a YC partner who knows A Story well. Kind, direct and specific; never flattering. Score CONTEXT.content on every criterion in CONTEXT.rubric (1-5) using '
                   'the coaching lens in CONTEXT.playbook section 9, judged for CONTEXT.program and its format. Numbers in CONTEXT.appendix are approved modeled figures (said rounded in the pitch); question how they are framed, not whether they exist. For each score give why and the one concrete fix that would raise it. '
                   'Write 6-8 hard_questions a judge or investor would ask this exact pitch, each with the best honest answer from CONTEXT facts (say "we don’t know yet - here is the test" when true) and gap = what proof is missing. '
-                  'top_fixes: the 3 changes that matter most, most important first. verdict PASS only when every score is 4 or higher. Never invent facts.')
+                  'top_fixes: the 3 changes that matter most, most important first. verdict PASS only when every score is 4 or higher. Never invent facts.'
+                  +(' CONTEXT.win_brief describes this program’s judges, criteria, past winners and other companies: score as those judges would, weight the criteria as win_brief.criteria says, and add the hard questions they or the listed competitors would prompt.' if ctx.get('win_brief') else ''))
             return task+'\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False),schema,'coach',False
         if st=='LEARN':
             ctx={**{k:v for k,v in self.base_context('ALL').items() if k!='playbook'},'item':it['payload'],'current_lessons':self.approved_lessons()}

@@ -115,6 +115,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/application-list':
                 from .application_drafter import application_list
                 result=application_list(s)
+            elif route.startswith('/api/win/'):
+                from .win_scout import WinScout
+                result=WinScout(s).brief(route.rsplit('/',1)[1])
             elif route=='/api/stack':
                 from .scouts import Scouts
                 result=Scouts(s).stack()
@@ -128,7 +131,8 @@ class Handler(BaseHTTPRequestHandler):
                 from .growth_agents import Growth
                 from .growth_desk import GrowthDesk
                 from .reservation_drive import ReservationDrive
-                result=Growth(s).alerts()+GrowthDesk(s).alerts()+ReservationDrive(s).alerts()
+                from .win_scout import WinScout
+                result=Growth(s).alerts()+GrowthDesk(s).alerts()+ReservationDrive(s).alerts()+WinScout(s).alerts()
             elif route=='/api/drive':
                 from .reservation_drive import ReservationDrive
                 result=ReservationDrive(s).board()
@@ -298,6 +302,10 @@ class Handler(BaseHTTPRequestHandler):
                 else:result=lab.decide_lesson(p['id'],p['decision'])
                 if route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun'):
                     result={k:v for k,v in result.items() if k!='payload'};self.start_worker()
+            elif route in ('/api/win-research','/api/win-seen'):
+                from .win_scout import WinScout
+                if route=='/api/win-seen':result=WinScout(s).mark_seen(p['opportunity_id'])
+                else:result=WinScout(s).request(p['opportunity_id']);self.start_worker()
             elif route in ('/api/stack-cost','/api/stack-delete'):
                 from .scouts import Scouts
                 result=Scouts(s).save_cost(p) if route=='/api/stack-cost' else Scouts(s).delete_cost(p['id'])

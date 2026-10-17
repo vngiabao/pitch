@@ -203,6 +203,10 @@ class ApplicationDrafter:
         self.db.execute("INSERT OR IGNORE INTO hunter_requests(id,request_key,reason,state,created_at,run_id) VALUES(?,?,?,'QUEUED',?,NULL)",(rid,key,DRAFT_PREFIX+aid,now()))
         return rid
 
+    def win_brief(self,oid):
+        from .win_scout import WinScout
+        return WinScout(self.store).for_agents(oid)
+
     def draft_context(self,aid):
         """Everything the AI drafter may use: approved facts, approved answers, owner sources and writing rules."""
         app=self.store.one('SELECT a.*,p.canonical_name FROM applications a LEFT JOIN funding_intelligence i ON i.opportunity_id=a.opportunity_id LEFT JOIN funding_programs p ON p.id=i.program_id WHERE a.id=?',(aid,))
@@ -217,7 +221,7 @@ class ApplicationDrafter:
         guide=Path(__file__).resolve().parents[1]/'PITCH_WRITING.md'
         return {'program':app['canonical_name'] or app['title'],'questions':[{'question_id':q['id'],'question':q['prompt'],'limit':q['limit_value'],'unit':q['limit_unit'],'type':q['type']} for q in self.open_questions(aid)],
                 'company_facts':{k:v['value'] for k,v in mem['attributes'].items()},'approved_statements':[{'topic':c['topic'],'text':c['body']} for c in mem['canonical_claims'] if not c['body'].startswith('{')],
-                'owner_sources':owner_sources,'approved_answers':approved,'owner_written_answers':recent_owner,'founder_profile':FounderProfile(self.store).public_values(),
+                'owner_sources':owner_sources,'approved_answers':approved,'owner_written_answers':recent_owner,'founder_profile':FounderProfile(self.store).public_values(),'win_brief':self.win_brief(app['opportunity_id']),
                 'writing_guide':guide.read_text(encoding='utf-8')[:9000] if guide.exists() else '',
                 'rules':['Use only the facts, statements, sources and answers given here. Never invent numbers, customers, partners, awards or traction.',
                          'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Do not mention Nhi Tran except for the Michigan Business Challenge.',

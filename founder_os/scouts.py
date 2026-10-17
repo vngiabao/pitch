@@ -45,6 +45,8 @@ SCOUTS=[
   'lands':('/growth','Deals: investors'),'families':None,'focus':None,'reason':INVESTOR_DISCOVERY,'days':('WE',),'hour':8,'minute':15},
  {'key':'partners','name':'Partner Scout','group':'People to reach','hunts':'Organizations that reach adult children or buy gifts for many older adults.',
   'lands':('/growth','Deals: partners'),'families':None,'focus':None,'reason':'Partner and deal discovery','days':('TU',),'hour':8,'minute':0,'external':True},
+ {'key':'win','name':'Win Scout','group':'How to win','hunts':'For one competition: the rules, the scoring, the judges and what they look for, past winners and why, the other companies this cycle, and the expectations nobody writes down. Feeds Pitch Tailor, the Drafter and the Coach.',
+  'lands':('/opportunities','Each program’s page: How we win here'),'families':None,'focus':None,'reason':'Win brief','days':DAY,'hour':8,'minute':30,'external':True},
  {'key':'press','name':'Press Scout','group':'People to reach','hunts':'Holiday gift guides, newsletters, podcasts and local outlets that take pitches.',
   'lands':('/press','Press and gift guides'),'families':None,'focus':None,'reason':'Press and gift-guide discovery','days':('MO','TH'),'hour':8,'minute':0,'external':True},
 ]
@@ -137,6 +139,9 @@ class Scouts:
         local=(instant or datetime.now(ET)).astimezone(ET);out=[]
         for s in SCOUTS:
             running=bool(self.db.execute("SELECT 1 FROM hunter_requests WHERE reason=? AND state IN ('QUEUED','RUNNING')",(s['reason'],)).fetchone())
+            if s['key']=='win':
+                from .win_scout import WinScout
+                w=WinScout(self.s).summary();last={'at':w['last_checked'],'found':w['briefs']} if w['last_checked'] else None;running=w['running']
             if s['key']=='press':last=self._setting('press_last_run')
             elif s['key']=='partners':last=self._setting('partners_last_run')
             elif s['key']=='investors':last=self._setting('investors_last_run')

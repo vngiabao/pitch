@@ -143,7 +143,8 @@ def draft(h,request):
     prompt=('You are the A Story Founder OS application drafter. Draft an answer for every question in CONTEXT.questions, '
             'using ONLY CONTEXT. Follow CONTEXT.rules and CONTEXT.writing_guide. Prefer the owner wording from owner_written_answers and approved_answers when a question matches. '
             'Return JSON matching the schema: one item per question_id. Use an empty answer plus a short note when the context cannot answer it. '
-            'Do not use shell, files, web, email or any tool.\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False))
+            +('If CONTEXT.win_brief exists, let its criteria, judges and how_we_win shape what each answer leads with; it describes the program, never A Story, so take no fact about us from it. ' if ctx.get('win_brief') else '')
+            +'Do not use shell, files, web, email or any tool.\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False))
     disabled=('shell_tool','apps','plugins','browser_use','browser_use_external','computer_use','multi_agent','goals','workspace_dependencies','skill_search')
     command=[cli,'-a','never']
     for feature in disabled:command.extend(['--disable',feature])
@@ -326,7 +327,11 @@ def main():
             print(json.dumps(lab_step(h,request)),flush=True)
             s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
             return 0
-        from founder_os import growth_desk,scouts as scout_registry
+        from founder_os import growth_desk,scouts as scout_registry,win_scout
+        if win_scout.handles(request['reason']):
+            print(json.dumps(win_scout.run(h,request,codex_json)),flush=True)
+            s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
+            return 0
         if scout_registry.handles(request['reason']):
             print(json.dumps(scout_registry.run(h,request,codex_json)),flush=True)
             s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
