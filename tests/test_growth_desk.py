@@ -91,6 +91,21 @@ class GrowthDeskTests(unittest.TestCase):
         clean=d.save_plan('holiday-gift-passes',self.plan())
         self.assertEqual(clean['issues'],[]);self.assertEqual(d.set_campaign_state('holiday-gift-passes','RUNNING')['state'],'RUNNING')
 
+    def test_field_day_has_a_spoken_script_and_a_tally(self):
+        d=self.desk();c=d.campaign('hope-college-onsite-2026-10-17')
+        [script]=[x for x in c['drafts'] if x['title']=='Cold approach script']
+        self.assertIn('reserve it for a dollar',script['body']);self.assertIn('$119 a year',script['body']);self.assertNotIn('partner',script['body'].lower())
+        self.assertEqual(c['field']['approached'],0);self.assertIsNone(d.campaign('holiday-gift-passes')['field'])
+        self.assertEqual(len(GrowthDesk(self.s).campaign('hope-college-onsite-2026-10-17')['drafts']),1,'the script is seeded once')
+        f=d.log_field_day('hope-college-onsite-2026-10-17',{'approached':40,'conversations':12,'emails':9,'reservations':3,'on':'2026-10-17','note':'lunch rush'})
+        self.assertEqual((f['approached'],f['emails'],f['reservations']),(40,9,3))
+        ev=next(ch for ch in d.math()['channels'] if ch['channel']=='events')
+        self.assertEqual((ev['visits'],ev['signups'],ev['purchases'],ev['from']),(40,9,3,'2026-10-12'));self.assertIn('12 conversations',f['entries'][0]['note'])
+        with self.assertRaises(ValueError):d.log_field_day('hope-college-onsite-2026-10-17',{'approached':3,'conversations':9})
+        # The script goes through Fact Guard and Bao's Voice like every growth draft.
+        PitchLab(self.s).poll()
+        self.assertTrue(self.s.rows("SELECT id FROM work_items WHERE kind='GROWTH_DRAFT' AND subject_id=?",(c['id'],)))
+
     def test_worker_entry_routes_each_job(self):
         d=self.desk();deal=d.add_deal({'name':'Senior Living Co','kind':'buyer'})
         calls=[]

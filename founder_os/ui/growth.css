@@ -23,6 +23,10 @@
 .scout-card.running{border-color:#d1902c}
 .scout-facts{margin:var(--space-3) 0 0}
 .deal-filters{margin:0 0 var(--space-4)}
+/* Label above control, like the People and Credits forms, for every form that lacked it. */
+.family-form label,.import-form label,.deal-form label,.deal-event-form label,.deal-edit-form label,.entry-form label,.campaign-form label,.field-form label,.stack-add label{display:grid;gap:var(--space-1);font-size:var(--text-sm);font-weight:560}
+.family-form textarea,.deal-form textarea,.deal-event-form textarea,.campaign-form textarea{width:100%;min-height:72px}
+.field-day{margin:var(--space-3) 0 var(--space-4)}
 .stack-list{display:flex;flex-direction:column}
 .stack-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) 120px minmax(0,1.4fr) auto auto;gap:var(--space-2);align-items:center;padding:var(--space-2) 0;border-top:var(--rule)}
 .stack-row input,.stack-row select{min-width:0;margin:0}

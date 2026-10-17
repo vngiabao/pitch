@@ -97,6 +97,17 @@ class PitchLabTests(unittest.TestCase):
         PitchStudio(self.s).save(saved['pitch_id'],{**{k:p[k] for k in ('title','audience','scenario','speaker','notes','format','status','duration_seconds','sources','claim_versions')},'body':p['body']+' My own line.','change_note':'Bao edit','expected_version_id':p['id']})
         self.assertEqual(lab.harvest_voice(),1)
 
+    def test_fact_guard_hears_written_language_in_spoken_scripts(self):
+        g=FactGuard(self.lab(),'Startup World Cup')
+        staged="It's not just a book, it's a living archive. Here's the thing. A Story serves as the bridge between generations and stands as a testament to every family that chose to remember together, year after year, call after call."
+        r=g.check([{'key':'meet-a-story','text':staged}],'PITCH_EDITION')
+        spoken=[i for i in r['issues'] if i['rule']=='spoken'];self.assertEqual(len(spoken),2)
+        self.assertIn('say the point',spoken[0]['text']);self.assertIn('one breath',spoken[1]['text'])
+        self.assertTrue(all(i['severity']=='warn' for i in spoken),'spoken-language notes never block')
+        self.assertFalse([i for i in g.check([{'key':'q1','text':staged}],'APPLICATION_SET')['issues'] if i['rule']=='spoken'],'written answers are not held to speech')
+        clean=g.check([{'key':'meet-a-story','text':"Your mom tells her story by phone. We call, we ask, and the family keeps every word."}],'PITCH_EDITION')
+        self.assertFalse([i for i in clean['issues'] if i['rule']=='spoken'])
+
     def test_last_round_block_reaches_bao_flagged(self):
         oid=self.h.upsert(self.record('Startup World Cup'))['opportunity_id'];lab=self.lab()
         bad=brief({'legacy-gap':'We already have 4,321 families.'});bad['ask']='Test from January 29—March 25.'

@@ -28,6 +28,27 @@ Learned from the Startup World Cup answers (Oct 14, 2026), the founder bios and 
 - Stay under the limit. When over, cut adjectives first, then the second example, and never the business line.
 - Keep his own sentences exactly when they already answer the question. Edit around them.
 
+## Spoken, not written (Oct 16, 2026)
+
+Every pitch script, speaker note, cold-approach line and outreach message is said out loud or read like someone talking. Write it the way Bao says it, then check it by reading it aloud once.
+
+- One breath per sentence. If a sentence runs past about 20 words, split it.
+- Say "we", "you", "your mom", "her". Never "users", "customers" in a spoken line, never "the solution", "the platform".
+- Plain verbs that a person uses in conversation: calls, asks, remembers, keeps, prints. Not "enables", "delivers", "provides", "facilitates".
+- Contractions always: "doesn't", "we're", "it's", "you'll".
+- Start with the person or the moment, not with the company. "Your mom tells her story by phone" before "A Story is".
+- No staging. Never "not X but Y", "it's not just a book, it's", "here's the thing", "the real question is", "at its core", "let's dive in", "what really matters". Say the point.
+- No triads for rhythm. Two items, or one, unless there really are three.
+- No inflation. Never "testament", "pivotal", "crucial", "transformative", "unlock", "landscape", "journey", "seamless", "robust", "empower", "leverage", "elevate", "game-changer", "cutting-edge", "world-class".
+- No long-phrase verbs. "is", "has", "does" instead of "serves as", "stands as", "boasts", "features", "offers", "represents".
+- No -ing riders bolted on the end: "highlighting", "underscoring", "ensuring", "fostering", "showcasing", "reflecting".
+- No sales words: "rich", "profound", "stunning", "renowned", "diverse array", "exemplifies", "commitment to".
+- No dashes at all in spoken lines. A period or a comma.
+- A question is fine when it is one a listener would answer in their head: "When did you last ask your grandma how she met your grandpa?"
+- End on the concrete thing, never on a slogan or a summary line.
+
+These are the humanizer rules (the Wikipedia "signs of AI writing" list) applied to speech. Fact Guard warns on the words; Bao's Voice fixes the sentences.
+
 ## What not to change
 
 - Facts, numbers, names and claims. Bao's Voice edits wording only. If a fact looks wrong, it flags it and leaves it alone.

@@ -24,7 +24,19 @@ FOLLOW_DAYS={'SENT':7,'REPLIED':3,'MEETING':1,'PROPOSAL':7}
 CHANNELS=('gift_passes','referrals','partners','press','email','paid_social','search','events','other')
 CHANNEL_WORDS={'gift_passes':'Gift passes','referrals':'Referrals','partners':'Partners','press':'Press and gift guides','email':'Email and mailing list','paid_social':'Paid social','search':'Search','events':'Events and pitch nights','other':'Other'}
 DECK_FORMULA={'visits':1000,'rate':0.03,'families':30}
-CAMPAIGNS=[('holiday-gift-passes','Holiday gift passes 2026','Adult children buy A Story as a gift for a parent or grandparent before Thanksgiving and the December holidays. The $1 reservation closes November 2.')]
+CAMPAIGNS=[('holiday-gift-passes','Holiday gift passes 2026','Adult children buy A Story as a gift for a parent or grandparent before Thanksgiving and the December holidays. The $1 reservation closes November 2.',None),
+           ('hope-college-onsite-2026-10-17','Hope College on site, October 17','Direct sales on campus, cold approach. Students who want to gift A Story to a grandparent reserve it for $1 (15 percent off before November 2) or join the mailing list. Student interest only; there is no college partnership.',
+            "Hi, quick question. When did you last ask your grandma how she met your grandpa?\n\n"
+            "That's what we do. A Story calls your parent or grandparent once a week and asks the questions you never got to. She picks the time. The family gets every recording, and a book at the end of the year.\n\n"
+            "I'm Bao. There are two of us, we're from Michigan, and we're launching for the holidays.\n\n"
+            "If you'd gift this to a grandparent, you can reserve it for a dollar today and get 15 percent off before November 2. It takes about thirty seconds on your phone. Or give me your email and I'll send you the link.\n\n"
+            "If they ask:\n"
+            "\"She won't answer a robot call.\" It's a scheduled call she picks the time for, and it sounds like a conversation. There's a free plan to try it first.\n"
+            "\"How much?\" $119 a year for one storyteller, with a hardcover book included. Or $79 once for the Express version if you just want the one book.\n"
+            "\"Who hears it?\" The family decides who gets invited.\n"
+            "\"Is this like Storyworth?\" Storyworth emails a question and waits for her to type. We call her and do the asking, and it doesn't stop at one book.\n\n"
+            "Thanks either way. Here's the link.")]
+FIELD_CHANNEL='events'
 
 SCHEMA='''
 CREATE TABLE IF NOT EXISTS deals(id TEXT PRIMARY KEY,key TEXT NOT NULL UNIQUE,name TEXT NOT NULL,kind TEXT NOT NULL,region TEXT,url TEXT,contact_route TEXT,why TEXT,angle TEXT,
@@ -55,8 +67,13 @@ class GrowthDesk:
         self.s=store;self.db=store.db;self.g=Growth(store);self.h=FundingHunter(store)
         for statement in SCHEMA.split(';'):
             if statement.strip():self.db.execute(statement)
-        for key,title,brief in CAMPAIGNS:
+        for key,title,brief,script in CAMPAIGNS:
             self.db.execute('INSERT OR IGNORE INTO campaigns(id,key,title,brief,state,created_at,updated_at) VALUES(?,?,?,?,?,?,?)',(uid('campaign'),key,title,brief,'NEW',now(),now()))
+            if script:
+                # The field script is a growth draft, so Fact Guard checks it and Bao's Voice reads it aloud before he does.
+                cid=self.db.execute('SELECT id FROM campaigns WHERE key=?',(key,)).fetchone()['id']
+                if not self.db.execute("SELECT 1 FROM growth_drafts WHERE subject_kind='campaign' AND subject_id=? AND title='Cold approach script'",(cid,)).fetchone():
+                    self.g.save_draft('campaign',cid,'Cold approach script',script,'Spoken script for the day. Prices from astoryapp.com.')
 
     # ---------- deals ----------
     def add_deal(self,p):
@@ -197,6 +214,7 @@ class GrowthDesk:
         c['plan']=json.loads(c['plan_json']) if c['plan_json'] else None;c['issues']=json.loads(c['issues_json']) if c['issues_json'] else []
         c['planning']=bool(self.db.execute("SELECT 1 FROM hunter_requests WHERE reason=? AND state IN ('QUEUED','RUNNING')",(CAMPAIGN_PREFIX+key,)).fetchone())
         c['drafts']=self.s.rows("SELECT * FROM growth_drafts WHERE subject_kind='campaign' AND subject_id=? ORDER BY created_at DESC",(c['id'],))
+        c['field']=self.field_days(key) if any(k==key and s for k,_,_,s in CAMPAIGNS) else None
         for k in ('plan_json','issues_json'):c.pop(k)
         return c
 
@@ -231,6 +249,22 @@ class GrowthDesk:
     def _safe_day(v):
         try:return bool(day(v))
         except ValueError:return False
+
+    def log_field_day(self,key,p):
+        """A tally from a day of direct sales: approached, real conversations, emails collected, $1 reservations. Lands in channel math as an events entry."""
+        c=self.s.one('SELECT id,title FROM campaigns WHERE key=?',(key,))
+        approached=num(p.get('approached'),'Approached');talked=num(p.get('conversations'),'Conversations');emails=num(p.get('emails'),'Emails');reserved=num(p.get('reservations'),'Reservations')
+        if talked>approached and approached:raise ValueError('Conversations cannot exceed people approached')
+        if reserved>approached and approached:raise ValueError('Reservations cannot exceed people approached')
+        on=day(p.get('on'),'Date') or today().isoformat();week=(date.fromisoformat(on)-timedelta(days=date.fromisoformat(on).weekday())).isoformat()
+        note=(f'{c["title"]} ({on}): {talked} conversations.'+((' '+text(p.get('note'),200,'Note')) if p.get('note') else ''))[:300]
+        self.db.execute('INSERT INTO channel_entries VALUES(?,?,?,?,?,?,?,?,?,?,?)',(uid('entry'),FIELD_CHANNEL,week,approached,emails,reserved,0.0,float(reserved),'field_day:'+key,note,now()))
+        self.s.log('growth.field_day','owner',{'campaign':key,'approached':approached,'conversations':talked,'emails':emails,'reservations':reserved})
+        return self.field_days(key)
+
+    def field_days(self,key):
+        rows=self.s.rows("SELECT * FROM channel_entries WHERE source=? ORDER BY created_at DESC",('field_day:'+key,))
+        return {'entries':rows[:20],'approached':sum(r['visits'] for r in rows),'emails':sum(r['signups'] for r in rows),'reservations':sum(r['purchases'] for r in rows)}
 
     def set_campaign_state(self,key,state):
         if state not in ('NEW','PLANNED','RUNNING','DONE'):raise ValueError('Unknown campaign state')

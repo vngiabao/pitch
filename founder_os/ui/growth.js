@@ -23,7 +23,12 @@ function addDealForm(b,open){
 function campaignCard(c){
  const p=c.plan,latest={};for(const d of c.drafts)if(!latest[d.title])latest[d.title]=d;
  const stateWord={NEW:'Not planned yet',PLANNED:'Plan ready for you',RUNNING:'Running',DONE:'Done'}[c.state]||c.state;
+ const script=c.drafts.find(d=>d.title==='Cold approach script');
  return `<section class="section campaign" id="campaign-${E(c.key)}"><div class="section-title"><div><h2>${E(c.title)}</h2><p class="small">${E(c.brief)}</p></div><span class="credit-status${c.state==='PLANNED'?' due':''}">${E(c.planning?'Planning…':stateWord)}</span></div>`+
+ (c.field?`<div class="field-day"><div class="summary desk-tiles"><div><strong>${c.field.approached}</strong><span>approached</span></div><div><strong>${c.field.emails}</strong><span>emails</span></div><div><strong>${c.field.reservations}</strong><span>$1 reservations</span></div></div>`+
+  (script?`<p class="small">What to say${/Voice/.test(script.note||'')?', in your voice':''}. Read it out loud once before you go.</p>${answerBox(script.body)}`:'')+
+  `<form class="field-form" data-key="${E(c.key)}"><p class="pill-label">Tally the day</p><div class="form-grid"><label>People approached<input type="number" name="approached" min="0" value="0"></label><label>Real conversations<input type="number" name="conversations" min="0" value="0"></label><label>Emails collected<input type="number" name="emails" min="0" value="0"></label><label>$1 reservations<input type="number" name="reservations" min="0" value="0"></label><label>Date<input type="date" name="on"></label><label>Note<input name="note" maxlength="200" placeholder="e.g. lunch rush at the student center"></label></div><div class="actions"><button class="primary" type="submit">Save tally</button></div></form>`+
+  (c.field.entries.length?`<ul class="tracker">${c.field.entries.slice(0,6).map(e=>`<li><span><strong>${E(fmtDay(e.week_start))} week</strong><small class="tracker-sub">${e.visits} approached · ${e.signups} emails · ${e.purchases} reservations${e.note?' · '+E(e.note):''}</small></span></li>`).join('')}</ul>`:'')+`</div>`:'')+
  (p?`<div class="plan-top"><div><p class="pill-label">Goal</p><p>${E(p.goal)}</p></div><div><p class="pill-label">Who</p><p>${E(p.audience)}</p></div><div><p class="pill-label">The offer</p><p>${E(p.offer)}</p></div></div>`+
   (c.issues.length?`<ul class="qa-list">${c.issues.map(i=>`<li class="${E(i.severity)}"><b>Fact Guard</b> ${E(i.text)} <span class="muted">(${E(i.where)})</span></li>`).join('')}</ul>`:'')+
   `<div class="plan-channels">${p.channels.map(ch=>{const d=latest[CHANNEL_LABEL(ch.channel)];return `<div class="plan-channel"><div class="section-title"><h3>${E(CHANNEL_LABEL(ch.channel))}</h3><span class="small">${ch.start_on?E(fmtDay(ch.start_on)):''}${ch.end_on?' to '+E(fmtDay(ch.end_on)):''}${ch.spend_cap_usd?' · cap '+E(usd(ch.spend_cap_usd)):''}</span></div><p>${E(ch.what)}</p>${d?`<p class="small">Lead message${/Voice/.test(d.note||'')?', in your voice':''}</p>${answerBox(d.body)}`:ch.message?`<p class="small">Lead message</p>${answerBox(ch.message)}`:''}<p class="small"><b>Success:</b> ${E(ch.success_metric)}${ch.needs_from_bao?` · <b>You supply:</b> ${E(ch.needs_from_bao)}`:''}</p></div>`;}).join('')}</div>`+
@@ -80,13 +85,14 @@ document.addEventListener('click',async e=>{
  }catch(err){toast(err.message,true);}finally{b.disabled=false;}
 });
 document.addEventListener('submit',async e=>{
- const f=e.target,kind=['deal-form','deal-event-form','deal-edit-form','campaign-form','entry-form'].find(k=>f.classList.contains(k));if(!kind)return;e.preventDefault();
+ const f=e.target,kind=['deal-form','deal-event-form','deal-edit-form','campaign-form','entry-form','field-form'].find(k=>f.classList.contains(k));if(!kind)return;e.preventDefault();
  const body=Object.fromEntries(new FormData(f)),btn=f.querySelector('button[type=submit]');btn.disabled=true;
  try{
   if(kind==='deal-form'){await api('/api/deal',body);toast('Added. The agent drafts a first note; you send it.');}
   else if(kind==='deal-event-form'){await api('/api/deal-event',{id:f.dataset.id,...body});toast('Logged.');}
   else if(kind==='deal-edit-form'){await api('/api/deal-update',{id:f.dataset.id,...body});toast('Saved.');}
   else if(kind==='campaign-form'){await api('/api/campaign-plan',{key:f.dataset.key,note:body.note});toast('Campaign Planner started. The plan appears here in a few minutes.');}
+  else if(kind==='field-form'){await api('/api/field-day',{key:f.dataset.key,...body});toast('Tally saved. It counts in channel math under events.');}
   else{await api('/api/channel-entry',body);toast('Week saved.');}
   await boot();
  }catch(err){toast(err.message,true);}finally{btn.disabled=false;}

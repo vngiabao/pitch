@@ -260,7 +260,7 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result=g.queue_draft(p['kind'],p['id'],manual=True) if route=='/api/growth-draft' else g.request_press_discovery()
                     self.start_worker()
-            elif route in ('/api/deal','/api/deal-update','/api/deal-stage','/api/deal-event','/api/deal-draft','/api/partner-discover','/api/campaign-plan','/api/campaign-state','/api/channel-entry','/api/channel-entry-delete'):
+            elif route in ('/api/deal','/api/deal-update','/api/deal-stage','/api/deal-event','/api/deal-draft','/api/partner-discover','/api/campaign-plan','/api/campaign-state','/api/channel-entry','/api/channel-entry-delete','/api/field-day'):
                 from .growth_desk import GrowthDesk
                 desk=GrowthDesk(s)
                 if route=='/api/deal':result=desk.add_deal(p)
@@ -270,6 +270,7 @@ class Handler(BaseHTTPRequestHandler):
                 elif route=='/api/campaign-state':result=desk.set_campaign_state(p['key'],p['state'])
                 elif route=='/api/channel-entry':result=desk.add_entry(p)
                 elif route=='/api/channel-entry-delete':result=desk.delete_entry(p['id'])
+                elif route=='/api/field-day':result=desk.log_field_day(p['key'],p)
                 else:
                     result=desk.queue_deal_draft(p['id'],manual=True) if route=='/api/deal-draft' else desk.request_partner_discovery() if route=='/api/partner-discover' else desk.request_plan(p['key'],p.get('note'))
                     self.start_worker()

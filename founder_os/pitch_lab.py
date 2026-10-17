@@ -28,7 +28,12 @@ STAGE_WORDS={'TAILOR':'Pitch Tailor is drafting','FACT_CHECK':'Fact Guard is che
              'COACH':'Pitch Coach is reviewing','FORMAT':'Checking time and limits','BUILD':'Building the deck','SLIDE_QA':'Checking every slide','LEARN':'Learning from the result','READY':'Ready for you','APPROVED':'Approved by you','ARCHIVED':'Archived'}
 CRITERIA=('Clarity','Problem urgency','Insight','Why now','Evidence','Business','Defensibility','Team','The ask','Delivery')
 STORY_SLIDES=('cover','legacy-gap','retelling','want-to-know','cant-wait','todays-options','meet-a-story','every-narrator','the-everyday','why-now')
-HYPE=('leverage','leverages','empower','empowers','seamless','seamlessly','revolutionize','revolutionary','cutting-edge','game-changer','game changer','testament','tapestry','delve','robust','curated','journey')
+HYPE=('leverage','leverages','empower','empowers','seamless','seamlessly','revolutionize','revolutionary','cutting-edge','game-changer','game changer','testament','tapestry','delve','robust','curated','journey',
+      'pivotal','crucial','transformative','unlock','landscape','elevate','world-class','groundbreaking','renowned','profound','exemplifies','underscores','underscoring','highlighting','showcasing','fostering','ensuring')
+# Written-language staging that does not survive being said out loud (BAO-VOICE.md, "Spoken, not written").
+WRITTEN=(r"\bnot (just|only|merely) \w+[^.]{0,60}\bbut\b",r"\bit'?s not (just |only )?[^.]{0,40}, it'?s\b",r"\bhere'?s the thing\b",r"\bthe real question\b",r"\bat its core\b",r"\bwhat really matters\b",r"\blet'?s dive\b",r"\bserves as\b",r"\bstands as\b",r"\bboasts\b")
+SPOKEN_KINDS=('PITCH_EDITION','GROWTH_DRAFT')
+LONG_SENTENCE=24
 
 SCHEMA='''
 CREATE TABLE IF NOT EXISTS work_items(id TEXT PRIMARY KEY,kind TEXT NOT NULL,title TEXT NOT NULL,opportunity_id TEXT,subject_id TEXT,stage TEXT NOT NULL,round INTEGER NOT NULL DEFAULT 1,
@@ -102,6 +107,11 @@ class FactGuard:
                 issues.append({'where':seg['key'],'rule':'price_placement','severity':'block','text':'No prices on the story or solution slides. Prices go where the business model is told.'})
             hype=[w for w in HYPE if re.search(r'\b'+re.escape(w)+r'\b',text,re.I)]
             if hype:issues.append({'where':seg['key'],'rule':'voice','severity':'warn','text':'Hype words Bao never uses: '+', '.join(hype)+'.'})
+            if kind in SPOKEN_KINDS:
+                staged=[m.group(0) for p in WRITTEN for m in re.finditer(p,text,re.I)]
+                if staged:issues.append({'where':seg['key'],'rule':'spoken','severity':'warn','text':'Written-language staging; say the point instead: '+'; '.join(f'“{s[:50]}”' for s in staged[:3])+'.'})
+                long=[s.strip() for s in re.split(r'(?<=[.!?])\s+',text) if len(s.split())>LONG_SENTENCE]
+                if long:issues.append({'where':seg['key'],'rule':'spoken','severity':'warn','text':f'{len(long)} sentence'+('s' if len(long)>1 else '')+f' over {LONG_SENTENCE} words; hard to say in one breath: “{long[0][:70]}…”'})
             fixed.append({**seg,'text':text})
         blocking=[i for i in issues if i['severity']=='block']
         return {'issues':issues,'blocking':len(blocking),'segments':fixed}
@@ -392,7 +402,8 @@ class PitchLab:
             seg={'type':'object','additionalProperties':False,'properties':{'key':{'type':'string'},'text':{'type':'string'},'changed':{'type':'boolean'}},'required':['key','text','changed']}
             schema={'type':'object','additionalProperties':False,'properties':{'segments':{'type':'array','items':seg},'notes':{'type':'array','items':{'type':'string'}}},'required':['segments','notes']}
             task=('You are Bao’s Voice. Rewrite each segment so it reads exactly like Bao wrote it, following CONTEXT.voice_guide and the before/after CONTEXT.examples of his own edits. '
-                  'Change wording only: keep every fact, number, name and claim exactly. Do not add new claims or numbers. Stay within any limit. '
+                  +('These segments are said out loud. Apply the "Spoken, not written" section of the voice guide: one breath per sentence, contractions, plain verbs, no staging ("not X but Y", "here is the thing"), no triads for rhythm, no inflated words, no dashes. Read each line aloud in your head before returning it. ' if it['kind'] in SPOKEN_KINDS else '')
+                  +'Change wording only: keep every fact, number, name and claim exactly. Do not add new claims or numbers. Stay within any limit. '
                   'If a segment already sounds like Bao, return it unchanged with changed=false. notes: the patterns you applied, in one short line each.')
             return task+'\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False),schema,'voice',False
         if st=='COACH':
