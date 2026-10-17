@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts','/drive') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
-        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/scouts.js','/product.js','/ranker.js','/ranker.css','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
+        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/scouts.js','/product.js','/ranker.js','/ranker.css','/drive.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
         if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
@@ -127,7 +127,11 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/growth-alerts':
                 from .growth_agents import Growth
                 from .growth_desk import GrowthDesk
-                result=Growth(s).alerts()+GrowthDesk(s).alerts()
+                from .reservation_drive import ReservationDrive
+                result=Growth(s).alerts()+GrowthDesk(s).alerts()+ReservationDrive(s).alerts()
+            elif route=='/api/drive':
+                from .reservation_drive import ReservationDrive
+                result=ReservationDrive(s).board()
             elif route in ('/api/credits','/api/people','/api/press','/api/growth-alerts'):
                 from .growth_agents import Growth
                 g=Growth(s);result={'/api/credits':g.credits,'/api/people':g.contacts,'/api/press':g.press,'/api/growth-alerts':g.alerts}[route]()
@@ -308,6 +312,11 @@ class Handler(BaseHTTPRequestHandler):
                 elif route=='/api/family-event':result=d.log_event(p)
                 elif route=='/api/family-event-delete':result=d.delete_event(p['id'])
                 else:result=d.import_file(p['file'],p['provider'],p.get('note',''))
+            elif route in ('/api/drive-import','/api/drive-action'):
+                from .reservation_drive import ReservationDrive
+                d=ReservationDrive(s)
+                if route=='/api/drive-import':result=d.import_csv(p.get('csv',''))
+                else:result={'sent':d.mark_sent,'replied':lambda cid:d.mark_replied(cid,p.get('note','')),'reserved':d.mark_reserved,'referred':lambda cid:d.mark_referred(cid,p.get('who',''))}[p['action']](p['id'])
             elif route=='/api/notification-read':
                 s.db.execute('UPDATE funding_notifications SET read_at=datetime(\'now\') WHERE id=?',(p['id'],));result={'read':True}
             else:return self.respond(404,{'error':'Action not available'})

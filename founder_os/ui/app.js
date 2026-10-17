@@ -226,7 +226,7 @@ document.addEventListener('submit',async e=>{
 });
 function routeContext(){
  const path=location.pathname,parent=path.startsWith('/pitch-lab/')?'/pitch-lab':path.startsWith('/pitch/')?'/pitches':path.startsWith('/material/')?'/materials':path.startsWith('/application-review/')||path.startsWith('/application/')?'/applications':path.startsWith('/opportunity/')?'/opportunities':path.startsWith('/run/')?'/activity':path;
- const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts'};
+ const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/drive':'Reservation drive'};
  document.querySelectorAll('#workspace-nav a').forEach(a=>{const active=a.getAttribute('href')===parent;a.classList.toggle('active',active);active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#breadcrumbs').innerHTML='<a href="/">A Story</a> / '+(parent!==path?'<a href="'+E(parent)+'">'+E(names[parent]||'Workspace')+'</a> / Detail':E(names[parent]||'Workspace'));
  document.querySelector('#workspace-location').textContent=location.hostname==='pitch.gbaonvo.com'?'Owner sign-in protected':'On this PC';document.title=(names[parent]||'Workspace')+' | A Story';
@@ -245,6 +245,7 @@ async function boot(){
  if(path==='/growth')return growthDesk();
  if(path==='/scouts')return scouts();
  if(path==='/families')return betaFamilies();
+ if(path==='/drive')return reservationDrive();
  if(path.startsWith('/pitch/'))return pitchEditor(path.split('/').at(-1));
  if(path==='/pitches')return pitchLibrary();
  if(path.startsWith('/material/')){await material(path.split('/').at(-1));try{app.querySelector('.page-heading a').href=sessionStorage.getItem('astory-materials-list')||'/materials';}catch{}return;}
@@ -367,7 +368,7 @@ async function people(){
  const list=await api('/api/people'),due=list.filter(c=>c.due),rest=list.filter(c=>!c.due);
  app.innerHTML=heading('People','Who to follow up with, and a note ready to send. You send every message yourself.')+
  (due.length?`<section aria-labelledby="due-title"><div class="block-title"><h2 id="due-title">Follow up now</h2></div>${due.map(personCard).join('')}</section>`:'<div class="all-clear"><h2>No follow-ups due</h2><p class="small">When a follow-up date arrives, the agent writes the note for you here.</p></div>')+
- addPersonForm(!list.length)+
+ addPersonForm(!list.length)+driveLoaderCard()+
  (rest.length?`<section aria-labelledby="all-title"><div class="block-title"><h2 id="all-title">Everyone else</h2></div>${rest.map(personCard).join('')}</section>`:'');
 }
 const PRESS_KIND_WORDS={gift_guide:'Gift guide',newsletter:'Newsletter',podcast:'Podcast',journalist:'Journalist',local_news:'Local news',blog:'Blog',community:'Community'};

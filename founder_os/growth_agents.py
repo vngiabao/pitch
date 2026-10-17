@@ -230,8 +230,9 @@ class Growth:
                          'The owner sends every message himself. Never claim it was sent or promise anything on his behalf.']}
 
     def followup_context(self,cid):
+        from .reservation_drive import drive_task
         c=self.contact(cid)
-        return {**self.base_context(),'task':'Write a short follow-up email from Bao to this contact. Pick up from the last conversation, give one concrete update from the approved statements, and end with one easy next step. Under 140 words.',
+        return {**self.base_context(),'task':drive_task(self.s,cid) or 'Write a short follow-up email from Bao to this contact. Pick up from the last conversation, give one concrete update from the approved statements, and end with one easy next step. Under 140 words.',
                 'contact':{k:c[k] for k in ('name','org','kind','context','next_followup_on')},'conversation_log':c['touches']}
 
     def press_context(self,tid):
@@ -266,7 +267,8 @@ class Growth:
         for c in credits:
             if c['level'] in ('URGENT','SOON'):items.append({'title':c['provider']+' credits: '+c['label'].lower(),'detail':(c['after_expiry'] or 'Use them before they lapse.')[:160],'url':'/credits','link':'Review'})
             if c['level']=='ACTIVATE':items.append({'title':'Activate your '+c['provider']+' credits','detail':'Credits usually start when you redeem them. Note the date here when you do.','url':'/credits','link':'Open'})
-        due=self.due_contacts()
+        from .reservation_drive import member_ids
+        due=[c for c in self.due_contacts() if c['id'] not in member_ids(self.s)]  # drive members get the drive's own nudges
         if due:items.append({'title':'Follow up with '+', '.join(c['name'] for c in due[:3])+(' and '+str(len(due)-3)+' more' if len(due)>3 else ''),'detail':'Drafts are ready to copy.' if all(c['draft'] for c in due) else 'The agent is drafting the notes.','url':'/people','link':'Open drafts'})
         for t in self.press()['targets']:
             if t['state']=='NEW' and t['days_left'] is not None and 0<=t['days_left']<=10:
