@@ -34,8 +34,13 @@ SCOUTS=[
   'lands':('/money#cat-accelerators','Money map: accelerators and investment'),'families':('accelerators_with_cash','ai_programs','midwest','corporate'),
   'focus':'You are the Accelerator Scout. Only programs that put cash in count: accelerators and pre-seed programs with investment or a stipend, corporate and AI startup programs with a cash award. Label equity, SAFE and note terms plainly. Michigan, Ohio and the Midwest first, then remote-friendly national programs.',
   'days':('SA',),'hour':7,'minute':45},
- {'key':'credits','name':'Credits Scout','group':'Money for the company','hunts':'Free voice, AI and cloud credits that cut what A Story pays, with the conditions attached.',
-  'lands':('/credits','Credits'),'families':None,'focus':None,'reason':'Daily free credits discovery','days':DAY,'hour':7,'minute':30,'external':True},
+ {'key':'credits','name':'Credits Scout','group':'Money you do not have to spend','hunts':'Credits for the top AI models, voice, transcription, media and cloud: what A Story would otherwise pay for, with the conditions attached.',
+  'lands':('/credits','Credits'),'families':None,'reason':'Daily free credits discovery','days':DAY,'hour':7,'minute':30,'external':True,
+  'focus':'You are the Credits Scout. Only credit and free-usage programs count: AI model APIs (OpenAI, Anthropic, Google, Mistral, Cohere and peers), voice and transcription, image, video and media generation, cloud and hosting. Prefer programs open to bootstrapped companies with no VC referral. Record the face value, what it covers, expiry, renewal and paid-account or deposit conditions exactly as published.'},
+ {'key':'perks','name':'Perks Scout','group':'Money you do not have to spend','hunts':'Free tools, software, ad credits, fee waivers, office space, legal and accounting help and expert hours that a bootstrapped two-founder startup can get free.',
+  'lands':('/money#cat-perks','Money map: free tools and perks'),'families':('dev_tool_perks','business_perks','marketing_credits','founder_benefits'),
+  'focus':'You are the Perks Scout. Only free or nearly free benefits count: startup programs from software and dev-tool companies, banking and legal perks, ad and marketing credits, developer fee waivers, coworking space, university and alumni founder resources, expert office hours. No VC referral required. Record each as a startup program with what is free, for how long, the conditions (company email, paid account, deposit) and the application route. Never call a free trial a grant.',
+  'days':('SU',),'hour':7,'minute':45},
  {'key':'investors','name':'Investor Scout','group':'People to reach','hunts':'Angel groups, pre-seed funds, university and alumni funds and syndicates that back consumer, family or aging products, with how to reach each.',
   'lands':('/growth','Deals: investors'),'families':None,'focus':None,'reason':INVESTOR_DISCOVERY,'days':('WE',),'hour':8,'minute':15},
  {'key':'partners','name':'Partner Scout','group':'People to reach','hunts':'Organizations that reach adult children or buy gifts for many older adults.',
@@ -52,11 +57,16 @@ BROAD='Scheduled broad discovery'
 def handles(reason):return reason==INVESTOR_DISCOVERY
 
 
-def apply(reason,families):
-    """For a Hunter scout's run: only its families and its focus. Anything else passes through unchanged."""
+def apply(reason,families,store=None):
+    """For a scout's run: only its families and its focus. The credits and perks scouts also hear what A Story pays for and is not covered. Anything else passes through unchanged."""
     s=BY_REASON.get(reason)
-    if not s or not s.get('families'):return families,None
-    return {k:v for k,v in families.items() if k in s['families']},s['focus']
+    if not s or not s.get('focus'):return families,None
+    fam={k:v for k,v in families.items() if k in s['families']} if s.get('families') else families
+    focus=s['focus']
+    if store is not None and s['key'] in ('credits','perks'):
+        gaps=Scouts(store).uncovered()
+        if gaps:focus+=' A Story currently pays for, with no credit covering it: '+'; '.join(f"{g['item']}"+(f" ({g['provider']})" if g['provider'] else '')+(f" about ${g['monthly_usd']:g} a month" if g['monthly_usd'] else '') for g in gaps)+'. Hunt cover for these first.'
+    return fam,focus
 
 
 def next_run(s,local):
@@ -68,9 +78,44 @@ def next_run(s,local):
     return None
 
 
+STACK_SCHEMA='CREATE TABLE IF NOT EXISTS stack_costs(id TEXT PRIMARY KEY,item TEXT NOT NULL,provider TEXT,monthly_usd REAL,covered_by TEXT,note TEXT,updated_at TEXT NOT NULL);'
+# What a product like A Story pays for. Amounts stay empty until Bao fills them; nothing here is a fact until he does.
+STACK_SEED=[('Voice calls','Cartesia'),('Transcription','AssemblyAI'),('AI model API',''),('Cloud hosting and database',''),('Apple Developer Program','Apple'),('Domain, email and website',''),('Design and video tools','')]
+
+
 class Scouts:
     def __init__(self,store):
-        self.s=store;self.db=store.db;self.h=FundingHunter(store)
+        self.s=store;self.db=store.db;self.h=FundingHunter(store);self.db.execute(STACK_SCHEMA)
+        if not self.db.execute('SELECT 1 FROM stack_costs LIMIT 1').fetchone():
+            for item,provider in STACK_SEED:self.db.execute('INSERT INTO stack_costs VALUES(?,?,?,?,?,?,?)',(uid('cost'),item,provider,None,'',None,now()))
+
+    # ---------- what A Story pays for, and which credit covers it ----------
+    def stack(self):
+        rows=self.s.rows('SELECT * FROM stack_costs ORDER BY CASE WHEN covered_by IS NULL OR covered_by=\'\' THEN 0 ELSE 1 END,monthly_usd DESC,item')
+        uncovered=[r for r in rows if not r['covered_by']]
+        return {'items':rows,'monthly_uncovered':round(sum(r['monthly_usd'] or 0 for r in uncovered),2),'monthly_covered':round(sum(r['monthly_usd'] or 0 for r in rows if r['covered_by']),2),
+                'credit_providers':[r['provider'] for r in self.s.rows("SELECT DISTINCT provider FROM credit_grants WHERE state NOT IN ('USED_UP','ENDED') ORDER BY provider")] if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='credit_grants'").fetchone() else []}
+
+    def uncovered(self):return [r for r in self.stack()['items'] if not r['covered_by']]
+
+    def save_cost(self,p):
+        item=(p.get('item') or '').strip()[:120]
+        if not item:raise ValueError('Name what you pay for')
+        amount=p.get('monthly_usd')
+        if amount in (None,''):amount=None
+        else:
+            try:amount=float(amount)
+            except (TypeError,ValueError):raise ValueError('Monthly cost must be a number')
+            if not 0<=amount<=100000:raise ValueError('Monthly cost must be between 0 and 100,000')
+        row=(item,(p.get('provider') or '').strip()[:80],amount,(p.get('covered_by') or '').strip()[:80],(p.get('note') or '').strip()[:300],now())
+        if p.get('id'):
+            self.s.one('SELECT id FROM stack_costs WHERE id=?',(p['id'],))
+            self.db.execute('UPDATE stack_costs SET item=?,provider=?,monthly_usd=?,covered_by=?,note=?,updated_at=? WHERE id=?',(*row,p['id']))
+        else:self.db.execute('INSERT INTO stack_costs VALUES(?,?,?,?,?,?,?)',(uid('cost'),*row))
+        self.s.log('scouts.stack_cost','owner',{'item':item});return self.stack()
+
+    def delete_cost(self,cid):
+        self.s.one('SELECT id FROM stack_costs WHERE id=?',(cid,));self.db.execute('DELETE FROM stack_costs WHERE id=?',(cid,));return self.stack()
 
     def _last(self,reason):
         r=self.db.execute("SELECT request_key,state,created_at,last_error,run_id FROM hunter_requests WHERE reason=? AND state='COMPLETE' ORDER BY created_at DESC LIMIT 1",(reason,)).fetchone()

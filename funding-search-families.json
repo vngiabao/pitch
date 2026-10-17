@@ -91,6 +91,30 @@
       "AI hackathon cash prize {year} online voice agents",
       "voice AI hackathon prize {year}",
       "consumer AI app challenge cash prize {year}"
+    ],
+    "ai_tool_credits": [
+      "OpenAI Anthropic Google Gemini startup credits program bootstrapped {year}",
+      "AI coding and research tools free for startups founders program {year}",
+      "AI API free tier startup program credits no VC referral {year}"
+    ],
+    "dev_tool_perks": [
+      "startup perks free software GitHub Vercel Notion Figma Linear startup program {year}",
+      "free SaaS for early stage startups program apply no VC {year}"
+    ],
+    "business_perks": [
+      "Stripe Atlas Mercury Brex startup perks bootstrapped free {year}",
+      "free legal clinic startup Michigan university entrepreneurship law clinic {year}",
+      "free accounting bookkeeping perks early stage startup program {year}"
+    ],
+    "marketing_credits": [
+      "Google Ads startup credit promotional offer {year}",
+      "Meta ads credits startup program {year}",
+      "Apple App Store Small Business Program developer fee waiver startup {year}"
+    ],
+    "founder_benefits": [
+      "free coworking office space startups Ann Arbor Detroit Columbus {year}",
+      "University of Michigan alumni founder resources free mentorship office hours {year}",
+      "startup perks marketplace free for founders no VC {year}"
     ]
   },
   "directory_policy": "Discovery only. Follow through to official organizer/program and current cycle before asserting dates, benefits or eligibility.",
@@ -131,5 +155,6 @@
     "Techstars",
     "Startup World Cup"
   ],
-  "money_policy": "Any money that can reach the founders counts: cash prizes, grants, fellowships and stipends paid to individual founders, hackathon prizes, and investment programs. Rank non-dilutive cash first, then investment. Label investment and SAFE terms plainly and never call them grants. Founder-personal programs are judged on founder eligibility (age, student status, location), not company traction; leave unknown eligibility null. Report the next cycle when the current one has closed, with the date it is expected to reopen if published."
+  "money_policy": "Any money that can reach the founders counts: cash prizes, grants, fellowships and stipends paid to individual founders, hackathon prizes, and investment programs. Rank non-dilutive cash first, then investment. Label investment and SAFE terms plainly and never call them grants. Founder-personal programs are judged on founder eligibility (age, student status, location), not company traction; leave unknown eligibility null. Report the next cycle when the current one has closed, with the date it is expected to reopen if published.",
+  "perk_policy": "Free tools, software, ad credits, fee waivers, space and expert help count as money A Story does not have to spend. Record them as startup programs with what is free, for how long and the conditions. Never call a free trial a grant and never equate a perk with cash."
 }

@@ -115,6 +115,9 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/application-list':
                 from .application_drafter import application_list
                 result=application_list(s)
+            elif route=='/api/stack':
+                from .scouts import Scouts
+                result=Scouts(s).stack()
             elif route=='/api/scouts':
                 from .scouts import Scouts
                 result=Scouts(s).status()
@@ -283,6 +286,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:result=lab.decide_lesson(p['id'],p['decision'])
                 if route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun'):
                     result={k:v for k,v in result.items() if k!='payload'};self.start_worker()
+            elif route in ('/api/stack-cost','/api/stack-delete'):
+                from .scouts import Scouts
+                result=Scouts(s).save_cost(p) if route=='/api/stack-cost' else Scouts(s).delete_cost(p['id'])
             elif route=='/api/scout-run':
                 from .scouts import Scouts
                 result=Scouts(s).request_run(p['key']);self.start_worker()

@@ -24,6 +24,28 @@ async function scouts(){
  groups.map(g=>`<section aria-labelledby="g-${E(g.replace(/\W+/g,'-'))}"><div class="block-title"><h2 id="g-${E(g.replace(/\W+/g,'-'))}">${E(g)}</h2></div><div class="scout-grid">${r.scouts.filter(s=>s.group===g).map(scoutCard).join('')}</div></section>`).join('')+
  `<section class="section quiet"><div class="section-title"><div><h3>${E(b.name)}</h3><p class="small">${E(b.hunts)}</p></div><span class="credit-status">${b.running?'Running now':E(scheduleWords(b.schedule))}</span></div><p class="small">${E(lastRunWords(b.last_run))}. <a href="/activity">All research runs</a>.</p></section>`;
 }
+// What A Story pays for, and which credit covers it. Uncovered items steer the Credits and Perks scouts.
+function stackRow(r,providers){
+ const opts=['',...providers.filter(p=>p&&p!==r.covered_by),...(r.covered_by?[r.covered_by]:[])];
+ return `<form class="stack-form stack-row" data-id="${E(r.id)}"><input name="item" value="${E(r.item)}" maxlength="120" aria-label="What you pay for" required><input name="provider" value="${E(r.provider||'')}" maxlength="80" placeholder="Provider" aria-label="Provider"><input name="monthly_usd" type="number" min="0" step="0.01" value="${r.monthly_usd??''}" placeholder="$/month" aria-label="Monthly cost"><select name="covered_by" aria-label="Covered by">${opts.map(p=>`<option value="${E(p)}"${p===(r.covered_by||'')?' selected':''}>${p?E(p)+' credits':'Not covered'}</option>`).join('')}</select><button type="submit">Save</button><button type="button" class="link-button" data-stack-delete="${E(r.id)}">Remove</button></form>`;
+}
+function stackSection(st){
+ const u=st.monthly_uncovered,c=st.monthly_covered;
+ return `<section class="section" id="stack"><div class="section-title"><h2>What A Story pays for</h2><span class="small">${u||c?`${E(money(u))} a month not covered · ${E(money(c))} covered by credits`:'Add monthly costs to see what credits still need to cover'}</span></div>`+
+ `<p class="small">Fill in the monthly cost and which credit covers it. The Credits and Perks scouts hunt cover for the uncovered items first.</p>`+
+ `<div class="stack-list">${st.items.map(r=>stackRow(r,st.credit_providers)).join('')}</div>`+
+ `<form class="stack-form stack-row stack-add"><input name="item" maxlength="120" placeholder="Add something you pay for" aria-label="New item" required><input name="provider" maxlength="80" placeholder="Provider" aria-label="Provider"><input name="monthly_usd" type="number" min="0" step="0.01" placeholder="$/month" aria-label="Monthly cost"><select name="covered_by" aria-label="Covered by"><option value="">Not covered</option>${st.credit_providers.filter(Boolean).map(p=>`<option value="${E(p)}">${E(p)} credits</option>`).join('')}</select><button type="submit" class="primary">Add</button></form></section>`;
+}
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(!f.classList.contains('stack-form'))return;e.preventDefault();
+ const body=Object.fromEntries(new FormData(f)),btn=f.querySelector('button[type=submit]');btn.disabled=true;
+ try{await api('/api/stack-cost',{...(f.dataset.id?{id:f.dataset.id}:{}),...body});await boot();toast('Saved.');}catch(err){toast(err.message,true);}finally{btn.disabled=false;}
+});
+document.addEventListener('click',async e=>{
+ const d=e.target.closest('[data-stack-delete]');if(!d)return;e.preventDefault();
+ if(!confirm('Remove this item?'))return;d.disabled=true;
+ try{await api('/api/stack-delete',{id:d.dataset.stackDelete});await boot();toast('Removed.');}catch(err){toast(err.message,true);d.disabled=false;}
+});
 document.addEventListener('click',async e=>{
  const b=e.target.closest('[data-scout-run]');if(!b)return;e.preventDefault();b.disabled=true;
  try{await api('/api/scout-run',{key:b.dataset.scoutRun});await boot();toast('Scout started. Results appear on its page in about 15 minutes.');}

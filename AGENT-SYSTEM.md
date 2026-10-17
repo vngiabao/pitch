@@ -10,7 +10,8 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 | Find | **Grant Scout** | Non-dilutive grants: foundations, SBIR/STTR, MEDC, AgeTech and family-tech funds (4 families). Tuesday and Friday. | Yes | Yes |
 | Find | **Founder Money Scout** | Fellowships, stipends and awards paid to Bao or Daniel personally; judged on founder eligibility (3 families). Wednesday. | Yes | Yes |
 | Find | **Accelerator Scout** | Pre-seed accelerators and corporate or AI programs that put cash in, terms labelled plainly (4 families). Saturday. | Yes | Yes |
-| Find | **Credits Scout** | Free voice, AI and cloud credits with their conditions (4 credit families, rotating). Daily at 7:30. | Yes | Yes |
+| Find | **Credits Scout** | Credits for the top AI models, voice, transcription, media and cloud (5 credit families, rotating), told which of A Story's costs are still uncovered. Daily at 7:30. | Yes | Yes |
+| Find | **Perks Scout** | Free tools, software, ad credits, fee waivers, office space, legal and accounting help and expert hours for a bootstrapped startup (4 families). Sunday. Lands in the Money map under free tools and perks. | Yes | Yes |
 | Find | **Investor Scout** | Angel groups, pre-seed funds, university and alumni funds and syndicates with a published way in; thesis fit, check size and stage as published. Wednesday. Lands on the deal board as investor deals. | Yes | Yes |
 | Find | **Funding Hunter (broad sweep)** | All 19 search families at once, kept as a weekly safety net behind the scouts; also runs targeted re-verifications | Yes | Yes |
 | Find | **Press Scout** | Finds gift guides, newsletters and outlets | Yes | Yes |

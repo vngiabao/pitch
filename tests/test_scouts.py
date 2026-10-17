@@ -27,7 +27,28 @@ class ScoutTests(unittest.TestCase):
         used=[f for s in SCOUTS for f in (s['families'] or ())]
         self.assertEqual(len(used),len(set(used)),'no family belongs to two scouts')
         self.assertTrue(set(used)<=set(families),set(used)-set(families))
-        self.assertEqual(set(families)-set(used),{'voice_credits','bootstrap_credits','cloud_credits','creative_credits'},'credit families belong to the Credits Scout')
+        self.assertEqual(set(families)-set(used),{'voice_credits','bootstrap_credits','cloud_credits','creative_credits','ai_tool_credits'},'credit families belong to the Credits Scout')
+        self.assertEqual(set(next(s for s in SCOUTS if s['key']=='perks')['families']),{'dev_tool_perks','business_perks','marketing_credits','founder_benefits'})
+
+    def test_uncovered_costs_steer_the_credits_and_perks_scouts(self):
+        from founder_os.money_map import classify
+        sc=Scouts(self.s);st=sc.stack()
+        self.assertEqual(st['monthly_uncovered'],0);self.assertTrue(any(r['item']=='Voice calls' for r in st['items']))
+        voice=next(r for r in st['items'] if r['item']=='Voice calls')
+        sc.save_cost({'id':voice['id'],'item':'Voice calls','provider':'Cartesia','monthly_usd':'120','covered_by':'Cartesia'})
+        st=sc.save_cost({'item':'Email sending','provider':'Resend','monthly_usd':'20'})
+        self.assertEqual((st['monthly_covered'],st['monthly_uncovered']),(120.0,20.0))
+        families=json.loads((ROOT/'funding-search-families.json').read_text(encoding='utf-8'))['families']
+        fam,focus=scouts.apply('Daily free credits discovery',families,self.s)
+        self.assertEqual(fam,families,'the credits scan keeps its own rotation');self.assertIn('Email sending (Resend) about $20 a month',focus);self.assertNotIn('Voice calls',focus)
+        _,perks=scouts.apply(SCOUT_PREFIX+'Perks',families,self.s);self.assertIn('Perks Scout',perks);self.assertIn('Email sending',perks)
+        _,grant=scouts.apply(SCOUT_PREFIX+'Grant',families,self.s);self.assertNotIn('Email sending',grant)
+        with self.assertRaises(ValueError):sc.save_cost({'item':'','monthly_usd':'5'})
+        sc.delete_cost(next(r['id'] for r in st['items'] if r['item']=='Email sending'));self.assertEqual(sc.stack()['monthly_uncovered'],0)
+        perk={'data':{'opportunity_type':'startup_program','canonical_name':'Notion for Startups','organizer':'Notion','notes':'Free plan for startups'},'analysis':{'money':{'kind':'SUPPORT','cash_max':None}}}
+        self.assertEqual(classify(perk),'perks')
+        cash={'data':{'opportunity_type':'startup_program','canonical_name':'Founders Challenge','organizer':'X','notes':'$10,000 prize for startups'},'analysis':{'money':{'kind':'CASH','cash_max':10000}}}
+        self.assertNotEqual(classify(cash),'perks')
         self.assertEqual({s['reason'] for s in SCOUTS if s['key'] in ('competitions','grants','founder_money','accelerators')},{SCOUT_PREFIX+'Competition',SCOUT_PREFIX+'Grant',SCOUT_PREFIX+'Founder Money',SCOUT_PREFIX+'Accelerator'})
 
     def test_hunter_scout_runs_with_only_its_families_and_focus(self):

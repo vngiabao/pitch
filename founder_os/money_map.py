@@ -12,7 +12,9 @@ CATEGORIES=[
  ('accelerators','Accelerators and investment','Cash for equity or a SAFE. Always investment, never a grant.'),
  ('hackathons','Hackathons','Prize money for building fast with voice and AI.'),
  ('credits','Credits','Not cash. They cut what A Story pays for voice and AI.'),
+ ('perks','Free tools and perks','Not cash. Software, services, ad credits, space and help a bootstrapped startup gets free.'),
  ('other','Everything else','Programs the agents track that fit no group above.')]
+PERK=('perk','free tool','free software','startup program','for startups','fee waiver','coworking','office hours','ad credit','ads credit')
 LOCAL=('michigan','5x5','pitch night','grand rapids','ann arbor','detroit','kalamazoo','muskegon','gvsu','start garden')
 AGE=('agetech','aarp','aging','older adult','longevity','national institute on aging','caregiv','dementia')
 MOVES=[
@@ -31,6 +33,7 @@ def classify(d):
     data=d['data'];money=d['analysis']['money'];t=str(data.get('opportunity_type') or '').lower()
     text=' '.join(str(data.get(k) or '') for k in ('canonical_name','organizer','notes','opportunity_type')).lower()
     if money['kind']=='CREDITS' or 'credit' in t:return 'credits'
+    if not money.get('cash_max') and (money['kind']=='SUPPORT' or t in ('startup_program','startup_support','perk','perks') or any(k in text for k in PERK)):return 'perks'
     if 'hackathon' in text:return 'hackathons'
     if any(k in text for k in AGE):return 'agetech'
     if t in ('fellowship','founder_fellowship') or 'fellow' in text or 'emergent ventures' in text:return 'founder'

@@ -259,14 +259,13 @@ def research(h,request,probe=False):
     families=config['families']
     # A specialized scout searches only its own families, with its own focus (founder_os/scouts.py).
     from founder_os import scouts as scout_registry
-    families,scout_focus=scout_registry.apply(request['reason'],families)
+    families,scout_focus=scout_registry.apply(request['reason'],families,h.store)
     if scout_focus:config={**config,'families':families}
     if request['reason']=='Daily free credits discovery':
-        # Daily scan: two cash families and two credit families, rotating so every family is covered within three days.
+        # Daily credits scan: three credit families a day, rotating so every one is covered within two days. Cash belongs to the specialized scouts.
         day=datetime.now(timezone.utc).date().toordinal()
-        cash=('pitch_competitions','big_pitch_competitions','local_pitch_nights','founder_personal','grants','federal_state_grants','agetech','michigan','midwest','vertical','ai_programs','accelerators_with_cash','hackathons')
-        credit=('voice_credits','bootstrap_credits','cloud_credits','creative_credits')
-        chosen={cash[(2*day)%len(cash)],cash[(2*day+1)%len(cash)],credit[(2*day)%len(credit)],credit[(2*day+1)%len(credit)]}
+        credit=('voice_credits','bootstrap_credits','cloud_credits','creative_credits','ai_tool_credits')
+        chosen={credit[(3*day+i)%len(credit)] for i in range(3)}
         families={k:v for k,v in families.items() if k in chosen}
         config={**config,'families':families}
     contract=(ROOT/'FUNDING-HUNTER-RUNBOOK.md').read_text(encoding='utf-8')

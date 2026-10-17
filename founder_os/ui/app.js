@@ -344,8 +344,9 @@ function creditCard(c){
  (c.program_url?`<p class="quiet-actions"><a href="${E(c.program_url)}" target="_blank" rel="noopener noreferrer">Program page ↗</a></p>`:'')+`</section>`;
 }
 async function credits(){
- const list=await api('/api/credits'),open=list.filter(c=>c.level!=='DONE'),done=list.filter(c=>c.level==='DONE');
+ const [list,stack]=await Promise.all([api('/api/credits'),api('/api/stack').catch(()=>null)]),open=list.filter(c=>c.level!=='DONE'),done=list.filter(c=>c.level==='DONE');
  app.innerHTML=heading('Credits','Free service credits you have won. Use them before they lapse, and decide before any paid plan starts.')+
+ (stack?stackSection(stack):'')+
  (open.length?open.map(creditCard).join(''):'<p class="empty">No active credit grants. Accepted credit programs appear here on their own.</p>')+
  (done.length?`<details class="more finished-apps"><summary>Used up or ended (${done.length})</summary>${done.map(creditCard).join('')}</details>`:'');
 }
