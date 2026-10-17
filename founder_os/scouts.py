@@ -47,6 +47,8 @@ SCOUTS=[
   'lands':('/growth','Deals: partners'),'families':None,'focus':None,'reason':'Partner and deal discovery','days':('TU',),'hour':8,'minute':0,'external':True},
  {'key':'win','name':'Win Scout','group':'How to win','hunts':'For one competition: the rules, the scoring, the judges and what they look for, past winners and why, the other companies this cycle, and the expectations nobody writes down. Feeds Pitch Tailor, the Drafter and the Coach.',
   'lands':('/opportunities','Each program’s page: How we win here'),'families':None,'focus':None,'reason':'Win brief','days':DAY,'hour':8,'minute':30,'external':True},
+ {'key':'customer_voice','name':'Customer Voice Scout','group':'How to win','hunts':'What adult children and caregivers say online about a parent’s stories, memory, aging and gifts: the themes with how many threads voiced each, short quotes with links, what they tried, their objections and what they would pay. Feeds Pitch Tailor, the Coach, the Campaign Planner and the field-day script.',
+  'lands':('/growth#families-say','Deals & campaigns: What families say online'),'families':None,'focus':None,'reason':'Scout: Customer Voice','days':('TH',),'hour':8,'minute':15},
  {'key':'press','name':'Press Scout','group':'People to reach','hunts':'Holiday gift guides, newsletters, podcasts and local outlets that take pitches.',
   'lands':('/press','Press and gift guides'),'families':None,'focus':None,'reason':'Press and gift-guide discovery','days':('MO','TH'),'hour':8,'minute':0,'external':True},
 ]
@@ -142,10 +144,13 @@ class Scouts:
             if s['key']=='win':
                 from .win_scout import WinScout
                 w=WinScout(self.s).summary();last={'at':w['last_checked'],'found':w['briefs']} if w['last_checked'] else None;running=w['running']
+            if s['key']=='customer_voice':
+                from .customer_voice import CustomerVoice
+                v=CustomerVoice(self.s).summary();last={'at':v['last_checked'],'found':v['themes'],'unit':'themes'} if v['last_checked'] else None;running=v['running']
             if s['key']=='press':last=self._setting('press_last_run')
             elif s['key']=='partners':last=self._setting('partners_last_run')
             elif s['key']=='investors':last=self._setting('investors_last_run')
-            else:last=self._last(s['reason'])
+            elif s['key'] not in ('win','customer_voice'):last=self._last(s['reason'])
             nxt=next_run(s,local)
             out.append({'key':s['key'],'name':s['name'],'group':s['group'],'hunts':s['hunts'],'lands_url':s['lands'][0],'lands_label':s['lands'][1],'families':list(s['families'] or []),
                         'schedule':{'days':list(s['days']),'hour':s['hour'],'minute':s['minute']},'next_run':nxt.isoformat() if nxt else None,'running':running,'last_run':last,'uses_hunter':bool(s.get('families'))})

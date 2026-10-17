@@ -27,6 +27,7 @@ function campaignCard(c){
  return `<section class="section campaign" id="campaign-${E(c.key)}"><div class="section-title"><div><h2>${E(c.title)}</h2><p class="small">${E(c.brief)}</p></div><span class="credit-status${c.state==='PLANNED'?' due':''}">${E(c.planning?'Planning…':stateWord)}</span></div>`+
  (c.field?`<div class="field-day"><div class="summary desk-tiles"><div><strong>${c.field.approached}</strong><span>approached</span></div><div><strong>${c.field.emails}</strong><span>emails</span></div><div><strong>${c.field.reservations}</strong><span>$1 reservations</span></div></div>`+
   (script?`<p class="small">What to say${/Voice/.test(script.note||'')?', in your voice':''}. Read it out loud once before you go.</p>${answerBox(script.body)}`:'')+
+  (c.voice?fieldVoice(c.voice):'')+
   `<form class="field-form" data-key="${E(c.key)}"><p class="pill-label">Tally the day</p><div class="form-grid"><label>People approached<input type="number" name="approached" min="0" value="0"></label><label>Real conversations<input type="number" name="conversations" min="0" value="0"></label><label>Emails collected<input type="number" name="emails" min="0" value="0"></label><label>$1 reservations<input type="number" name="reservations" min="0" value="0"></label><label>Date<input type="date" name="on"></label><label>Note<input name="note" maxlength="200" placeholder="e.g. lunch rush at the student center"></label></div><div class="actions"><button class="primary" type="submit">Save tally</button></div></form>`+
   (c.field.entries.length?`<ul class="tracker">${c.field.entries.slice(0,6).map(e=>`<li><span><strong>${E(fmtDay(e.week_start))} week</strong><small class="tracker-sub">${e.visits} approached · ${e.signups} emails · ${e.purchases} reservations${e.note?' · '+E(e.note):''}</small></span></li>`).join('')}</ul>`:'')+`</div>`:'')+
  (p?`<div class="plan-top"><div><p class="pill-label">Goal</p><p>${E(p.goal)}</p></div><div><p class="pill-label">Who</p><p>${E(p.audience)}</p></div><div><p class="pill-label">The offer</p><p>${E(p.offer)}</p></div></div>`+
@@ -37,6 +38,29 @@ function campaignCard(c){
   `<div class="actions">${c.state==='PLANNED'?`<button class="primary" type="button" data-campaign-state="RUNNING" data-key="${E(c.key)}">Mark it running</button>`:''}${c.state==='RUNNING'?`<button type="button" data-campaign-state="DONE" data-key="${E(c.key)}">Mark it done</button>`:''}</div>`
   :`<p class="qa-needs">${c.planning?'<strong>Planning.</strong> The agent is writing the plan now; it appears here in a few minutes.':'<strong>No plan yet.</strong> Add anything the planner should know, then plan it.'}</p>`)+
  `<details class="more"${p?'':' open'}><summary>${p?'Plan it again':'Plan it'}</summary><form class="campaign-form" data-key="${E(c.key)}"><label>Anything the planner should know<textarea name="note" maxlength="1000" placeholder="e.g. $300 budget for paid social; Daniel can film two short videos; Rose will post to her family group">${E(c.owner_note||'')}</textarea></label><div class="actions"><button class="primary" type="submit"${c.planning?' disabled':''}>${p?'Plan again':'Plan it now'}</button></div></form></details></section>`;
+}
+// What families say online (Customer Voice Scout): read-only public threads, themes counted by thread, quotes with links. Evidence about the market, never about A Story.
+const quoteLink=q=>q&&q.url?`<a class="small" href="${E(q.url)}" target="_blank" rel="noopener noreferrer">${E(q.who||'thread')} ↗</a>`:'';
+function fieldVoice(v){
+ return `<div class="voice-field"><p class="small"><strong>What they may say</strong> - objections families raised online${v.as_of?` as of ${E(fmtDay(v.as_of))}`:''}, not our customers. <a href="#families-say">All of it</a></p>`+
+ (v.objections.length?`<ul class="voice-objections">${v.objections.map(o=>`<li><strong>${E(o.objection)}</strong>${o.quote?` <span class="small">“${E(o.quote)}”</span> ${quoteLink({who:'source',url:o.url})}`:''}</li>`).join('')}</ul>`:'')+
+ (v.words.length?`<p class="small">Their words: ${v.words.map(w=>`<span class="count-chip">${E(w)}</span>`).join(' ')}</p>`:'')+`</div>`;
+}
+function voiceSection(v){
+ const btn=`<button type="button" class="${v.report?'':'primary'}" data-scout-run="customer_voice"${v.researching?' disabled':''}>${v.researching?'Researching…':v.report?'Research again':'Research now'}</button>`;
+ const head=`<div class="section-title"><div><h2>What families say online</h2><p class="small">Adult children and caregivers on Reddit, X, Quora and the genealogy and senior-care forums, read by the Customer Voice Scout every Thursday morning. Public threads only; nothing here is about A Story.</p></div><span class="small">${v.run_on?`Read ${E(fmtDay(v.run_on))}${v.runs>1?` · ${v.runs} weeks kept`:''}`:'Not read yet'}</span></div>`;
+ if(!v.report)return `<section class="section" id="families-say">${head}<p class="qa-needs">${v.researching?'<strong>Reading the threads now.</strong> Themes, quotes and links land here in about 15 minutes.':'<strong>Nothing read yet.</strong> Press Research now, or wait for Thursday 8:15 AM Eastern.'}</p><div class="actions">${btn}</div></section>`;
+ const r=v.report,m=v.movement||{},mark=t=>{const k=t.toLowerCase();if((m.new||[]).some(x=>x.toLowerCase()===k))return '<span class="count-chip">new</span>';const up=(m.up||[]).find(x=>x.theme.toLowerCase()===k);if(up)return `<span class="count-chip">up from ${up.from}</span>`;const dn=(m.down||[]).find(x=>x.theme.toLowerCase()===k);if(dn)return `<span class="count-chip">down from ${dn.from}</span>`;return '';};
+ return `<section class="section" id="families-say">${head}`+
+ `<p class="small">${r.threads_read?`${r.threads_read} threads read`:''}${r.places_read.length?` across ${E(r.places_read.join(', '))}`:''}. ${v.previous_on?`Since ${E(fmtDay(v.previous_on))}: ${E(v.movement_words)}`:E(v.movement_words)}</p>`+
+ `<ol class="voice-themes">${r.themes.map(t=>`<li><div class="section-title"><strong>${E(t.theme)}</strong><span class="small">${t.threads} thread${t.threads===1?'':'s'} ${mark(t.theme)}</span></div>${t.summary?`<p class="small">${E(t.summary)}</p>`:''}${t.quotes.length?`<ul class="voice-quotes">${t.quotes.slice(0,2).map(q=>`<li>“${E(q.text)}” ${quoteLink(q)}</li>`).join('')}</ul>`:''}</li>`).join('')}</ol>`+
+ `<div class="lab-two">`+
+ (r.tried.length?`<div><h3 class="list-head">What they tried</h3><ul>${r.tried.map(x=>`<li><strong>${E(x.what)}</strong>${x.threads?` · ${x.threads} thread${x.threads===1?'':'s'}`:''}${x.said?`<p class="small">${E(x.said)}${x.quote?` “${E(x.quote.text)}” ${quoteLink(x.quote)}`:''}</p>`:''}</li>`).join('')}</ul></div>`:'')+
+ (r.objections.length?`<div><h3 class="list-head">Objections</h3><ul>${r.objections.map(o=>`<li><strong>${E(o.objection)}</strong>${o.threads?` · ${o.threads} thread${o.threads===1?'':'s'}`:''}${o.quote?`<p class="small">“${E(o.quote.text)}” ${quoteLink(o.quote)}</p>`:''}</li>`).join('')}</ul></div>`:'')+`</div>`+
+ (r.willing_to_pay.length?`<h3 class="list-head">What they say they would pay</h3><ul>${r.willing_to_pay.map(x=>`<li>“${E(x.said)}” ${quoteLink({who:'source',url:x.url})}</li>`).join('')}</ul>`:'')+
+ (r.words.length?`<p class="small">Their words: ${r.words.map(w=>`<span class="count-chip">${E(w)}</span>`).join(' ')}</p>`:'')+
+ `<p class="small">Pitch Tailor and the Coach read these themes as evidence about the market; the Campaign Planner and the field-day script get the objections and the words. Fact Guard still blocks any count from here unless it is quoted with its link.</p>`+
+ `<div class="actions">${btn}</div>${r.sources.length?`<details class="more"><summary>Sources (${r.sources.length})</summary><ul>${r.sources.slice(0,30).map(u=>`<li><a class="small" href="${E(u)}" target="_blank" rel="noopener noreferrer">${E(u.replace(/^https?:\/\//,'').slice(0,80))} ↗</a></li>`).join('')}</ul></details>`:''}</section>`;
 }
 let CHANNEL_WORDS_CACHE={};const CHANNEL_LABEL=k=>CHANNEL_WORDS_CACHE[k]||k;
 function mathSection(m,measured,channelWords){
@@ -64,6 +88,7 @@ async function growthDesk(){
  (b.open?openStages.filter(s=>s.deals.length).map(s=>`<h3 class="list-head stage-head">${E(s.label)} <span class="count-chip">${s.deals.length}</span></h3><div class="deal-grid">${s.deals.map(dealCard).join('')}</div>`).join(''):'<div class="all-clear"><h2>No deals yet</h2><p class="small">Add the organizations you already talk to, or let Partner Scout find who reaches adult children and gift buyers near you.</p></div>')+
  addDealForm(b,!b.open)+(closedN?`<details class="more finished-apps"><summary>Won, lost or parked (${closedN})</summary>${closed.map(s=>s.deals.length?`<h3 class="list-head">${E(s.label)}</h3><div class="deal-grid">${s.deals.map(dealCard).join('')}</div>`:'').join('')}</details>`:'')+`</section>`+
  `<div id="campaigns"><div class="block-title"><h2>Campaigns</h2><span class="small">A dated plan you can run alone. Messages go through Fact Guard and Bao’s Voice.</span></div>${b.campaigns.map(campaignCard).join('')}</div>`+
+ (b.voice?voiceSection(b.voice):'')+
  mathSection(b.math,b.measured,b.channel_words);
 }
 document.addEventListener('click',e=>{

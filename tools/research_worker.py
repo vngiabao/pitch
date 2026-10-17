@@ -327,9 +327,13 @@ def main():
             print(json.dumps(lab_step(h,request)),flush=True)
             s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
             return 0
-        from founder_os import growth_desk,scouts as scout_registry,win_scout
+        from founder_os import growth_desk,scouts as scout_registry,win_scout,customer_voice
         if win_scout.handles(request['reason']):
             print(json.dumps(win_scout.run(h,request,codex_json)),flush=True)
+            s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
+            return 0
+        if customer_voice.handles(request['reason']):
+            print(json.dumps(customer_voice.run(h,request,codex_json)),flush=True)
             s.db.execute("UPDATE hunter_requests SET state='COMPLETE',last_error=NULL WHERE id=?",(request['id'],))
             return 0
         if scout_registry.handles(request['reason']):

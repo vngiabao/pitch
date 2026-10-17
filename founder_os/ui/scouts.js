@@ -11,7 +11,7 @@ function lastRunWords(l){
  if(!l)return 'Has not run yet';
  const when=readableDate(l.at);
  if(l.found===null||l.found===undefined)return `Last ran ${when}`;
- return `Last ran ${when}: ${l.found} new${l.checked?` of ${l.checked} checked`:''}`;
+ return `Last ran ${when}: ${l.found} ${l.unit||'new'}${l.checked?` of ${l.checked} checked`:''}`;
 }
 function scoutCard(s){
  return `<article class="section scout-card${s.running?' running':''}"><div class="section-title"><div><h3>${E(s.name)}</h3><p class="small">${E(s.hunts)}</p></div><span class="credit-status${s.running?' due':''}">${s.running?'Running now':E(scheduleWords(s.schedule))}</span></div>`+

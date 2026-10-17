@@ -199,14 +199,20 @@ class GrowthDesk:
         c=self.campaign(key);mm=self.money_moves()
         return {**{k:v for k,v in self.g.base_context().items() if k!='writing_guide'},'today':today().isoformat(),'campaign':{'title':c['title'],'brief':c['brief'],'owner_note':c['owner_note'] or ''},
                 'money_moves':mm,'press_targets':[{'outlet':t['outlet'],'kind':t['kind'],'deadline':t['deadline'],'state':t['state']} for t in self.s.rows('SELECT outlet,kind,deadline,state FROM press_targets ORDER BY COALESCE(deadline,\'9999\') LIMIT 20')],
-                'deals':[{'name':d['name'],'kind':d['kind'],'stage':d['stage']} for d in self.deals()[:20]],'channel_math':self.math()['channels'],'channels':list(CHANNELS),
+                'deals':[{'name':d['name'],'kind':d['kind'],'stage':d['stage']} for d in self.deals()[:20]],'channel_math':self.math()['channels'],'channels':list(CHANNELS),'customer_voice':self.customer_voice(),
                 'task':'Plan this campaign as a dated, measurable plan Bao can run himself with no team and no budget beyond what owner_note allows. For each channel: what to do, when to start and end, the one message to lead with, how success is measured, and what Bao must supply. '
+                       'If customer_voice exists, lead messages use the words families use (customer_voice.words) and answer the top objections (customer_voice.objections) in plain terms; those come from public threads, not from A Story customers, so never present them as what our families said and never quote a thread count. '
                 'Put spend caps only if owner_note gives a budget; otherwise spend_cap_usd is null. Dates fall between today and December 24, 2026; the $1 reservation deadline is November 2. Use only CONTEXT facts and pricing. '
                 'Open questions are the decisions only Bao can make. Risks are honest and specific.'}
 
     def money_moves(self):
         if not self.db.execute("SELECT 1 FROM sqlite_master WHERE name='money_moves'").fetchone():return []
         return self.s.rows('SELECT title,detail,state FROM money_moves ORDER BY updated_at')
+
+    def customer_voice(self):
+        """The top objections and the words families use online, for the Campaign Planner and the field-day script. None until the Customer Voice Scout has run."""
+        from .customer_voice import CustomerVoice
+        return CustomerVoice(self.s).for_field_day()
 
     # ---------- campaigns ----------
     def campaign(self,key):
@@ -215,6 +221,8 @@ class GrowthDesk:
         c['planning']=bool(self.db.execute("SELECT 1 FROM hunter_requests WHERE reason=? AND state IN ('QUEUED','RUNNING')",(CAMPAIGN_PREFIX+key,)).fetchone())
         c['drafts']=self.s.rows("SELECT * FROM growth_drafts WHERE subject_kind='campaign' AND subject_id=? ORDER BY created_at DESC",(c['id'],))
         c['field']=self.field_days(key) if any(k==key and s for k,_,_,s in CAMPAIGNS) else None
+        # A field day shows what families say online beside the script: the objections to expect and the words they use.
+        c['voice']=self.customer_voice() if c['field'] is not None else None
         for k in ('plan_json','issues_json'):c.pop(k)
         return c
 
@@ -326,7 +334,11 @@ class GrowthDesk:
                 'ready_to_send':[d for d in deals if d['stage']=='DRAFTED' and d['draft']],'won_value':sum(d['value_usd'] or 0 for d in deals if d['stage']=='WON'),
                 'kinds':[{'key':k,'label':KIND_WORDS[k]} for k in DEAL_KINDS],'stage_words':STAGE_WORDS,'channel_words':CHANNEL_WORDS,
                 'searching':bool(self.db.execute("SELECT 1 FROM hunter_requests WHERE reason=? AND state IN ('QUEUED','RUNNING')",(PARTNER_DISCOVERY,)).fetchone()),'last_run':json.loads(last['value_json']) if last else None,
-                'campaigns':self.campaigns(),'math':self.math(),'measured':self.measured_facts(),'today':t}
+                'campaigns':self.campaigns(),'math':self.math(),'measured':self.measured_facts(),'today':t,'voice':self._voice_board()}
+
+    def _voice_board(self):
+        from .customer_voice import CustomerVoice
+        return CustomerVoice(self.s).current()
 
     def alerts(self):
         """For Today and the daily email. Every item is something only Bao can do: send, answer, meet, decide."""

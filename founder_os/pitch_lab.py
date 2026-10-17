@@ -79,8 +79,11 @@ class FactGuard:
     def __init__(self,lab,program=''):
         self.lab=lab;self.mbc='michigan business challenge' in (program or '').lower()
         self.allowed=lab.allowed_numbers();self.measured=lab.measured_numbers()
+        # Thread counts from the Customer Voice Scout are never approved facts; they may appear only inside a quotation with the thread's URL beside it.
+        self.voice_urls=lab.voice_source_urls()
 
     def check(self,segments,kind):
+        from .customer_voice import cited
         issues=[];fixed=[]
         for seg in segments:
             text=seg.get('text') or ''
@@ -92,7 +95,8 @@ class FactGuard:
                 if v in self.measured:
                     issues.append({'where':seg['key'],'rule':'measured','severity':'info','text':f'“{n}” is measured. '+self.measured[v]})
                 elif v not in self.allowed and not re.fullmatch(r'(19|20)\d\d',v) and not (v.isdigit() and int(v)<=12):
-                    issues.append({'where':seg['key'],'rule':'unverified_number','severity':'block','text':f'“{n}” is not in approved facts or the evidence table.'})
+                    if cited(text,n,self.voice_urls):issues.append({'where':seg['key'],'rule':'cited','severity':'info','text':f'“{n}” is quoted from a public thread with its source; it is not a fact about A Story.'})
+                    else:issues.append({'where':seg['key'],'rule':'unverified_number','severity':'block','text':f'“{n}” is not in approved facts or the evidence table.'+(' A figure from what families say online may appear only inside a quotation with the thread’s URL beside it.' if self.voice_urls else '')})
             if re.search(r'\[[^\]]{1,80}\]',text):
                 issues.append({'where':seg['key'],'rule':'placeholder','severity':'block','text':'A bracketed placeholder is still in the text.'})
             for m in re.finditer(r'paying customers?',text,re.I):
@@ -369,6 +373,15 @@ class PitchLab:
         from .win_scout import WinScout
         return WinScout(self.s).for_agents(oid)
 
+    def customer_voice(self):
+        """What families say online this week (themes, counts, two quotes each): evidence about the market for Tailor and Coach, never about A Story."""
+        from .customer_voice import CustomerVoice
+        return CustomerVoice(self.s).for_agents()
+
+    def voice_source_urls(self):
+        from .customer_voice import CustomerVoice
+        return CustomerVoice(self.s).source_urls()
+
     def program_context(self,oid):
         if not oid:return None
         try:d=self.h.detail(oid)
@@ -383,7 +396,7 @@ class PitchLab:
             program=self.program_context(it['opportunity_id'])
             first=it['round']==1 and not p.get('brief')
             ctx={**self.base_context('TAILOR'),'program':program,'minutes':p.get('minutes'),'slide_limit':p.get('slide_limit'),'owner_note':p.get('owner_note',''),
-                 'master_deck':self.master_deck()['slides'],'previous_edition':p.get('brief'),'feedback':p.get('feedback'),'voice_guide':self.doc('BAO-VOICE.md',6000),'win_brief':self.win_brief(it['opportunity_id'])}
+                 'master_deck':self.master_deck()['slides'],'previous_edition':p.get('brief'),'feedback':p.get('feedback'),'voice_guide':self.doc('BAO-VOICE.md',6000),'win_brief':self.win_brief(it['opportunity_id']),'customer_voice':self.customer_voice()}
             slide=({'type':'object','additionalProperties':False,'properties':{'slide_id':{'type':'string'},'title':{'type':'string'},'seconds':{'type':'integer'},'text':{'type':'string'}},'required':['slide_id','title','seconds','text']})
             plan={'type':'object','additionalProperties':False,'properties':{'slide_id':{'type':'string'},'action':{'type':'string','enum':['keep','change','add','cut']},'change':{'type':'string'},'why':{'type':'string'}},'required':['slide_id','action','change','why']}
             rules={'type':'object','additionalProperties':False,'properties':{'minutes':{'type':['number','null']},'slide_limit':{'type':['integer','null']},'format':{'type':'string'},
@@ -399,6 +412,7 @@ class PitchLab:
                   'If CONTEXT.feedback exists, fix every point and say how in answers_to_feedback. If CONTEXT.previous_edition exists, revise it rather than starting over. '
                   'Put anything only Bao can supply (the ask amount, a credential) in open_questions, never as a bracketed placeholder in the script. '
                   +('If CONTEXT.win_brief exists, build the edition to win this exact program: weight and order the slides by win_brief.criteria, make every how_we_win move visible on a slide or in the script, answer each unstated expectation, and prepare for the named judges. win_brief describes the program and other companies; take no fact about A Story from it. ' if ctx.get('win_brief') else '')
+                  +('CONTEXT.customer_voice is what families say online this week, as evidence that the problem is real and how people talk about it: use its words on the problem slides and cite a quote with its URL where a judge would want proof. It says nothing about A Story; take no traction, customer or number about A Story from it, and say a thread count only as a quoted figure with its URL. ' if ctx.get('customer_voice') else '')
                   +'rules.deadline is a plain date YYYY-MM-DD or null; put any caveat about the rules in rules.format. Use null for anything the official pages do not state.')
             return task+'\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False),schema,'tailor',first and bool(program)
         if st=='VOICE':
@@ -414,7 +428,7 @@ class PitchLab:
         if st=='COACH':
             content=[{k:s[k] for k in ('key','title','text')} for s in self.segments(it)]
             if it['kind']=='APPLICATION_SET':content=[{**c,'text':it['payload']['answers'][i].get('suggested') or c['text']} for i,c in enumerate(content)]
-            ctx={**self.base_context('COACH'),'program':self.program_context(it['opportunity_id']),'win_brief':self.win_brief(it['opportunity_id']),'kind':it['kind'],'minutes':it['payload'].get('minutes'),'content':content,
+            ctx={**self.base_context('COACH'),'program':self.program_context(it['opportunity_id']),'win_brief':self.win_brief(it['opportunity_id']),'customer_voice':self.customer_voice(),'kind':it['kind'],'minutes':it['payload'].get('minutes'),'content':content,
                  'rubric':list(CRITERIA),'appendix':[{'id':x['id'],'notes':x['spoken']} for x in self.master_deck()['slides'] if x.get('appendix')],'earlier_reviews':[r['detail'].get('top_fixes') for r in it['reviews'] if r['agent']=='COACH']}
             score={'type':'object','additionalProperties':False,'properties':{'criterion':{'type':'string','enum':list(CRITERIA)},'score':{'type':'integer','minimum':1,'maximum':5},'why':{'type':'string'},'fix':{'type':'string'}},'required':['criterion','score','why','fix']}
             q={'type':'object','additionalProperties':False,'properties':{'question':{'type':'string'},'answer':{'type':'string'},'gap':{'type':'string'}},'required':['question','answer','gap']}
@@ -424,7 +438,8 @@ class PitchLab:
                   'the coaching lens in CONTEXT.playbook section 9, judged for CONTEXT.program and its format. Numbers in CONTEXT.appendix are approved modeled figures (said rounded in the pitch); question how they are framed, not whether they exist. For each score give why and the one concrete fix that would raise it. '
                   'Write 6-8 hard_questions a judge or investor would ask this exact pitch, each with the best honest answer from CONTEXT facts (say "we don’t know yet - here is the test" when true) and gap = what proof is missing. '
                   'top_fixes: the 3 changes that matter most, most important first. verdict PASS only when every score is 4 or higher. Never invent facts.'
-                  +(' CONTEXT.win_brief describes this program’s judges, criteria, past winners and other companies: score as those judges would, weight the criteria as win_brief.criteria says, and add the hard questions they or the listed competitors would prompt.' if ctx.get('win_brief') else ''))
+                  +(' CONTEXT.win_brief describes this program’s judges, criteria, past winners and other companies: score as those judges would, weight the criteria as win_brief.criteria says, and add the hard questions they or the listed competitors would prompt.' if ctx.get('win_brief') else '')
+                  +(' CONTEXT.customer_voice is what families say online this week (themes, thread counts, quotes with URLs): judge Problem urgency and Evidence against it, ask whether the pitch speaks in those words and answers the listed objections, and suggest a cited quote where proof is thin. It is evidence about the market, not about A Story; never treat it as our traction or our customers.' if ctx.get('customer_voice') else ''))
             return task+'\nCONTEXT:\n'+json.dumps(ctx,ensure_ascii=False),schema,'coach',False
         if st=='LEARN':
             ctx={**{k:v for k,v in self.base_context('ALL').items() if k!='playbook'},'item':it['payload'],'current_lessons':self.approved_lessons()}
