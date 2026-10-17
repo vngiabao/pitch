@@ -227,7 +227,7 @@ document.addEventListener('submit',async e=>{
 });
 function routeContext(){
  const path=location.pathname,parent=path.startsWith('/pitch-lab/')?'/pitch-lab':path.startsWith('/pitch/')?'/pitches':path.startsWith('/material/')?'/materials':path.startsWith('/application-review/')||path.startsWith('/application/')?'/applications':path.startsWith('/opportunity/')?'/opportunities':path.startsWith('/run/')?'/activity':path;
- const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/drive':'Reservation drive','/founder-profile':'Founder profile'};
+ const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/plans':'Plans','/drive':'Reservation drive','/founder-profile':'Founder profile'};
  document.querySelectorAll('#workspace-nav a').forEach(a=>{const active=a.getAttribute('href')===parent;a.classList.toggle('active',active);active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#breadcrumbs').innerHTML='<a href="/">A Story</a> / '+(parent!==path?'<a href="'+E(parent)+'">'+E(names[parent]||'Workspace')+'</a> / Detail':E(names[parent]||'Workspace'));
  document.querySelector('#workspace-location').textContent=location.hostname==='pitch.gbaonvo.com'?'Owner sign-in protected':'On this PC';document.title=(names[parent]||'Workspace')+' | A Story';
@@ -245,6 +245,7 @@ async function boot(){
  if(path==='/money')return moneyMap();
  if(path==='/growth')return growthDesk();
  if(path==='/scouts')return scouts();
+ if(path==='/plans')return plans();
  if(path==='/families')return betaFamilies();
  if(path==='/founder-profile')return founderProfile();
  if(path==='/drive')return reservationDrive();

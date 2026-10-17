@@ -14,6 +14,7 @@ from founder_os.growth_agents import Growth
 from founder_os.growth_desk import GrowthDesk
 from founder_os.scouts import Scouts
 from founder_os.win_scout import WinScout
+from founder_os.planner import Planner
 from founder_os.pitch_lab import PitchLab
 
 def poll(s):
@@ -41,6 +42,9 @@ def poll(s):
         # Growth agents: one follow-up or press draft per cycle, press discovery twice a week.
         try:growth=Growth(s).poll(limit=1)
         except Exception as e:s.log('growth.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});growth={'error':type(e).__name__}
+        # Planner: the weekly plan writes itself on Monday morning.
+        try:plan=Planner(s).poll(instant)
+        except Exception as e:s.log('planner.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});plan={'error':type(e).__name__}
         # Win Scout: a weekly refresh for the programs A Story is in or about to enter.
         try:win=WinScout(s).poll(instant)
         except Exception as e:s.log('win.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});win={'error':type(e).__name__}
@@ -53,7 +57,7 @@ def poll(s):
         # Pitch Lab: harvest Bao's edits and results, start reviews, keep every item moving.
         try:lab=PitchLab(s).poll()
         except Exception as e:s.log('lab.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});lab={'error':type(e).__name__}
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'prepared':prepared,'forms':forms,'growth':growth,'growth_desk':desk,'scouts':scouts,'win':win,'lab':lab}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'prepared':prepared,'forms':forms,'growth':growth,'growth_desk':desk,'scouts':scouts,'win':win,'plan':plan,'lab':lab}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()

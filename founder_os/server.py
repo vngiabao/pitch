@@ -38,10 +38,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts','/drive','/founder-profile') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
+        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts','/drive','/founder-profile','/plans') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
-        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/scouts.js','/product.js','/profile.js','/ranker.js','/ranker.css','/drive.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
+        if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/scouts.js','/plans.js','/product.js','/profile.js','/ranker.js','/ranker.css','/drive.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
         if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
@@ -54,6 +54,11 @@ class Handler(BaseHTTPRequestHandler):
         s=Store(self.server.db_path)
         try:
             h=FundingHunter(s);q=parse_qs(p.query)
+            if route.startswith('/plan/') and route.endswith(('.pdf','.html')):
+                from .planner import Planner
+                rid,ext=route.rsplit('/',1)[1].rsplit('.',1);f=Planner(s).file(rid,ext)
+                if ext=='pdf':return self.respond(200,f.read_bytes(),'application/pdf',filename='A-Story-plan-'+rid[-8:]+'.pdf')
+                return self.respond(200,f.read_bytes(),'text/html',csp="default-src 'none'; style-src 'unsafe-inline'; font-src 'self' file:; img-src 'self' data:; frame-ancestors 'none'")
             if route.startswith('/edition/') or (route.startswith('/api/lab/') and route.endswith('/edition.zip')):
                 from .pitch_lab import PitchLab
                 from . import slide_deck
@@ -115,6 +120,12 @@ class Handler(BaseHTTPRequestHandler):
             elif route=='/api/application-list':
                 from .application_drafter import application_list
                 result=application_list(s)
+            elif route=='/api/plans':
+                from .planner import Planner
+                result=Planner(s).reports()
+            elif route.startswith('/api/plan/'):
+                from .planner import Planner
+                result=Planner(s).report(route.rsplit('/',1)[1])
             elif route.startswith('/api/win/'):
                 from .win_scout import WinScout
                 result=WinScout(s).brief(route.rsplit('/',1)[1])
@@ -302,6 +313,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:result=lab.decide_lesson(p['id'],p['decision'])
                 if route in ('/api/lab-edition','/api/lab-review','/api/lab-application','/api/lab-rerun'):
                     result={k:v for k,v in result.items() if k!='payload'};self.start_worker()
+            elif route=='/api/plan':
+                from .planner import Planner
+                result=Planner(s).ask(p.get('question',''));self.start_worker()
             elif route in ('/api/win-research','/api/win-seen'):
                 from .win_scout import WinScout
                 if route=='/api/win-seen':result=WinScout(s).mark_seen(p['opportunity_id'])

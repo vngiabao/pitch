@@ -40,6 +40,7 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 | Decide | **Bao** | Edits, approves or rejects. Submits himself. | - | - |
 | Learn | **Outcome Learner** | Turns results and Bao's edits into proposed lessons | Yes | No |
 | Report | **Daily Report and Today** | One list of what needs Bao, every morning | No | No |
+| Report | **Planner** | On request, or every Monday morning: answers Bao's question from every desk (Today, money per hour, deals, campaigns, channel math, scouts, win briefs, Pitch Lab, measured facts), lays out the dated next moves with an owner, and lists the questions only he can answer. Delivered as a PDF in his own identity (The Turn) on the Plans page and linked in the daily brief. | Yes | No |
 
 ## The assembly line (one work item)
 
