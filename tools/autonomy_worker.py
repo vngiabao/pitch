@@ -29,6 +29,11 @@ def poll(s):
         # Read-only inbox check last, so a slow mailbox never delays reports or applications.
         try:inbox=InboxTracker(s,h).poll(instant)
         except Exception as e:s.log('inbox.failed','autonomy_worker',{'error_type':type(e).__name__});inbox={'error':type(e).__name__}
+        # Money per hour: one preparation step for the five programs worth the most per founder hour (read the form, queue the drafter, or start the pitch edition).
+        try:
+            from founder_os.money_ranker import MoneyRanker
+            prepared=MoneyRanker(s).prepare(BrowserFormReader(ROOT/'data/browser-profile'))
+        except Exception as e:s.log('ranker.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});prepared={'error':type(e).__name__}
         # Read one official application form per cycle (read-only) and queue answer drafts.
         try:forms=ApplicationDrafter(s,BrowserFormReader(ROOT/'data/browser-profile')).poll(limit=1)
         except Exception as e:s.log('forms.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});forms={'error':type(e).__name__}
@@ -44,7 +49,7 @@ def poll(s):
         # Pitch Lab: harvest Bao's edits and results, start reviews, keep every item moving.
         try:lab=PitchLab(s).poll()
         except Exception as e:s.log('lab.failed','autonomy_worker',{'error_type':type(e).__name__,'error':str(e)[:300]});lab={'error':type(e).__name__}
-        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'forms':forms,'growth':growth,'growth_desk':desk,'scouts':scouts,'lab':lab}
+        return {'application_pilot':applications,'daily_report':{'id':report.get('id'),'state':report.get('state','WAITING')},'inbox':inbox,'prepared':prepared,'forms':forms,'growth':growth,'growth_desk':desk,'scouts':scouts,'lab':lab}
     finally:
         with s.transaction():
             lock=s.db.execute("SELECT value_json FROM hunter_settings WHERE key='autonomy_lock'").fetchone()

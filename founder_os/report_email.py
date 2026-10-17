@@ -195,6 +195,10 @@ class DailyReporter:
             needs+=[{**x,'url':founder_url(x['url'])} for x in PitchLab(self.store).alerts()]
         except Exception as e:self.store.log('growth.alerts_failed','daily_report',{'error_type':type(e).__name__})
         needs=needs[:8]
+        try:
+            from .money_ranker import MoneyRanker,brief_rows
+            apply_first=brief_rows(MoneyRanker(self.store).top(),founder_url)
+        except Exception as e:self.store.log('ranker.brief_failed','daily_report',{'error_type':type(e).__name__});apply_first=[]
         tz=local.tzinfo
         waiting=[{'name':t['canonical_name'],'status':t['outcome']+' '+datetime.fromisoformat(t['occurred_at'].replace('Z','+00:00')).astimezone(tz).strftime('%b %d').replace(' 0',' ')} for t in board['tracked'] if t.get('waiting')]
         reach=[{'name':x['program'],'detail':f"{x['answered']} of {x['questions']} answers ready",'url':founder_url('/application/'+x['application_id'])} for x in apps if x['access']['level'] in ('READY','DRAFTING') and x['questions']]
@@ -204,7 +208,7 @@ class DailyReporter:
         summary=((f"{len(needs)} thing{'s' if len(needs)!=1 else ''} need{'' if len(needs)!=1 else 's'} you. " if needs else 'Nothing needs you today. ')+f"{len(cash)} cash program{'s are' if len(cash)!=1 else ' is'} open"
                  +(f", {len(closing)} closing this week" if closing else '')+f". The agent can reach {len(reach)} application form{'s' if len(reach)!=1 else ''}; {len(blocked)} {'are' if len(blocked)!=1 else 'is'} blocked.")
         return {'date_label':local.strftime('%a %b %d').replace(' 0',' '),'headline':local.strftime('%A, %B %d').replace(' 0',' '),'summary':summary,'preheader':summary,
-                'needs_you':needs,'cash':cash,'credits':credits,'closing_soon':len(closing),'waiting':waiting,
+                'needs_you':needs,'apply_first':apply_first,'cash':cash,'credits':credits,'closing_soon':len(closing),'waiting':waiting,
                 'access':{'reach':reach,'blocked':blocked,'not_checked':not_checked},
                 'agent_status':'Last research: '+((runs[0]['state'].lower()+' at '+runs[0]['started_at'][11:16]+' UTC on '+runs[0]['started_at'][:10]) if runs else 'none yet')+f'. Forms read so far: {forms}. As of '+local.strftime('%I:%M %p %Z').lstrip('0')+'.',
                 'os_url':founder_url('/')}
@@ -213,6 +217,9 @@ class DailyReporter:
     def digest_text(d):
         lines=['A Story - daily brief - '+d['headline'],'',d['summary'],'','NEEDS YOU TODAY']
         lines+=[f"{i}. {x['title']} - {x['detail']} {x['url']}" for i,x in enumerate(d['needs_you'],1)] or ['Nothing needs you today.']
+        if d.get('apply_first'):
+            lines+=['','APPLY TO THESE FIRST (expected money per founder hour; an estimate that orders the work, not a forecast)']
+            lines+=[f"{i}. {x['name']}: {x['per_hour_label']} - {x['reason']} {x['status']} {x['url']}" for i,x in enumerate(d['apply_first'],1)]
         for title,rows in (('CASH ON THE TABLE',d['cash']),('CREDITS WORTH CLAIMING',d['credits'])):
             lines+=['',title]+([f"- {r['name']}: {r['amount']} | {r['when']} | {r['access']['label']}" for r in rows] or ['None right now.'])
         lines+=['','ACCESS REPORT','Agent can reach: '+(', '.join(f"{x['name']} ({x['detail']})" for x in d['access']['reach']) or 'none yet'),

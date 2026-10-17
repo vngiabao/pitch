@@ -1,0 +1,13 @@
+/* Apply to these first: expected money per founder hour (ranker.js) */
+.apply-first .section-title{align-items:flex-start;flex-wrap:wrap}
+.apply-first-list{list-style:none;margin:0;padding:0}
+.apply-first-row{display:grid;grid-template-columns:2ch minmax(0,1fr) auto;gap:var(--space-1) var(--space-4);padding:var(--space-3) 0;border-bottom:var(--rule);align-items:start}
+.apply-first-rank{font-weight:650;color:var(--color-brass-text);font-variant-numeric:lining-nums}
+.apply-first-main p{margin:2px 0 0}
+.apply-first-figure{text-align:right;white-space:nowrap}
+.apply-first-figure strong{display:block;font-weight:650;color:var(--color-brass-text);font-variant-numeric:lining-nums}
+.apply-first-figure small{color:var(--color-muted)}
+.apply-first-method{margin-top:var(--space-3)}
+.apply-first-method summary{cursor:pointer}
+.apply-first-parts{display:flex;flex-wrap:wrap;gap:4px 12px;margin:2px 0 0;padding:0;list-style:none;color:var(--color-muted)}
+@media (max-width:640px){.apply-first-row{grid-template-columns:2ch minmax(0,1fr)}.apply-first-figure{grid-column:2;text-align:left}}

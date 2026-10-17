@@ -19,6 +19,7 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 | Find | **Form Reader** | Opens official application forms and reads the questions | No | Yes (read-only) |
 | Find | **Inbox Tracker** | Reads both inboxes for results (read-only) | No | No |
 | Find | **Metrics Intake** | Reads CSV exports (App Store Connect, Stripe, RevenueCat) from `data/metrics-inbox`; every number keeps its file, fingerprint and day. API pulls are a documented stub whose keys would live only in Windows Credential Manager. | No | No |
+| Rank | **Money Ranker** | Gives every open, not-yet-applied program an expected value per founder hour (prize or discounted credits x win likelihood from the fit score / estimated hours, raised near a deadline) and names the five to apply to first. Every component is shown; the figure is an estimate. Then it prepares those five ahead of Bao: reads the form, queues the drafter, or starts the Pitch Lab edition, one action per cycle. | No (rules) | No |
 | Draft | **Application Drafter** | Answers form questions from approved facts | Yes | No |
 | Draft | **Pitch Tailor** | Reads a program's rules and builds the program edition: slide plan, timed script, materials checklist, ask | Yes | Official rules page only |
 | Draft | **Follow-up and Press Drafters** | Notes to people and outlets | Yes | No |
@@ -96,12 +97,14 @@ Every piece of outward-facing writing (an application answer, a tailored pitch, 
 - **Measured beats reported.** Numbers from the beta family journal are labelled measured, with their denominator and as-of date. Where a measured number and an owner-reported one both exist, drafters use the measured one, and Fact Guard notes which numbers in a draft are measured.
 - **Voice can't change facts; Coach can't add facts.** If the Coach wants a number that doesn't exist, it says "missing proof" and the item lists it under open questions for Bao.
 - **Every review is kept.** Each work item shows its full history: who said what, at which round, with scores. Nothing is overwritten.
+- **Ranking is an estimate, shown whole.** The money-per-hour figure orders the work and never forecasts an award. Its parts (amount counted, likelihood, hours, urgency) are always displayed beside it, and programs with no published amount are listed as unranked rather than scored.
 - **Cost guard.** One AI step per worker cycle (every 5 minutes), on the ChatGPT plan. No API keys. Coach and Voice skip items Bao already approved.
 - **Safety.** Read-only on the web and in the inboxes. Agents never submit, send, pay or accept terms.
 
 ## Where Bao sees it
 
 - **Today and the daily email:** items READY for him, and lessons waiting in Decisions.
+- **Apply to these first:** on Today (one line each), at the top of the Money map (every component), and in the daily email: the five open programs worth the most per founder hour, with what the agents have already prepared for each.
 - **Beta families:** the family journal (Bao enters each family and logs first call, second call, a relative contributing, photo uploads, issues), the measured retention numbers with their denominators, and the metrics inbox.
 - **Pitch Lab:** program editions, with the Coach scorecard, hard questions with suggested answers, the timed script and the slide plan.
 - **Each application page:** answers with Fact Guard and Voice notes, plus the Coach's scorecard for the whole set.
@@ -116,3 +119,7 @@ Each pitch edition gets a real deck at `data/editions/<item>/round-<n>/` (`deck.
 ## Product desk (Phase 1 of the C-suite plan)
 
 `founder_os/product_desk.py` holds three small parts. The **beta family journal** (`beta_families`, `family_events`) is filled by Bao only; nothing is seeded. The **retention tracker** is pure functions over those events: second-call rate (families with a second call / families with a first call), relatives contributing, and calls that followed a contribution, each with its numerator, denominator, date range and source. A rate with an empty denominator stays empty, never zero. **Metrics intake** is read-only: Bao saves a CSV export into `data/metrics-inbox`, picks the provider on the Beta families page, and every imported number is stored with the file name, its SHA-256 and its day (`metrics_sources`, `metrics_points`). The same file is never imported twice. API pulls are a stub (`api_pull`) that only reports whether a key exists under `AStoryFounderOS:Metrics:<provider>` in Windows Credential Manager; it never reads the key into the app or the database. Fact Guard reads the measured facts through `PitchLab.facts()['measured']`.
+
+## Money per hour (apply to these first)
+
+`founder_os/money_ranker.py` ranks every open, not-yet-applied program by expected money per founder hour. The function is pure over the hunter's analysis: cash prize maximum (or credit face value at 25 percent) x a win likelihood from the fit score (fit above 40 scaled to a 60 percent ceiling, halved while eligibility is unknown) / estimated founder hours (3 when the hunter has none) x an urgency factor for programs closing within 14 days (up to 2x on the closing day). Applied, expired, closed, skipped and ineligible programs are left out; programs with no published amount are listed as unranked. The result is labelled an estimate everywhere it appears. Each cycle the autonomy worker takes one preparation step for the top five, in rank order: read the official form (Form Reader), queue the Application Drafter when answers are missing, or start a Pitch Lab edition for a pitch competition with the minutes the program states (3 by default). It never submits. Bao sees the list on Today, the Money map and the daily brief, with each program's preparation state and what the agents will do next.

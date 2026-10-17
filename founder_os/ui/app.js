@@ -97,7 +97,7 @@ function doNextList(items){
  return `<section class="do-next" aria-labelledby="next-title"><h2 id="next-title">Do next</h2><ol>${items.map((x,i)=>`<li><div><strong>${E(x.title)}</strong><p class="small">${E(x.detail)}</p></div><a class="button${i===0?' primary':''}" href="${E(x.href)}"${x.external?' target="_blank" rel="noopener noreferrer"':''}>${E(x.label)}</a></li>`).join('')}</ol></section>`;
 }
 async function home(){
- const board=dash.money_board,[pitches,apps,growth,lab]=await Promise.all([api('/api/pitches').catch(()=>({items:[]})),api('/api/application-list').catch(()=>[]),api('/api/growth-alerts').catch(()=>[]),api('/api/lab-alerts').catch(()=>[])]);
+ const board=dash.money_board,[pitches,apps,growth,lab,applyFirstRows]=await Promise.all([api('/api/pitches').catch(()=>({items:[]})),api('/api/application-list').catch(()=>[]),api('/api/growth-alerts').catch(()=>[]),api('/api/lab-alerts').catch(()=>[]),api('/api/apply-first').catch(()=>null)]);
  const byOpp=Object.fromEntries(apps.map(x=>[x.opportunity_id,x])),todo=[...doNext(board,apps),...growth.map(x=>({title:x.title,detail:x.detail,href:x.url,label:x.link})),...lab.map(x=>({title:x.title,detail:x.detail,href:x.url,label:x.link}))].slice(0,8);
  const latestPitch=[...pitches.items].sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))[0];
  const closingSoon=board.cash.filter(d=>{const n=d.analysis.scoring.dates.days_remaining;return n!==null&&n>=0&&n<=7;}).length,waiting=board.tracked.filter(t=>t.waiting).length;
@@ -105,7 +105,7 @@ async function home(){
  const lastRun=dash.agent_activity[0];
  app.innerHTML=heading('Today',today+'. What needs you, what pays, and what closes first.')+
  `<p class="state-line"><span class="${todo.length?'urgent':''}"><strong>${todo.length}</strong> need you</span><span><strong>${board.cash.length}</strong> cash programs open</span><span class="${closingSoon?'urgent':''}"><strong>${closingSoon}</strong> closing this week</span><span><strong>${waiting}</strong> waiting on results</span></p>`+
- doNextList(todo)+
+ doNextList(todo)+(window.applyFirst&&applyFirstRows?applyFirst(applyFirstRows,{compact:true}):'')+
  `<div class="today"><div><section aria-labelledby="cash-title"><div class="block-title"><h2 id="cash-title">Cash on the table</h2><a href="/opportunities">Full pipeline</a></div><p class="block-note">Prizes, grants and fellowships, soonest deadline first. A pool size is not your award.</p><ol class="toc">${board.cash.slice(0,8).map(d=>tocRow(d,true,byOpp[d.opportunity_id])).join('')||'<li class="empty">No open cash programs are verified right now. Run research to look for new competitions and grants.</li>'}</ol></section>`+
  `<section class="credits" aria-labelledby="credit-title"><div class="block-title"><h2 id="credit-title">Credits that cut real costs</h2></div><p class="block-note">Credits are not cash. Ranked by how directly they cover the voice and AI services A Story runs on.</p><ol class="toc">${board.credits.slice(0,6).map(d=>tocRow(d,false,byOpp[d.opportunity_id])).join('')||'<li class="empty">No open credit programs.</li>'}</ol></section></div>`+
  `<div class="side">`+waitingSection(board.tracked)+
@@ -496,7 +496,8 @@ async function moneyMap(){
   `<div class="money-status">${r.outcome?tag(r.outcome):accessChip(r.access)}${r.application_id?` <a class="small" href="/application/${E(r.application_id)}">Answers</a>`:''}</div>`+
   `<div class="money-pitch">${r.edition?`<a class="small" href="/pitch-lab/${E(r.edition.id)}">Pitch: ${E(r.edition.stage==='READY'?'ready':r.edition.stage==='APPROVED'?'approved':'in progress')}</a>`:(done?'':`<a class="small" href="/pitch-lab?program=${E(r.id)}">Tailor the pitch</a>`)}</div></div>`;};
  app.innerHTML=heading('Money map','Every route to money: what to sell, what to apply to, and where each pitch stands.')+
- `<nav class="cat-nav" aria-label="Money categories"><a href="#moves">Your moves</a>${used.map(c=>`<a href="#cat-${E(c.key)}">${E(c.title)} <span class="count-chip">${c.programs.length}</span></a>`).join('')}</nav>`+
+ `<nav class="cat-nav" aria-label="Money categories"><a href="#apply-first">Apply first</a><a href="#moves">Your moves</a>${used.map(c=>`<a href="#cat-${E(c.key)}">${E(c.title)} <span class="count-chip">${c.programs.length}</span></a>`).join('')}</nav>`+
+ (window.applyFirst&&m.apply_first?applyFirst(m.apply_first):'')+
  `<section class="section" id="moves"><div class="section-title"><h2>Your money moves</h2><span class="small">The fastest money doesn’t need a judge</span></div>${groups.map(g=>`<h3 class="list-head">${E(g)}</h3>${m.moves.filter(x=>x.grp===g).map(x=>`<div class="move-row${x.state==='DONE'?' done':''}"><div><p class="move-title">${E(x.title)}</p><p class="small">${E(x.detail)}</p></div><div class="segmented" role="group" aria-label="Status">${MOVE_STATES.map(([v,l])=>`<button type="button" class="${x.state===v?'on':''}" data-move="${E(x.id)}" data-state="${v}" aria-pressed="${x.state===v}">${l}</button>`).join('')}</div></div>`).join('')}`).join('')}</section>`+
  used.map(c=>`<section class="section" id="cat-${E(c.key)}"><div class="section-title"><h2>${E(c.title)}</h2><span class="count-chip">${c.programs.length}</span></div><p class="small">${E(c.note)}</p>${c.programs.map(row).join('')}</section>`).join('');
 }

@@ -60,7 +60,13 @@ def render_digest(d,sample=False):
             +(f'<p style="margin:6px 0 0;font:13px/1.55 {SANS};color:{MUTED};">Not checked yet: {e(", ".join(d["access"]["not_checked"]))}. The agent reads one form every few minutes.</p>' if d['access']['not_checked'] else ''))
     waiting=''.join(f'<tr><td style="padding:9px 0;border-top:1px solid {LINE};font:14px/1.5 {SANS};color:{INK};">{e(w["name"])}</td><td align="right" style="padding:9px 0;border-top:1px solid {LINE};font:13px/1.5 {SANS};color:{MUTED};white-space:nowrap;">{e(w["status"])}</td></tr>' for w in d['waiting'])
     waiting=f'<table role="presentation" width="100%" cellspacing="0" cellpadding="0">{waiting}</table>' if waiting else f'<p style="margin:0;font:14px/1.6 {SANS};color:{MUTED};">Nothing pending.</p>'
-    body=(section('Needs you today',needs)
+    first=''
+    if d.get('apply_first'):
+        items=''.join(f'''<tr><td style="padding:12px 0;border-top:1px solid {LINE};vertical-align:top;width:28px;font:400 18px/1.3 {SERIF};color:{BRASS};">{i}</td>
+<td style="padding:12px 0;border-top:1px solid {LINE};vertical-align:top;"><div style="font:400 17px/1.35 {SERIF};color:{INK};">{a(x['url'],x['name'],'color:'+INK+';text-decoration:none;')}</div><div style="font:13px/1.6 {SANS};color:{MUTED};margin-top:2px;">{e(x['reason'])} {e(x['status'])}</div></td>
+<td align="right" style="padding:12px 0 12px 12px;border-top:1px solid {LINE};vertical-align:top;white-space:nowrap;font:600 15px/1.35 {SANS};color:{BRASS};">{e(x['per_hour_label'])}<br><span style="font:12px {SANS};color:{MUTED};font-weight:400;">estimate</span></td></tr>''' for i,x in enumerate(d['apply_first'],1))
+        first=section('Apply to these first',f'<table role="presentation" width="100%" cellspacing="0" cellpadding="0">{items}</table>','Expected money per founder hour: prize or discounted credits, times a win likelihood from the fit score, divided by the hours, raised when the deadline is close. An estimate that orders the work, not a forecast of an award.')
+    body=(section('Needs you today',needs)+first
           +section('Cash on the table',program_rows(d['cash'],'No open cash programs are verified right now.'),'Prizes, grants and fellowships, soonest deadline first. A pool size is not your award.')
           +section('Credits worth claiming',program_rows(d['credits'],'No open credit programs right now.'),'Credits are not cash. Ranked by how directly they cover the voice and AI services A Story uses.')
           +section('Access report',access,'Whether the agent could open each official application form. Reachable forms have answers waiting on the website.')
