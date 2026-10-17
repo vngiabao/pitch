@@ -107,7 +107,9 @@ class WinScout:
             outcome=self.db.execute('SELECT outcome FROM funding_outcomes WHERE opportunity_id=? ORDER BY occurred_at DESC,created_at DESC LIMIT 1',(oid,)).fetchone()
             in_play=bool(outcome and outcome['outcome'] in IN_PLAY)
             soon=days is not None and 0<=days<=60
-            if (in_play and (soon or days is None)) or (d['recommendation'] in ('APPLY NOW','PREPARE') and soon):out.append((0 if in_play else 1,days if days is not None else 999,oid))
+            # A program A Story is in stays in play after its deadline: the pitch or the decision comes later (SWC Columbus: deadline Oct 15, finale Oct 24).
+            recent=days is not None and -60<=days<=60
+            if (in_play and (recent or days is None)) or (d['recommendation'] in ('APPLY NOW','PREPARE') and soon):out.append((0 if in_play else 1,abs(days) if days is not None else 999,oid))
         return [oid for _,_,oid in sorted(out)[:limit]]
 
     def poll(self,instant=None):
