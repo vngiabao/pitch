@@ -11,6 +11,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 from .store import now,js,digest,uid
 from .funding_hunter import FundingHunter,stamp
+from .founder_profile import FounderProfile,FACT_FALLBACK
 
 SCHEMA='''CREATE TABLE IF NOT EXISTS form_inspections(
  opportunity_id TEXT PRIMARY KEY,url TEXT,state TEXT NOT NULL,reason TEXT NOT NULL,
@@ -153,6 +154,7 @@ class ApplicationDrafter:
         }
         fact_versions=list(dict.fromkeys(f['claim_version_id'] for f in facts.values()))
         bios=self.store.approved_answers('founder bio')
+        profile=FounderProfile(self.store);vault=profile.values()
         for q in self.open_questions(aid):
             label=norm(q['prompt'].split(' [')[0]);answer=None;why=''
             options=self._options(q['prompt'])
@@ -160,6 +162,14 @@ class ApplicationDrafter:
                 if re.search(pattern,label) and derived.get(key) not in (None,''):
                     answer=choose_option(derived[key],options) if options else str(derived[key])
                     if answer:why='From your approved company facts';break
+            if answer is None:
+                # Form Filler: the Founder Profile Vault answers what only Bao knows (EIN, addresses, links, dates).
+                key=profile.match(q['prompt'].split(' [')[0]);raw=vault.get(key) if key else None
+                if key and not raw and FACT_FALLBACK.get(key) in facts:raw=value(FACT_FALLBACK[key])
+                if raw not in (None,''):
+                    typed=int(raw) if isinstance(raw,str) and raw.isdigit() else raw
+                    answer=choose_option(typed,options) if options else str(raw)
+                    if answer:why='founder_profile'
             if answer is None and re.search(r'\bbio\b',label):
                 who='bao' if re.search(r'team member 1|primary contact|your bio',label) else 'daniel' if 'team member 2' in label else None
                 match=[b for b in bios if who and who in b['prompt'].lower()]
@@ -169,9 +179,18 @@ class ApplicationDrafter:
                 if reuse:answer=reuse[0]['body'];why='Your approved answer to the same question'
             if answer is None:continue
             src=self.db.execute('SELECT source_version_id FROM questions WHERE id=?',(q['id'],)).fetchone()[0]
-            self.store.add_answer(q['id'],answer,[src],fact_versions=fact_versions if why.startswith('From your approved') else (),unresolved=(),provenance='auto_filled')
+            self.store.add_answer(q['id'],answer,[src],fact_versions=fact_versions if why.startswith('From your approved') else (),unresolved=(),provenance='founder_profile' if why=='founder_profile' else 'auto_filled')
+            if why=='founder_profile':self.db.execute('DELETE FROM draft_notes WHERE question_id=?',(q['id'],))
             filled+=1
         return filled
+
+    def refill_all(self):
+        """Run the Form Filler again over every application whose form was read, e.g. after Bao edits his profile. Returns {application_id: newly filled}."""
+        out={}
+        for row in self.db.execute("SELECT application_id FROM form_inspections WHERE state='QUESTIONS_READ' AND application_id IS NOT NULL").fetchall():
+            out[row[0]]=self.fill_known(row[0])
+        if any(out.values()):self.store.log('application.profile_filled','form_filler',{'applications':{k:v for k,v in out.items() if v}})
+        return out
 
     @staticmethod
     def _options(prompt):
@@ -187,6 +206,7 @@ class ApplicationDrafter:
     def draft_context(self,aid):
         """Everything the AI drafter may use: approved facts, approved answers, owner sources and writing rules."""
         app=self.store.one('SELECT a.*,p.canonical_name FROM applications a LEFT JOIN funding_intelligence i ON i.opportunity_id=a.opportunity_id LEFT JOIN funding_programs p ON p.id=i.program_id WHERE a.id=?',(aid,))
+        self.fill_known(aid)  # the Form Filler goes first, so the AI is never asked what the vault already knows
         mem=self.h.company_memory()
         owner_sources=[]
         for kind in ('owner_confirmation','application_history','official_pricing_capture'):
@@ -197,14 +217,14 @@ class ApplicationDrafter:
         guide=Path(__file__).resolve().parents[1]/'PITCH_WRITING.md'
         return {'program':app['canonical_name'] or app['title'],'questions':[{'question_id':q['id'],'question':q['prompt'],'limit':q['limit_value'],'unit':q['limit_unit'],'type':q['type']} for q in self.open_questions(aid)],
                 'company_facts':{k:v['value'] for k,v in mem['attributes'].items()},'approved_statements':[{'topic':c['topic'],'text':c['body']} for c in mem['canonical_claims'] if not c['body'].startswith('{')],
-                'owner_sources':owner_sources,'approved_answers':approved,'owner_written_answers':recent_owner,
+                'owner_sources':owner_sources,'approved_answers':approved,'owner_written_answers':recent_owner,'founder_profile':FounderProfile(self.store).public_values(),
                 'writing_guide':guide.read_text(encoding='utf-8')[:9000] if guide.exists() else '',
                 'rules':['Use only the facts, statements, sources and answers given here. Never invent numbers, customers, partners, awards or traction.',
                          'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Do not mention Nhi Tran except for the Michigan Business Challenge.',
                          'Runway: no fixed runway; if a number is required, use 8 months. Bootstrapped from founder money.',
                          'Prices come from the astoryapp.com pricing capture. Stats: 79% want to know more, 37% know their mother\'s life before kids, 74% regret not learning more.',
                          'Stay within each word or character limit. For a choice question, answer with the exact option text.',
-                         'If the facts cannot answer a question (phone numbers, private details), return an empty answer and say what is missing in note.',
+                         'If the facts cannot answer a question (phone numbers, private details), return an empty answer and say what is missing in note. founder_profile holds the links and public details Bao wrote himself; private ones (EIN, addresses, dates of birth) are filled by the Form Filler, never by you.',
                          'Write in plain founder language, one connected paragraph for short answers, normal hyphens, no em dashes.']}
 
     def save_drafts(self,aid,drafts):

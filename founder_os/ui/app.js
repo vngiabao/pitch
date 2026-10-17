@@ -226,7 +226,7 @@ document.addEventListener('submit',async e=>{
 });
 function routeContext(){
  const path=location.pathname,parent=path.startsWith('/pitch-lab/')?'/pitch-lab':path.startsWith('/pitch/')?'/pitches':path.startsWith('/material/')?'/materials':path.startsWith('/application-review/')||path.startsWith('/application/')?'/applications':path.startsWith('/opportunity/')?'/opportunities':path.startsWith('/run/')?'/activity':path;
- const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/drive':'Reservation drive'};
+ const names={'/':'Today','/pitches':'Pitch Studio','/materials':'Materials & answers','/applications':'Applications','/opportunities':'Funding pipeline','/activity':'Agent activity','/memory':'Company facts','/decisions':'Decisions','/credits':'Credits','/people':'People','/press':'Press & gift guides','/pitch-lab':'Pitch Lab','/money':'Money map','/growth':'Deals & campaigns','/scouts':'Scouts','/drive':'Reservation drive','/founder-profile':'Founder profile'};
  document.querySelectorAll('#workspace-nav a').forEach(a=>{const active=a.getAttribute('href')===parent;a.classList.toggle('active',active);active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#breadcrumbs').innerHTML='<a href="/">A Story</a> / '+(parent!==path?'<a href="'+E(parent)+'">'+E(names[parent]||'Workspace')+'</a> / Detail':E(names[parent]||'Workspace'));
  document.querySelector('#workspace-location').textContent=location.hostname==='pitch.gbaonvo.com'?'Owner sign-in protected':'On this PC';document.title=(names[parent]||'Workspace')+' | A Story';
@@ -245,6 +245,7 @@ async function boot(){
  if(path==='/growth')return growthDesk();
  if(path==='/scouts')return scouts();
  if(path==='/families')return betaFamilies();
+ if(path==='/founder-profile')return founderProfile();
  if(path==='/drive')return reservationDrive();
  if(path.startsWith('/pitch/'))return pitchEditor(path.split('/').at(-1));
  if(path==='/pitches')return pitchLibrary();
@@ -293,7 +294,7 @@ function applicationGroups(list){
  return ACCESS_GROUPS.map(([level,title,note])=>{const rows=list.filter(x=>x.access.level===level);if(!rows.length)return '';
   return `<div class="app-group"><h2>${E(title)} <span class="count-chip">${rows.length}</span></h2><p class="small">${E(note)}</p>${rows.map(appRow).join('')}</div>`;}).join('')||'<p class="empty">No open applications. New programs appear here once the agent finds and reads their forms.</p>';
 }
-const SOURCE_WORDS={auto_filled:'From your facts',agent_draft:'Agent draft',owner_written:'Your wording',drafted:'Draft'};
+const SOURCE_WORDS={auto_filled:'From your facts',founder_profile:'From your founder profile',agent_draft:'Agent draft',owner_written:'Your wording',drafted:'Draft'};
 async function applicationPage(id){
  const a=await api('/api/application/'+encodeURIComponent(id)),latest=a.outcomes[0],submitted=a.outcomes.some(o=>o.outcome!=='Withdrawn');
  const ready=a.questions.filter(q=>q.answer),needs=a.questions.filter(q=>!q.answer),url=a.application_url||a.official_url,label=q=>q.label||q.prompt.split(' [')[0];
