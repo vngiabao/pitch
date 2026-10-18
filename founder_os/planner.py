@@ -33,7 +33,7 @@ def plain_sources(text):
     return re.sub(r'(Today brief|Win brief|Pitch Lab|Channel math|Campaigns|Deals board|Reservation drive|Families page|Credits page|Scouts|Assumptions|Customer voice|Funding pipeline|Agent activity)(\.[\w]+)+',r'\1',text)
 
 
-AGENT_NAMES=(('Scout: ',None),('Daily free credits discovery','Credits Scout'),('Partner and deal discovery','Partner Scout'),('Press and gift-guide discovery','Press Scout'),
+AGENT_NAMES=(('Scout: Investors','Investor Scout'),('Scout: ',None),('Daily free credits discovery','Credits Scout'),('Partner and deal discovery','Partner Scout'),('Press and gift-guide discovery','Press Scout'),
              ('Win brief','Win Scout'),('Plan report','Planner'),('Campaign plan','Campaign Planner'),('Draft deal note','Deal Drafter'),('Draft follow-up','Follow-up Drafter'),
              ('Draft press pitch','Press Drafter'),('Draft application','Application Drafter'),('Due program re-verifications','Funding Hunter'),('Scheduled broad discovery','Funding Hunter'),
              ('Manual broad discovery','Funding Hunter'),('Research opportunity','Funding Hunter'),('Assumption','Assumption Coach'),('Pipeline',''))

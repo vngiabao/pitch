@@ -79,8 +79,8 @@ class PlannerTests(unittest.TestCase):
 
     def test_agent_names_match_the_scouts_page(self):
         from founder_os.planner import agent_name
-        self.assertEqual([agent_name(x) for x in ('Scout: Competition','Scout: Founder Money','Daily free credits discovery','Win brief: opp-1','Draft deal note: deal-1','Due program re-verifications','Pipeline: work-1')],
-                         ['Competition Scout','Founder Money Scout','Credits Scout','Win Scout','Deal Drafter','Funding Hunter',''])
+        self.assertEqual([agent_name(x) for x in ('Scout: Competition','Scout: Founder Money','Daily free credits discovery','Win brief: opp-1','Scout: Investors','Draft deal note: deal-1','Due program re-verifications','Pipeline: work-1')],
+                         ['Competition Scout','Founder Money Scout','Credits Scout','Win Scout','Investor Scout','Deal Drafter','Funding Hunter',''])
 
     def test_render_escapes_and_handles_empty_sections(self):
         page=render_html({'title':'<b>x</b>','bottom_line':'','moves':[],'decisions':[],'numbers':[],'by_agent':[],'risks':[],'later':[]},'q <script>',datetime(2026,10,16,tzinfo=ET))
