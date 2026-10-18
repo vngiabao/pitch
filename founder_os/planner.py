@@ -33,14 +33,28 @@ def plain_sources(text):
     return re.sub(r'(Today brief|Win brief|Pitch Lab|Channel math|Campaigns|Deals board|Reservation drive|Families page|Credits page|Scouts|Assumptions|Customer voice|Funding pipeline|Agent activity)(\.[\w]+)+',r'\1',text)
 
 
-def _s(v,n=600):return plain_sources((str(v) if v is not None else '')[:n].strip())
+def words(text,cap):
+    """Keep a line to cap words: the first sentence when it fits, otherwise the first cap words."""
+    t=' '.join(str(text or '').split())
+    if len(t.split())<=cap:return t
+    first=re.split(r'(?<=[.!?])\s+',t)[0]
+    if len(first.split())<=cap:return first
+    return ' '.join(t.split()[:cap]).rstrip(',;:')+'…'
+
+
+def _s(v,cap=40):return plain_sources(words(v,cap))
 
 
 def clean(data):
-    return {'title':_s(data.get('title'),140) or 'Plan','answer':[_s(p,1200) for p in (data.get('answer') or [])[:8] if _s(p)],
-            'plan':[{'when':_s(x.get('when'),60),'what':_s(x.get('what'),300),'why':_s(x.get('why'),300),'owner':x.get('owner') if x.get('owner') in OWNERS else 'Bao','link':_s(x.get('link'),300)} for x in (data.get('plan') or [])[:14] if _s(x.get('what'))],
-            'numbers':[{'label':_s(x.get('label'),80),'value':_s(x.get('value'),60),'source':_s(x.get('source'),160)} for x in (data.get('numbers') or [])[:8] if _s(x.get('label'))],
-            'questions_for_bao':[_s(q,300) for q in (data.get('questions_for_bao') or [])[:10] if _s(q)],'risks':[_s(r,300) for r in (data.get('risks') or [])[:6] if _s(r)]}
+    """An executive brief: a conclusion, three moves, the decisions only Bao can make, a few numbers. Every line has a word limit."""
+    owner=lambda x:x.get('owner') if x.get('owner') in OWNERS else 'Bao'
+    return {'title':_s(data.get('title'),9) or 'Plan','bottom_line':_s(data.get('bottom_line'),45),
+            'moves':[{'what':_s(x.get('what'),16),'by':_s(x.get('by'),6),'owner':owner(x),'why':_s(x.get('why'),14)} for x in (data.get('moves') or [])[:3] if _s(x.get('what'))],
+            'decisions':[{'decision':_s(x.get('decision'),16),'recommend':_s(x.get('recommend'),14),'unblocks':_s(x.get('unblocks'),10)} for x in (data.get('decisions') or [])[:5] if _s(x.get('decision'))],
+            'numbers':[{'label':_s(x.get('label'),6),'value':_s(x.get('value'),5),'source':_s(x.get('source'),5)} for x in (data.get('numbers') or [])[:4] if _s(x.get('label'))],
+            'by_agent':[{'agent':_s(x.get('agent'),4),'result':_s(x.get('result'),14),'needs':_s(x.get('needs'),10)} for x in (data.get('by_agent') or [])[:12] if _s(x.get('agent'))],
+            'risks':[_s(r,16) for r in (data.get('risks') or [])[:3] if _s(r)],
+            'later':[{'what':_s(x.get('what'),14),'by':_s(x.get('by'),6),'owner':owner(x)} for x in (data.get('later') or [])[:6] if _s(x.get('what'))]}
 
 
 class Planner:
@@ -134,6 +148,10 @@ class Planner:
                 if r['state']=='COMPLETE':a['complete']+=1
                 elif r['state'] in ('QUEUED','RUNNING'):a['queued']+=1
                 elif r['last_error']:a['failed']+=1
+            words_for={'TAILOR':'Pitch Tailor','FACT_GUARD':'Fact Guard','VOICE':"Bao's Voice",'COACH':'Pitch Coach','FORMAT':'Format Check','BUILDER':'Edition Builder','SLIDE_QA':'Slide QA','LEARNER':'Outcome Learner'}
+            for r in self.s.rows("SELECT agent,verdict,created_at FROM work_reviews WHERE created_at>=datetime('now','-7 days') AND agent!='OWNER' ORDER BY created_at DESC"):
+                name='Pitch Lab: '+words_for.get(r['agent'],r['agent'].title());a=by.setdefault(name,{'agent':name,'runs':0,'complete':0,'queued':0,'failed':0,'last':None,'verdicts':{}})
+                a['runs']+=1;a['complete']+=1;a['last']=a['last'] or r['created_at'];a['verdicts'][r['verdict']]=a['verdicts'].get(r['verdict'],0)+1
             return sorted(by.values(),key=lambda a:-a['runs'])
         part('agent_runs',runs)
         state['gather_errors']=errors
@@ -178,7 +196,7 @@ class Planner:
 
     def save(self,rid,data,state):
         r=self.s.one('SELECT question,created_at FROM planner_reports WHERE id=?',(rid,));rep=clean(data)
-        if not rep['questions_for_bao']:rep['questions_for_bao']=self.open_questions(state)[:8]
+        if not rep['decisions']:rep['decisions']=[{'decision':_s(q,16),'recommend':'needs your input','unblocks':''} for q in self.open_questions(state)[:5]]
         page=render_html(rep,r['question'],datetime.now(ET));paths=write_files(rid,page)
         self.db.execute('UPDATE planner_reports SET state=?,title=?,report_json=?,html_path=?,pdf_path=?,error=NULL,finished_at=? WHERE id=?',('READY',rep['title'],js(rep),str(paths['html']),str(paths['pdf']) if paths['pdf'] else None,now(),rid))
         self.s.log('planner.report_ready','research_worker',{'id':rid,'pdf':bool(paths['pdf'])});return self.report(rid)
@@ -198,50 +216,62 @@ class Planner:
     def context(self,rid):
         r=self.s.one('SELECT question FROM planner_reports WHERE id=?',(rid,));state=self.gather()
         return {'question':r['question'],'state':state,'already_asked_of_bao':self.open_questions(state),
-                'task':'You are the Planner for A Story Founder OS. Answer CONTEXT.question for Bao using ONLY CONTEXT.state. Write like a sharp chief of staff: plain sentences, no staging ("not X but Y", "here is the thing"), no triads for rhythm, no inflated words, no em dashes, no bold labels. '
-                       'answer: 2 to 5 short paragraphs that answer the question directly, numbers only from CONTEXT with their source. plan: the dated next moves in order (when, what, why, who: Bao, Daniel or agents, link from CONTEXT when one applies), at most 10, the first three being what matters most this week. '
-                       'Name a source by its desk in plain words (Today brief, Deals board, Win brief for Columbus, Pitch Lab, Channel math), never by a field path, and never write "state." in the report. '
-                       'numbers: up to 6 figures that frame the week, each with its source. questions_for_bao: the decisions and facts only he can supply, drawn from already_asked_of_bao and the state, each one sentence, no duplicates. risks: up to 4, specific. Never invent a program, a number, a person or a date.'},state
+                'task':('You are the Planner for A Story Founder OS. Write a one-page brief for a busy founder that answers CONTEXT.question using ONLY CONTEXT.state. '
+                        'Hard limits. title: up to 9 words, states the conclusion, not the topic. bottom_line: the answer in 1 or 2 sentences, up to 45 words, conclusion first. '
+                        'moves: the 3 things that matter most this week, each one action of up to 16 words that starts with a verb, with by (a date or "today", up to 6 words), owner (Bao, Daniel or agents) and why (up to 14 words). '
+                        'decisions: up to 5 decisions only Bao can make, ordered by how much work each unblocks; each a question of up to 16 words; recommend is the option you would pick from the evidence in up to 14 words, or "needs your input" when CONTEXT gives no basis; unblocks says what moves once decided, up to 10 words. Merge related asks into one decision and never ask for the same fact twice; already_asked_of_bao lists what the agents have asked. '
+                        'numbers: up to 4 figures that change a decision, value short, source named as a desk. '
+                        'by_agent: fill only when the question asks about agents or the week\'s work; one row per agent from agent_runs and the desks, result is what it produced in up to 14 words with counts, needs is what it needs from Bao in up to 10 words or empty. '
+                        'risks: up to 3, each up to 16 words. later: up to 6 further moves, short. '
+                        'Write like a chief of staff talking: plain words, short sentences, no staging ("not X but Y", "here is the thing"), no triads for rhythm, no stacked hedges, no em dashes. '
+                        'Name sources as desks (Today brief, Deals board, Win brief for Columbus, Pitch Lab, Channel math), never as field paths or "state.". '
+                        'When a check has no record, write "not recorded", never "did not run". Never invent a program, a number, a person or a date.')},state
 
 
 def render_html(rep,question,when):
     E=lambda s:html.escape(str(s or ''),quote=False);T=THEME;fonts=(ROOT/'founder_os'/'ui'/'fonts')
     face=lambda name,file,weight:f"@font-face{{font-family:'{name}';src:url('{(fonts/file).as_uri()}') format('woff2');font-weight:{weight}}}"
     css=f"""{face('Mona Sans','mona-sans.woff2','200 900')}{face('Brygada 1918','brygada-1918.woff2','400 700')}
-@page{{size:Letter;margin:0.55in 0.6in 0.7in}}*{{box-sizing:border-box}}
-body{{margin:0;background:{T['paper']};color:{T['ink']};font-family:'Mona Sans','Helvetica Neue',Arial,sans-serif;font-size:11pt;line-height:1.5}}
-.band{{background:{T['navy']};color:{T['paper']};padding:22px 28px 18px;border-bottom:4px solid {T['brass']}}}
-.band .kicker{{font-size:9pt;letter-spacing:.14em;text-transform:uppercase;color:{T['maize']};margin:0 0 6px}}
-.band h1{{font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:22pt;line-height:1.15;margin:0 0 6px;letter-spacing:-.01em}}
-.band .q{{color:#cfd8e3;font-size:10.5pt;margin:0}}
-.wrap{{padding:20px 28px 28px}}
-h2{{font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:15pt;color:{T['navy']};margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid {T['stone']}}}
-p{{margin:0 0 9px}}
-.numbers{{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 6px}}
-.num{{flex:1 1 150px;background:{T['soft']};border:1px solid {T['stone']};border-radius:8px;padding:10px 12px}}
-.num b{{display:block;font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:18pt;color:{T['brass_text']};line-height:1.1}}
-.num span{{font-size:9.5pt;color:{T['muted']}}}
-table{{width:100%;border-collapse:collapse;font-size:10pt;margin:4px 0 6px}}
-th{{text-align:left;font-weight:600;font-size:9pt;letter-spacing:.06em;text-transform:uppercase;color:{T['muted']};padding:6px 8px;border-bottom:2px solid {T['stone']}}}
-td{{padding:7px 8px;border-bottom:1px solid {T['stone']};vertical-align:top}}
-td.when{{white-space:nowrap;color:{T['brass_text']};font-weight:600;width:14%}}td.who{{white-space:nowrap;width:10%;color:{T['muted']}}}
-td .why{{color:{T['muted']};font-size:9.5pt}}
-.box{{background:{T['maize_wash']};border-left:4px solid {T['brass']};border-radius:0 8px 8px 0;padding:10px 14px;margin:6px 0 8px}}
-.box ol{{margin:0;padding-left:18px}}.box li{{margin:0 0 5px}}
-ul.risks{{margin:0;padding-left:18px}}ul.risks li{{margin:0 0 4px}}
-.foot{{margin-top:22px;padding-top:8px;border-top:1px solid {T['stone']};font-size:8.5pt;color:{T['muted']};display:flex;justify-content:space-between}}
+@page{{size:Letter;margin:0.5in 0.55in 0.6in}}*{{box-sizing:border-box}}
+body{{margin:0;background:{T['paper']};color:{T['ink']};font-family:'Mona Sans','Helvetica Neue',Arial,sans-serif;font-size:10.5pt;line-height:1.45}}
+.band{{background:{T['navy']};color:{T['paper']};padding:18px 26px 16px;border-bottom:4px solid {T['brass']}}}
+.kicker{{font-size:8.5pt;letter-spacing:.14em;text-transform:uppercase;color:{T['maize']};margin:0 0 5px}}
+.band h1{{font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:21pt;line-height:1.15;margin:0;letter-spacing:-.01em}}
+.wrap{{padding:16px 26px 20px}}
+.q{{font-size:9pt;color:{T['muted']};margin:0 0 12px}}
+.bl{{background:{T['maize_wash']};border-left:5px solid {T['brass']};border-radius:0 8px 8px 0;padding:12px 16px;margin:0 0 16px}}
+.bl p{{font-family:'Brygada 1918',Georgia,serif;font-size:14pt;line-height:1.35;margin:0;color:{T['navy']}}}
+h2{{font-size:8.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:{T['brass_text']};margin:16px 0 8px}}
+ol.moves{{list-style:none;margin:0;padding:0;counter-reset:m}}
+ol.moves li{{counter-increment:m;display:grid;grid-template-columns:28px 1fr;gap:2px 10px;padding:8px 0;border-bottom:1px solid {T['stone']}}}
+ol.moves li::before{{content:counter(m);grid-row:span 2;width:24px;height:24px;border-radius:12px;background:{T['navy']};color:{T['paper']};font-weight:700;font-size:10pt;display:flex;align-items:center;justify-content:center}}
+.what{{font-weight:600;font-size:11pt}}.meta{{font-size:9pt;color:{T['muted']}}}.meta b{{color:{T['brass_text']};font-weight:600}}
+table{{width:100%;border-collapse:collapse;font-size:9.5pt}}
+th{{text-align:left;font-weight:600;font-size:8pt;letter-spacing:.08em;text-transform:uppercase;color:{T['muted']};padding:5px 8px;border-bottom:2px solid {T['stone']}}}
+td{{padding:6px 8px;border-bottom:1px solid {T['stone']};vertical-align:top}}
+td.rec{{color:{T['brass_text']};font-weight:600}}td.agent{{white-space:nowrap;font-weight:600}}td.small{{color:{T['muted']}}}
+.numbers{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}}
+.num{{background:{T['soft']};border:1px solid {T['stone']};border-radius:8px;padding:8px 10px}}
+.num b{{display:block;font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:16pt;color:{T['navy']};line-height:1.1}}
+.num span{{font-size:8.5pt;color:{T['muted']}}}
+.two{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}
+.two ul{{margin:0;padding-left:16px;font-size:9.5pt}}.two li{{margin:0 0 4px}}
+.foot{{margin-top:16px;padding-top:6px;border-top:1px solid {T['stone']};font-size:8pt;color:{T['muted']};display:flex;justify-content:space-between}}
 """
-    plan=''.join(f"<tr><td class='when'>{E(x['when'])}</td><td><div>{E(x['what'])}</div>{('<div class=why>'+E(x['why'])+'</div>') if x['why'] else ''}{('<div class=why>'+E(x['link'])+'</div>') if x['link'] else ''}</td><td class='who'>{E(x['owner'])}</td></tr>" for x in rep['plan'])
+    moves=''.join(f"<li><div class='what'>{E(m['what'])}</div><div class='meta'><b>{E(m['owner'])}</b>{(' · '+E(m['by'])) if m['by'] else ''}{(' · '+E(m['why'])) if m['why'] else ''}</div></li>" for m in rep['moves'])
+    dec=''.join(f"<tr><td>{E(d['decision'])}</td><td class='rec'>{E(d['recommend'])}</td><td class='small'>{E(d['unblocks'])}</td></tr>" for d in rep['decisions'])
     nums=''.join(f"<div class='num'><b>{E(n['value'])}</b><span>{E(n['label'])}{(' · '+E(n['source'])) if n['source'] else ''}</span></div>" for n in rep['numbers'])
-    qs=''.join(f"<li>{E(q)}</li>" for q in rep['questions_for_bao']);risks=''.join(f"<li>{E(r)}</li>" for r in rep['risks'])
+    agents=''.join(f"<tr><td class='agent'>{E(a['agent'])}</td><td>{E(a['result'])}</td><td class='small'>{E(a['needs'])}</td></tr>" for a in rep['by_agent'])
+    risks=''.join(f"<li>{E(r)}</li>" for r in rep['risks']);later=''.join(f"<li>{E(x['what'])}<span class='meta'> · {E(x['owner'])}{(' · '+E(x['by'])) if x['by'] else ''}</span></li>" for x in rep['later'])
     return (f"<!doctype html><html lang='en'><head><meta charset='utf-8'><title>{E(rep['title'])}</title><style>{css}</style></head><body>"
-            f"<div class='band'><p class='kicker'>A Story Founder OS · Planner · {E(when.strftime('%B %d, %Y').replace(' 0',' '))}</p><h1>{E(rep['title'])}</h1><p class='q'>{E(question)}</p></div><div class='wrap'>"
-            +(f"<h2>The answer</h2>{''.join('<p>'+E(p)+'</p>' for p in rep['answer'])}" if rep['answer'] else '')
-            +(f"<h2>Numbers that frame the week</h2><div class='numbers'>{nums}</div>" if nums else '')
-            +(f"<h2>The plan</h2><table><thead><tr><th>When</th><th>What and why</th><th>Who</th></tr></thead><tbody>{plan}</tbody></table>" if plan else '')
-            +(f"<h2>Questions only you can answer</h2><div class='box'><ol>{qs}</ol></div>" if qs else '')
-            +(f"<h2>Risks</h2><ul class='risks'>{risks}</ul>" if risks else '')
-            +f"<div class='foot'><span>Written from the desks: Today, Money, Deals, Scouts, Win briefs, Pitch Lab. Numbers carry their source; nothing here is submitted or sent.</span><span>pitch.gbaonvo.com</span></div></div></body></html>")
+            f"<div class='band'><p class='kicker'>A Story · Planner · {E(when.strftime('%B %d, %Y').replace(' 0',' '))}</p><h1>{E(rep['title'])}</h1></div><div class='wrap'><p class='q'>You asked: {E(question)}</p>"
+            +(f"<div class='bl'><p>{E(rep['bottom_line'])}</p></div>" if rep['bottom_line'] else '')
+            +(f"<h2>This week</h2><ol class='moves'>{moves}</ol>" if moves else '')
+            +(f"<h2>Decide</h2><table><thead><tr><th>Decision</th><th>Recommended</th><th>Unblocks</th></tr></thead><tbody>{dec}</tbody></table>" if dec else '')
+            +(f"<h2>Numbers</h2><div class='numbers'>{nums}</div>" if nums else '')
+            +(f"<h2>By agent</h2><table><thead><tr><th>Agent</th><th>Result</th><th>Needs you</th></tr></thead><tbody>{agents}</tbody></table>" if agents else '')
+            +(f"<div class='two'>{('<div><h2>Risks</h2><ul>'+risks+'</ul></div>') if risks else '<div></div>'}{('<div><h2>Later</h2><ul>'+later+'</ul></div>') if later else ''}</div>" if risks or later else '')
+            +f"<div class='foot'><span>From every Founder OS desk. Numbers carry their source; nothing is sent or submitted.</span><span>pitch.gbaonvo.com/plans</span></div></div></body></html>")
 
 
 def write_files(rid,page,timeout=120):
@@ -265,12 +295,13 @@ def run(h,request,codex_json):
     try:
         ctx,state=pl.context(rid)
         S=lambda:{'type':'string'}
-        step={'type':'object','additionalProperties':False,'properties':{'when':S(),'what':S(),'why':S(),'owner':{'type':'string','enum':list(OWNERS)},'link':S()},'required':['when','what','why','owner','link']}
-        num={'type':'object','additionalProperties':False,'properties':{'label':S(),'value':S(),'source':S()},'required':['label','value','source']}
-        schema={'type':'object','additionalProperties':False,'properties':{'title':S(),'answer':{'type':'array','items':S()},'plan':{'type':'array','items':step},'numbers':{'type':'array','items':num},
-                'questions_for_bao':{'type':'array','items':S()},'risks':{'type':'array','items':S()}},'required':['title','answer','plan','numbers','questions_for_bao','risks']}
+        own={'type':'string','enum':list(OWNERS)}
+        o=lambda **props:{'type':'object','additionalProperties':False,'properties':props,'required':list(props)}
+        schema=o(title=S(),bottom_line=S(),moves={'type':'array','items':o(what=S(),by=S(),owner=own,why=S())},decisions={'type':'array','items':o(decision=S(),recommend=S(),unblocks=S())},
+                 numbers={'type':'array','items':o(label=S(),value=S(),source=S())},by_agent={'type':'array','items':o(agent=S(),result=S(),needs=S())},risks={'type':'array','items':S()},
+                 later={'type':'array','items':o(what=S(),by=S(),owner=own)})
         prompt=ctx['task']+' Do not use shell, files, web, email or any tool. Return JSON matching the schema.\nCONTEXT:\n'+json.dumps({k:v for k,v in ctx.items() if k!='task'},ensure_ascii=False,default=str)
         data,_=codex_json(h,request,prompt,schema,'plan')
-        r=pl.save(rid,data,state);return {'report':rid,'title':r['title'],'pdf':bool(r['pdf_url']),'plan_steps':len(r['report']['plan'])}
+        r=pl.save(rid,data,state);return {'report':rid,'title':r['title'],'pdf':bool(r['pdf_url']),'moves':len(r['report']['moves']),'decisions':len(r['report']['decisions'])}
     except Exception as e:
         pl.fail(rid,e);raise

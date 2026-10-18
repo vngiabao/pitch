@@ -16,10 +16,13 @@ def request(reason):return {'id':'request-x','request_key':'k-'+reason,'reason':
 
 
 def report():
-    return {'title':'Launch week: five families first','answer':['Five families are waiting. Convert them before anything else.','The Columbus finale is Friday; the deck is ready.'],
-            'plan':[{'when':'Today','what':'Call the five waiting families','why':'First paying families','owner':'Bao','link':'https://pitch.gbaonvo.com/growth'},{'when':'Fri Oct 24','what':'Pitch in Columbus','why':'','owner':'Bao','link':''},{'when':'This week','what':'Finish the gift page','why':'Gift passes need it','owner':'Daniel','link':''},{'when':'Daily','what':'Scouts keep searching','why':'','owner':'nobody','link':''}],
-            'numbers':[{'label':'Open cash programs','value':'5','source':'Today'},{'label':'Deals in play','value':'$4,000','source':'Deals board'}],
-            'questions_for_bao':['What group price for employers?'],'risks':['No measured retention number before Friday']}
+    return {'title':'Convert the five waiting families before Columbus','bottom_line':'Five families are waiting to pay. Convert them this week, then pitch Columbus with a real number. Everything else waits on two decisions only you can make.',
+            'moves':[{'what':'Call the five waiting families','by':'today','owner':'Bao','why':'First paying families'},{'what':'Pitch in Columbus','by':'Fri Oct 24','owner':'Bao','why':''},
+                     {'what':'Finish the gift page','by':'this week','owner':'Daniel','why':'Gift passes need it'},{'what':'Fourth move is dropped','by':'','owner':'Bao','why':''}],
+            'decisions':[{'decision':'What group price for employers?','recommend':'needs your input','unblocks':'Partner proposals'}],
+            'numbers':[{'label':'Open cash programs','value':'5','source':'Today brief'},{'label':'Deals in play','value':'$4,000','source':'Deals board'}],
+            'by_agent':[{'agent':'Investor Scout','result':'7 funds found, check sizes unverified','needs':'Pick which to approach'}],
+            'risks':['No measured retention number before Friday'],'later':[{'what':'Scouts keep searching','by':'daily','owner':'nobody'}]}
 
 
 class PlannerTests(unittest.TestCase):
@@ -40,14 +43,14 @@ class PlannerTests(unittest.TestCase):
         def fake(h,request,prompt,schema,stem,search=False,timeout=900):
             calls.append((stem,search));self.assertIn('Planner for A Story',prompt);self.assertIn(DEFAULT_QUESTION,prompt);return report(),0
         out=planner.run(self.h,request(PLAN_PREFIX+r['id']),fake)
-        self.assertEqual((out['title'],out['plan_steps'],calls),('Launch week: five families first',4,[('plan',False)]))
-        saved=pl.report(r['id']);self.assertEqual(saved['state'],'READY');self.assertEqual(saved['report']['plan'][3]['owner'],'Bao','an unknown owner falls back to Bao')
+        self.assertEqual((out['title'],out['moves'],out['decisions'],calls),('Convert the five waiting families before Columbus',3,1,[('plan',False)]))
+        saved=pl.report(r['id']);self.assertEqual(saved['state'],'READY');self.assertEqual(saved['report']['later'][0]['owner'],'Bao','an unknown owner falls back to Bao')
         page=Path(saved['html_path']).read_text(encoding='utf-8')
         for c in (THEME['navy'],THEME['paper'],THEME['brass']):self.assertIn(c,page)
-        self.assertIn('Brygada 1918',page);self.assertIn('Mona Sans',page);self.assertIn('Call the five waiting families',page);self.assertIn('What group price for employers?',page)
+        self.assertIn('Brygada 1918',page);self.assertIn('Mona Sans',page);self.assertIn('Call the five waiting families',page);self.assertIn('What group price for employers?',page);self.assertNotIn('Fourth move',page,'three moves at most')
         self.assertIsNone(saved['pdf_url'],'PDF rendering is off in tests');self.assertTrue(saved['html_url'])
         lst=pl.reports();self.assertEqual(lst['latest']['id'],r['id']);self.assertFalse(lst['writing'])
-        self.assertEqual(pl.latest_for_brief()['title'],'Launch week: five families first')
+        self.assertEqual(pl.latest_for_brief()['title'],'Convert the five waiting families before Columbus')
 
     def test_failure_is_recorded_not_hidden(self):
         pl=Planner(self.s);r=pl.ask('Why?')
@@ -63,12 +66,20 @@ class PlannerTests(unittest.TestCase):
 
     def test_sources_read_as_desks_not_field_paths(self):
         from founder_os.planner import clean
-        c=clean({'title':'x','answer':['Zero reservations. Sources: state.reservation_drive.counts.reserved, state.today_brief.needs_you.'],'numbers':[{'label':'Open','value':'5','source':'state.growth.channel_math.totals'}]})
-        self.assertEqual(c['answer'][0],'Zero reservations. Sources: Reservation drive, Today brief.');self.assertEqual(c['numbers'][0]['source'],'Channel math')
+        c=clean({'title':'x','bottom_line':'Zero reservations, per state.reservation_drive.counts.reserved.','numbers':[{'label':'Open','value':'5','source':'state.growth.channel_math.totals'}]})
+        self.assertEqual(c['bottom_line'],'Zero reservations, per Reservation drive.');self.assertEqual(c['numbers'][0]['source'],'Channel math')
+
+    def test_every_line_has_a_word_limit(self):
+        from founder_os.planner import clean,words
+        long=' '.join(['word']*80)
+        c=clean({'title':'One two three four five six seven eight nine ten eleven','bottom_line':'First sentence is short. '+long,'moves':[{'what':long,'by':'today','owner':'Bao','why':long}]})
+        self.assertLessEqual(len(c['title'].split()),9);self.assertEqual(c['bottom_line'],'First sentence is short.')
+        self.assertLessEqual(len(c['moves'][0]['what'].split()),16);self.assertTrue(c['moves'][0]['what'].endswith('…'))
+        self.assertEqual(words('Short.',5),'Short.')
 
     def test_render_escapes_and_handles_empty_sections(self):
-        page=render_html({'title':'<b>x</b>','answer':[],'plan':[],'numbers':[],'questions_for_bao':[],'risks':[]},'q <script>',datetime(2026,10,16,tzinfo=ET))
-        self.assertIn('&lt;b&gt;x&lt;/b&gt;',page);self.assertNotIn('<script>',page);self.assertNotIn('The plan',page)
+        page=render_html({'title':'<b>x</b>','bottom_line':'','moves':[],'decisions':[],'numbers':[],'by_agent':[],'risks':[],'later':[]},'q <script>',datetime(2026,10,16,tzinfo=ET))
+        self.assertIn('&lt;b&gt;x&lt;/b&gt;',page);self.assertNotIn('<script>',page);self.assertNotIn('This week',page);self.assertNotIn('By agent',page)
 
 
 if __name__=='__main__':unittest.main()
