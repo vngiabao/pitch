@@ -140,11 +140,13 @@ class ApplicationDrafter:
             (r'\btype of product\b','product_type'),
         ]
         cofounder=(value('cofounder_name') or '').split()
+        # "Co-founder, COO & CTO" -> "COO & CTO": a form's job-title box wants the title, not the founder label.
+        title=lambda role:re.sub(r'^\s*co-?founder\s*[,&]?\s*','',role,flags=re.I).strip() or None if role else None
         derived={
             'company_name':value('company_name'),'website_url':value('website_url'),
             'founder_first_name':value('founder_first_name'),'founder_last_name':value('founder_last_name'),
             'cofounder_first':cofounder[0] if cofounder else None,'cofounder_last':' '.join(cofounder[1:]) if len(cofounder)>1 else None,
-            'founder_title':'COO' if value('founder_role') else None,'cofounder_title':'CEO' if value('cofounder_role') else None,
+            'founder_title':title(value('founder_role')),'cofounder_title':title(value('cofounder_role')),
             'owner_email':'bao@astoryapp.com','cofounder_email':'daniel@astoryapp.com','company_email':'bao@astoryapp.com',
             'incorporated_yes':'Yes' if value('incorporated') else None,'product_in_use':'Yes' if value('product_stage') in ('private_beta','launched','public') else None,
             'country':'United States' if value('us_company') else None,'team_size':value('team_size'),
@@ -224,7 +226,7 @@ class ApplicationDrafter:
                 'owner_sources':owner_sources,'approved_answers':approved,'owner_written_answers':recent_owner,'founder_profile':FounderProfile(self.store).public_values(),'win_brief':self.win_brief(app['opportunity_id']),
                 'writing_guide':guide.read_text(encoding='utf-8')[:9000] if guide.exists() else '',
                 'rules':['Use only the facts, statements, sources and answers given here. Never invent numbers, customers, partners, awards or traction.',
-                         'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Do not mention Nhi Tran except for the Michigan Business Challenge.',
+                         'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO). Do not mention Nhi Tran except for the Michigan Business Challenge.',
                          'Runway: no fixed runway; if a number is required, use 8 months. Bootstrapped from founder money.',
                          'Prices come from the astoryapp.com pricing capture. Stats: 79% want to know more, 37% know their mother\'s life before kids, 74% regret not learning more.',
                          'Stay within each word or character limit. For a choice question, answer with the exact option text.',

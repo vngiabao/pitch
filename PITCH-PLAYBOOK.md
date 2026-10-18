@@ -50,7 +50,7 @@ The order of argument, for any length. Short versions compress; they never reord
 - **Concrete over abstract.** A person, an action, a number or a real screen beats a category label. Avoid "living family documentary" when it hides the actual difference.
 - **Revenue order:** subscription (keeps the story growing), then books (a chapter, not the finish line), then the tier prices.
 - **No prices or "free" on the solution slide.** Prices belong on the business slide only.
-- **Team:** two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Nhi Tran (CMO) appears only in Michigan Business Challenge materials.
+- **Team:** two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO, since October 18, 2026). Nhi Tran (CMO) appears only in Michigan Business Challenge materials.
 - **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. No arrows between those numbers, no conversion rates, never "paying customers".
 - **Product state:** live end to end (calls, family archive, photo uploads, billing), private beta on TestFlight, App Store release in review.
 - **Partners and programs:** NVIDIA Inception, AssemblyAI Startup Program and Cartesia Startups Grant are accepted. Hope College: many students want to preorder A Story or join the mailing list to gift it to their grandparents for Thanksgiving. It is student interest only, never a college partnership.

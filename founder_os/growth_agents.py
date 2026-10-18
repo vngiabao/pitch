@@ -224,7 +224,7 @@ class Growth:
         return {'company_facts':{k:v['value'] for k,v in mem['attributes'].items()},'approved_statements':[{'topic':c['topic'],'text':c['body']} for c in mem['canonical_claims'] if not c['body'].startswith('{')],
                 'pricing':pricing['body'][:6000] if pricing else '','writing_guide':guide.read_text(encoding='utf-8')[:7000] if guide.exists() else '','today':today().isoformat(),
                 'rules':['Use only the facts and statements given here. Never invent numbers, customers, partners, press coverage, awards or traction.',
-                         'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO). Do not mention Nhi Tran.',
+                         'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO). Do not mention Nhi Tran.',
                          'Traction is owner-reported: 50 leads from the first version, 10 families in the private beta, 5 more waiting to join as paying customers. Never call them paying customers.',
                          'Write as Bao, warm and plain, short sentences, normal hyphens, no em dashes, no hype words.',
                          'The owner sends every message himself. Never claim it was sent or promise anything on his behalf.']}
