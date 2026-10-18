@@ -18,9 +18,9 @@ DAY=('MO','TU','WE','TH','FR','SA','SU')
 
 # key, name, group, what it hunts, where it lands (page, label), families (Hunter scouts) or None, focus, schedule (days, hour, minute), reason
 SCOUTS=[
- {'key':'competitions','name':'Competition Scout','group':'Money for the company','hunts':'Pitch competitions, pitch nights and hackathons with cash prizes and open deadlines, big and local.',
-  'lands':('/money#cat-big_pitch','Money map: pitch competitions'),'families':('pitch_competitions','big_pitch_competitions','local_pitch_nights','hackathons'),
-  'focus':'You are the Competition Scout. Only pitch competitions, pitch nights, startup challenges and hackathons with a cash prize count. Open or upcoming deadlines first; Michigan and student-founder events before national ones. Record the prize, the deadline and whether equity is taken.',
+ {'key':'competitions','name':'Competition Scout','group':'Money for the company','hunts':'Pitch competitions, pitch nights, hackathons and AI builder competitions like VibeCon, with cash prizes and open deadlines, big and local.',
+  'lands':('/money#cat-big_pitch','Money map: pitch competitions'),'families':('pitch_competitions','big_pitch_competitions','local_pitch_nights','hackathons','builder_competitions'),
+  'focus':'You are the Competition Scout. Only pitch competitions, pitch nights, startup challenges, hackathons and AI builder or vibe-coding competitions (VibeCon and similar contests run by AI app-building platforms) with a cash prize, credits or investment count; A Story is a shipped consumer AI product, so builder contests that judge a working app fit. Open or upcoming deadlines first; Michigan and student-founder events before national ones. Record the prize, the deadline and whether equity is taken.',
   'days':('MO','TH'),'hour':7,'minute':45},
  {'key':'grants','name':'Grant Scout','group':'Money for the company','hunts':'Non-dilutive grants: foundations, state and federal (SBIR/STTR, MEDC), AgeTech and family-tech programs.',
   'lands':('/money#cat-grants','Money map: grants and SBIR'),'families':('grants','federal_state_grants','agetech','vertical'),
