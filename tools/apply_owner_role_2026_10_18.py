@@ -38,7 +38,8 @@ def main():
         values={r['fact_key']:json.loads(r['value_json']) for r in s.rows('SELECT fact_key,value_json FROM company_fact_values WHERE claim_version_id=?',(cur,))}
         if values.get('founder_role')!=ROLE:
             values['founder_role']=ROLE
-            pv=s.propose_claim('team','Owner-confirmed company profile — October 18, 2026',json.dumps(values,sort_keys=True),'verified',sv,'owner chat, Oct 18 2026: Bao is also CTO',claim_id=PROFILE_CLAIM,last_verified_at=stamp)
+            label=lambda cid:s.one('SELECT label FROM claims WHERE id=?',(cid,))['label']  # a new version keeps its claim's label
+            pv=s.propose_claim('team',label(PROFILE_CLAIM),json.dumps(values,sort_keys=True),'verified',sv,'owner chat, Oct 18 2026: Bao is also CTO',claim_id=PROFILE_CLAIM,last_verified_at=stamp)
             have={r['fact_key'] for r in s.rows('SELECT fact_key FROM company_fact_values WHERE claim_version_id=?',(pv,))}
             for k,v in values.items():
                 if k not in have:h.attach_fact_value(pv,k,v)
@@ -48,7 +49,7 @@ def main():
         if 'COO and CTO' not in body:
             new=body.replace('Bao Vo (COO)','Bao Vo (COO and CTO)',1)
             assert new!=body,'team statement no longer names Bao Vo (COO)'
-            tv=s.propose_claim('team','Founders and roles - confirmed Oct 18, 2026',new,'verified',sv,'owner chat, Oct 18 2026',claim_id=TEAM_CLAIM,last_verified_at=stamp)
+            tv=s.propose_claim('team',s.one('SELECT label FROM claims WHERE id=?',(TEAM_CLAIM,))['label'],new,'verified',sv,'owner chat, Oct 18 2026',claim_id=TEAM_CLAIM,last_verified_at=stamp)
             approve(s,tv,'Owner-confirmed role update')
         mem=h.company_memory()
         print(json.dumps({'backup':str(target),'founder_role':mem['attributes'].get('founder_role',{}).get('value'),'cofounder_role':mem['attributes'].get('cofounder_role',{}).get('value'),
