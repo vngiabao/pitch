@@ -33,6 +33,21 @@ def plain_sources(text):
     return re.sub(r'(Today brief|Win brief|Pitch Lab|Channel math|Campaigns|Deals board|Reservation drive|Families page|Credits page|Scouts|Assumptions|Customer voice|Funding pipeline|Agent activity)(\.[\w]+)+',r'\1',text)
 
 
+AGENT_NAMES=(('Scout: ',None),('Daily free credits discovery','Credits Scout'),('Partner and deal discovery','Partner Scout'),('Press and gift-guide discovery','Press Scout'),
+             ('Win brief','Win Scout'),('Plan report','Planner'),('Campaign plan','Campaign Planner'),('Draft deal note','Deal Drafter'),('Draft follow-up','Follow-up Drafter'),
+             ('Draft press pitch','Press Drafter'),('Draft application','Application Drafter'),('Due program re-verifications','Funding Hunter'),('Scheduled broad discovery','Funding Hunter'),
+             ('Manual broad discovery','Funding Hunter'),('Research opportunity','Funding Hunter'),('Assumption','Assumption Coach'),('Pipeline',''))
+
+
+def agent_name(reason):
+    """The name an agent has on the Scouts page; empty for orchestration jobs that are not an agent of their own."""
+    for prefix,name in AGENT_NAMES:
+        if reason.startswith(prefix):
+            if name is None:return reason[len(prefix):].split(':')[0].strip()+' Scout'
+            return name
+    return reason.split(':')[0][:40]
+
+
 def words(text,cap):
     """Keep a line to cap words: the first sentence when it fits, otherwise the first cap words."""
     t=' '.join(str(text or '').split())
@@ -52,7 +67,7 @@ def clean(data):
             'moves':[{'what':_s(x.get('what'),16),'by':_s(x.get('by'),6),'owner':owner(x),'why':_s(x.get('why'),14)} for x in (data.get('moves') or [])[:3] if _s(x.get('what'))],
             'decisions':[{'decision':_s(x.get('decision'),16),'recommend':_s(x.get('recommend'),14),'unblocks':_s(x.get('unblocks'),10)} for x in (data.get('decisions') or [])[:5] if _s(x.get('decision'))],
             'numbers':[{'label':_s(x.get('label'),6),'value':_s(x.get('value'),5),'source':_s(x.get('source'),5)} for x in (data.get('numbers') or [])[:4] if _s(x.get('label'))],
-            'by_agent':[{'agent':_s(x.get('agent'),4),'result':_s(x.get('result'),14),'needs':_s(x.get('needs'),10)} for x in (data.get('by_agent') or [])[:12] if _s(x.get('agent'))],
+            'by_agent':[{'agent':_s(x.get('agent'),4),'result':_s(x.get('result'),14),'needs':_s(x.get('needs'),10)} for x in (data.get('by_agent') or [])[:10] if _s(x.get('agent'))],
             'risks':[_s(r,16) for r in (data.get('risks') or [])[:3] if _s(r)],
             'later':[{'what':_s(x.get('what'),14),'by':_s(x.get('by'),6),'owner':owner(x)} for x in (data.get('later') or [])[:6] if _s(x.get('what'))]}
 
@@ -141,17 +156,20 @@ class Planner:
         part('found_this_week',found)
         def runs():
             # Every agent job that finished in the last seven days, by agent, with failures named.
-            rows=self.s.rows("SELECT reason,state,last_error,created_at FROM hunter_requests WHERE created_at>=datetime('now','-7 days') ORDER BY created_at DESC LIMIT 200");by={}
+            rows=self.s.rows("SELECT reason,state,last_error,created_at FROM hunter_requests WHERE created_at>=datetime('now','-7 days') ORDER BY created_at DESC LIMIT 300");by={}
             for r in rows:
-                agent=r['reason'].split(':')[0] if ':' in r['reason'] else r['reason'];a=by.setdefault(agent,{'agent':agent,'runs':0,'complete':0,'queued':0,'failed':0,'last':None})
+                agent=agent_name(r['reason'])
+                if not agent:continue
+                a=by.setdefault(agent,{'agent':agent,'runs':0,'complete':0,'queued':0,'failed':0,'last':None})
                 a['runs']+=1;a['last']=a['last'] or r['created_at']
                 if r['state']=='COMPLETE':a['complete']+=1
                 elif r['state'] in ('QUEUED','RUNNING'):a['queued']+=1
                 elif r['last_error']:a['failed']+=1
             words_for={'TAILOR':'Pitch Tailor','FACT_GUARD':'Fact Guard','VOICE':"Bao's Voice",'COACH':'Pitch Coach','FORMAT':'Format Check','BUILDER':'Edition Builder','SLIDE_QA':'Slide QA','LEARNER':'Outcome Learner'}
             for r in self.s.rows("SELECT agent,verdict,created_at FROM work_reviews WHERE created_at>=datetime('now','-7 days') AND agent!='OWNER' ORDER BY created_at DESC"):
-                name='Pitch Lab: '+words_for.get(r['agent'],r['agent'].title());a=by.setdefault(name,{'agent':name,'runs':0,'complete':0,'queued':0,'failed':0,'last':None,'verdicts':{}})
-                a['runs']+=1;a['complete']+=1;a['last']=a['last'] or r['created_at'];a['verdicts'][r['verdict']]=a['verdicts'].get(r['verdict'],0)+1
+                name='Pitch Lab';a=by.setdefault(name,{'agent':name,'runs':0,'complete':0,'queued':0,'failed':0,'last':None,'by_step':{}})
+                step=words_for.get(r['agent'],r['agent'].title());a['runs']+=1;a['complete']+=1;a['last']=a['last'] or r['created_at']
+                a['by_step'].setdefault(step,{});a['by_step'][step][r['verdict']]=a['by_step'][step].get(r['verdict'],0)+1
             return sorted(by.values(),key=lambda a:-a['runs'])
         part('agent_runs',runs)
         state['gather_errors']=errors
@@ -220,12 +238,12 @@ class Planner:
                         'Hard limits. title: up to 9 words, states the conclusion, not the topic. bottom_line: the answer in 1 or 2 sentences, up to 45 words, conclusion first. '
                         'moves: the 3 things that matter most this week, each one action of up to 16 words that starts with a verb, with by (a date or "today", up to 6 words), owner (Bao, Daniel or agents) and why (up to 14 words). '
                         'decisions: up to 5 decisions only Bao can make, ordered by how much work each unblocks; each a question of up to 16 words; recommend is the option you would pick from the evidence in up to 14 words, or "needs your input" when CONTEXT gives no basis; unblocks says what moves once decided, up to 10 words. Merge related asks into one decision and never ask for the same fact twice; already_asked_of_bao lists what the agents have asked. '
-                        'numbers: up to 4 figures that change a decision, value short, source named as a desk. '
-                        'by_agent: fill only when the question asks about agents or the week\'s work; one row per agent from agent_runs and the desks, result is what it produced in up to 14 words with counts, needs is what it needs from Bao in up to 10 words or empty. '
+                        'numbers: up to 4 figures that change a decision, value short, source named as a desk; leave out anything not recorded rather than showing it as a number. '
+                        'by_agent: fill only when the question asks about agents or the week\'s work; at most 10 rows, agents that need Bao first; one row per agent named as in agent_runs (Pitch Lab is one row covering Tailor, Fact Guard, Voice, Coach, Builder and Slide QA); result is what it produced in up to 14 words with counts, taking what each scout found from CONTEXT.state.scouts; needs is what it needs from Bao in up to 10 words or empty. '
                         'risks: up to 3, each up to 16 words. later: up to 6 further moves, short. '
                         'Write like a chief of staff talking: plain words, short sentences, no staging ("not X but Y", "here is the thing"), no triads for rhythm, no stacked hedges, no em dashes. '
                         'Name sources as desks (Today brief, Deals board, Win brief for Columbus, Pitch Lab, Channel math), never as field paths or "state.". '
-                        'When a check has no record, write "not recorded", never "did not run". Never invent a program, a number, a person or a date.')},state
+                        'Address Bao as you. When desks disagree, trust the more specific check (a Pitch Lab review over a Today brief count) and say which. When a check has no record, write "not recorded", never "did not run". Never invent a program, a number, a person or a date.')},state
 
 
 def render_html(rep,question,when):
