@@ -1,0 +1,73 @@
+{
+ "v": 4,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-15T05:20:00Z"
+ },
+ "lists": "css",
+ "title": "A Story - Pitch Deck (Oct 2026)",
+ "order": [
+  "cover",
+  "legacy-gap",
+  "parents-met",
+  "retelling",
+  "never-forget",
+  "want-to-know",
+  "missing-moment",
+  "todays-options",
+  "blank-page",
+  "meet-a-story",
+  "every-narrator",
+  "the-everyday",
+  "living-memory",
+  "why-now",
+  "traction",
+  "business",
+  "market",
+  "competition",
+  "next-90",
+  "team",
+  "close",
+  "a1-economics",
+  "a2-competitors",
+  "a3-sources"
+ ],
+ "cover": "cover",
+ "sections": {
+  "story": {
+   "description": "The legacy gap in four parts: two dates and a folder of photos, stories lost in the retelling, families missing the moment, and options that keep pieces, not the story",
+   "start": "cover"
+  },
+  "product": {
+   "description": "A Story: an AI biographer that calls, remembers, lets every relative add their part, and never assumes the story is finished",
+   "start": "meet-a-story"
+  },
+  "proof": {
+   "description": "Why now, and what is already built and wanted",
+   "start": "why-now"
+  },
+  "business": {
+   "description": "How families pay, how big it can get, and how we win against guided-call products",
+   "start": "business"
+  },
+  "plan": {
+   "description": "The next 90 days, the team, and the close",
+   "start": "next-90"
+  },
+  "appendix": {
+   "description": "Appendix: modeled economics, competitor evidence and sources",
+   "start": "a1-economics"
+  }
+ },
+ "faces": {
+  "montserrat": {
+   "family": "Montserrat",
+   "href": "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..800;1,400..800&display=swap"
+  },
+  "source-serif-4": {
+   "family": "Source Serif 4",
+   "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300..700;1,300..700&display=swap"
+  }
+ },
+ "designSystems": []
+}
