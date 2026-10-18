@@ -18,8 +18,9 @@ PLAN_PREFIX='Plan report: '
 DEFAULT_QUESTION='Where are we this week, what should I do first, and what do you need from me?'
 OWNERS=('Bao','Daniel','agents')
 SCHEMA='CREATE TABLE IF NOT EXISTS planner_reports(id TEXT PRIMARY KEY,question TEXT NOT NULL,state TEXT NOT NULL,title TEXT,report_json TEXT,html_path TEXT,pdf_path TEXT,error TEXT,auto INTEGER NOT NULL DEFAULT 0,week TEXT,created_at TEXT NOT NULL,finished_at TEXT);'
-# Bao's identity for everything hosted on gbaonvo: The Turn.
-THEME={'navy':'#00274c','navy2':'#0d3a66','ink':'#1b2733','paper':'#f5f1e8','paper2':'#ede6d8','soft':'#fbf9f4','stone':'#d9d0bf','muted':'#5c6670','brass':'#b58420','brass_text':'#7a5612','maize':'#e8c064','maize_wash':'#f6ecd0','urgent':'#8c3a22','good':'#2f6b4a'}
+# Bao's Project Reboot identity (Project Reboot/src/tokens.css): cool letter paper, Prussian blue, honey gold, ribbon red, emerald.
+THEME={'navy':'#172c49','navy2':'#23467a','ink':'#1f2a44','paper':'#edf1f7','paper2':'#e1e7f0','soft':'#faf9f6','stone':'#cbd4e1','muted':'#5b6377','brass':'#c9a15a','brass_text':'#7f5d1b','maize':'#e2c07f','maize_wash':'#f7efdc','urgent':'#a8323e','good':'#1f6b57','cover_muted':'#c3d2e6'}
+SERIF="'Cormorant Garamond',Georgia,serif";SANS="'Source Sans 3','Helvetica Neue',Arial,sans-serif"
 
 
 # The model sees the desks as CONTEXT.state keys; Bao reads desk names.
@@ -249,16 +250,16 @@ class Planner:
 def render_html(rep,question,when):
     E=lambda s:html.escape(str(s or ''),quote=False);T=THEME;fonts=(ROOT/'founder_os'/'ui'/'fonts')
     face=lambda name,file,weight:f"@font-face{{font-family:'{name}';src:url('{(fonts/file).as_uri()}') format('woff2');font-weight:{weight}}}"
-    css=f"""{face('Mona Sans','mona-sans.woff2','200 900')}{face('Brygada 1918','brygada-1918.woff2','400 700')}
+    css=f"""{face('Source Sans 3','reboot/source-sans-3-latin-400-normal.woff2','400')}{face('Source Sans 3','reboot/source-sans-3-latin-600-normal.woff2','600 700')}{face('Cormorant Garamond','reboot/cormorant-garamond-latin-500-normal.woff2','400 500')}{face('Cormorant Garamond','reboot/cormorant-garamond-latin-600-normal.woff2','600 700')}
 @page{{size:Letter;margin:0.5in 0.55in 0.6in}}*{{box-sizing:border-box}}
-body{{margin:0;background:{T['paper']};color:{T['ink']};font-family:'Mona Sans','Helvetica Neue',Arial,sans-serif;font-size:10.5pt;line-height:1.45}}
-.band{{background:{T['navy']};color:{T['paper']};padding:18px 26px 16px;border-bottom:4px solid {T['brass']}}}
+body{{margin:0;background:{T['paper']};color:{T['ink']};font-family:{SANS};font-size:10.5pt;line-height:1.45}}
+.band{{background:linear-gradient(135deg,{T['navy']},{T['navy2']});color:{T['paper']};padding:18px 26px 16px;border-bottom:4px solid {T['brass']}}}
 .kicker{{font-size:8.5pt;letter-spacing:.14em;text-transform:uppercase;color:{T['maize']};margin:0 0 5px}}
-.band h1{{font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:21pt;line-height:1.15;margin:0;letter-spacing:-.01em}}
+.band h1{{font-family:{SERIF};font-weight:600;font-size:25pt;line-height:1.1;margin:0;letter-spacing:-.01em}}
 .wrap{{padding:16px 26px 20px}}
 .q{{font-size:9pt;color:{T['muted']};margin:0 0 12px}}
 .bl{{background:{T['maize_wash']};border-left:5px solid {T['brass']};border-radius:0 8px 8px 0;padding:12px 16px;margin:0 0 16px}}
-.bl p{{font-family:'Brygada 1918',Georgia,serif;font-size:14pt;line-height:1.35;margin:0;color:{T['navy']}}}
+.bl p{{font-family:{SERIF};font-weight:500;font-size:16pt;line-height:1.3;margin:0;color:{T['navy']}}}
 h2{{font-size:8.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:{T['brass_text']};margin:16px 0 8px}}
 ol.moves{{list-style:none;margin:0;padding:0;counter-reset:m}}
 ol.moves li{{counter-increment:m;display:grid;grid-template-columns:28px 1fr;gap:2px 10px;padding:8px 0;border-bottom:1px solid {T['stone']}}}
@@ -270,7 +271,7 @@ td{{padding:6px 8px;border-bottom:1px solid {T['stone']};vertical-align:top}}
 td.rec{{color:{T['brass_text']};font-weight:600}}td.agent{{white-space:nowrap;font-weight:600}}td.small{{color:{T['muted']}}}
 .numbers{{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}}
 .num{{background:{T['soft']};border:1px solid {T['stone']};border-radius:8px;padding:8px 10px}}
-.num b{{display:block;font-family:'Brygada 1918',Georgia,serif;font-weight:400;font-size:16pt;color:{T['navy']};line-height:1.1}}
+.num b{{display:block;font-family:{SERIF};font-weight:600;font-size:19pt;color:{T['navy']};line-height:1.1}}
 .num span{{font-size:8.5pt;color:{T['muted']}}}
 .two{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}
 .two ul{{margin:0;padding-left:16px;font-size:9.5pt}}.two li{{margin:0 0 4px}}

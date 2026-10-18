@@ -47,7 +47,7 @@ class PlannerTests(unittest.TestCase):
         saved=pl.report(r['id']);self.assertEqual(saved['state'],'READY');self.assertEqual(saved['report']['later'][0]['owner'],'Bao','an unknown owner falls back to Bao')
         page=Path(saved['html_path']).read_text(encoding='utf-8')
         for c in (THEME['navy'],THEME['paper'],THEME['brass']):self.assertIn(c,page)
-        self.assertIn('Brygada 1918',page);self.assertIn('Mona Sans',page);self.assertIn('Call the five waiting families',page);self.assertIn('What group price for employers?',page);self.assertNotIn('Fourth move',page,'three moves at most')
+        self.assertIn('Cormorant Garamond',page);self.assertIn('Source Sans 3',page);self.assertIn('Call the five waiting families',page);self.assertIn('What group price for employers?',page);self.assertNotIn('Fourth move',page,'three moves at most')
         self.assertIsNone(saved['pdf_url'],'PDF rendering is off in tests');self.assertTrue(saved['html_url'])
         lst=pl.reports();self.assertEqual(lst['latest']['id'],r['id']);self.assertFalse(lst['writing'])
         self.assertEqual(pl.latest_for_brief()['title'],'Convert the five waiting families before Columbus')
