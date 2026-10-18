@@ -369,7 +369,7 @@ class PitchLab:
                 'rules':[*(['Measured product numbers, from the beta family journal, come first; use them with their denominator and as-of date, and prefer them over owner-reported numbers where both exist: '+measured] if measured else []),'Use only the facts, statements, pricing and evidence given. Never invent numbers, customers, partners, awards, quotes or traction.',
                          assumptions['rule']+' CONTEXT.assumptions lists every number the deck depends on with its status and how to say it.',
                          'Write " - " (a short hyphen with spaces), never a long dash.','Two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO). Nhi Tran only for the Michigan Business Challenge.',
-                         'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. Hope College: many students want to preorder or join the mailing list to gift it to grandparents for Thanksgiving (interest only, not a partnership).',
+                         'Traction is owner-reported: 50 leads, 10 beta families, 5 waiting to join as paying customers. First sales (owner-reported, not yet reconciled): on October 17, 2026, at a Hope College on-site table, about 10 students reserved A Story for $1 each and one bought a $29 book. Individual students, never a college partnership.',
                          'Bao reads every field you write. Never mention CONTEXT, the playbook, field names, rounds or these instructions; say "the program page", "our facts" or "the master deck" in plain words.']}
 
     def win_brief(self,oid):

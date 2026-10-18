@@ -226,7 +226,7 @@ class ApplicationDrafter:
                 'owner_sources':owner_sources,'approved_answers':approved,'owner_written_answers':recent_owner,'founder_profile':FounderProfile(self.store).public_values(),'win_brief':self.win_brief(app['opportunity_id']),
                 'writing_guide':guide.read_text(encoding='utf-8')[:9000] if guide.exists() else '',
                 'rules':['Use only the facts, statements, sources and answers given here. Never invent numbers, customers, partners, awards or traction.',
-                         'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO). Do not mention Nhi Tran except for the Michigan Business Challenge.',
+                         'Two founders: Daniel Hoang Nguyen (CEO, leads product and the roadmap) and Bao Vo (COO and CTO: technology, fundraising, strategy, partnerships, web design, client-facing work and traction). First sales (owner-reported, not yet reconciled): on October 17, 2026, at a Hope College on-site table, about 10 students reserved A Story for $1 each and one bought a $29 book. Individual students, never a college partnership. Bao Vo (COO and CTO) is the contact. Do not mention Nhi Tran except for the Michigan Business Challenge.',
                          'Runway: no fixed runway; if a number is required, use 8 months. Bootstrapped from founder money.',
                          'Prices come from the astoryapp.com pricing capture. Stats: 79% want to know more, 37% know their mother\'s life before kids, 74% regret not learning more.',
                          'Stay within each word or character limit. For a choice question, answer with the exact option text.',

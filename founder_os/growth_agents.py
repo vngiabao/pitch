@@ -225,7 +225,7 @@ class Growth:
                 'pricing':pricing['body'][:6000] if pricing else '','writing_guide':guide.read_text(encoding='utf-8')[:7000] if guide.exists() else '','today':today().isoformat(),
                 'rules':['Use only the facts and statements given here. Never invent numbers, customers, partners, press coverage, awards or traction.',
                          'Two founders: Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO). Do not mention Nhi Tran.',
-                         'Traction is owner-reported: 50 leads from the first version, 10 families in the private beta, 5 more waiting to join as paying customers. Never call them paying customers.',
+                         'Traction is owner-reported: 50 leads from the first version, 10 families in the private beta, 5 more waiting to join as paying customers; never call those five paying customers. First sales (owner-reported, not yet reconciled): on October 17, 2026, at a Hope College on-site table, about 10 students reserved A Story for $1 each and one bought a $29 book. Individual students, never a college partnership. Bao (COO and CTO) runs partnerships, client-facing work and traction.',
                          'Write as Bao, warm and plain, short sentences, normal hyphens, no em dashes, no hype words.',
                          'The owner sends every message himself. Never claim it was sent or promise anything on his behalf.']}
 

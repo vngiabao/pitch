@@ -50,10 +50,11 @@ The order of argument, for any length. Short versions compress; they never reord
 - **Concrete over abstract.** A person, an action, a number or a real screen beats a category label. Avoid "living family documentary" when it hides the actual difference.
 - **Revenue order:** subscription (keeps the story growing), then books (a chapter, not the finish line), then the tier prices.
 - **No prices or "free" on the solution slide.** Prices belong on the business slide only.
-- **Team:** two founders, Daniel Hoang Nguyen (CEO) and Bao Vo (COO and CTO, since October 18, 2026). Nhi Tran (CMO) appears only in Michigan Business Challenge materials.
-- **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. No arrows between those numbers, no conversion rates, never "paying customers".
+- **Team:** two founders. Daniel Hoang Nguyen (CEO) leads product and the product roadmap. Bao Vo (COO and CTO, since October 18, 2026) leads technology, fundraising and strategy, and runs all partnerships, web design, client-facing work and traction. Nhi Tran (CMO) appears only in Michigan Business Challenge materials.
+- **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. No arrows between those numbers, no conversion rates, never call the five "paying customers".
+- **First sales (October 17, 2026, owner-reported, not yet reconciled):** at a Hope College on-site table, about 10 students reserved A Story for $1 each and one bought a $29 book. Say "about 10" and "first sales"; never round up, never call it a partnership.
 - **Product state:** live end to end (calls, family archive, photo uploads, billing), private beta on TestFlight, App Store release in review.
-- **Partners and programs:** NVIDIA Inception, AssemblyAI Startup Program and Cartesia Startups Grant are accepted. Hope College: many students want to preorder A Story or join the mailing list to gift it to their grandparents for Thanksgiving. It is student interest only, never a college partnership.
+- **Partners and programs:** NVIDIA Inception, AssemblyAI Startup Program and Cartesia Startups Grant are accepted. Hope College: students reserved and bought on October 17 (see First sales). They are individual students, never a college partnership.
 - **Write " - " (spaced short hyphen), never an em dash.** En dashes are fine in number ranges (7–10 minutes).
 - **No placeholders, internal notes, "illustrative" labels or photo disclaimers on slides.** Unknowns go in speaker notes.
 - **Urgency without fear.** Calm, warm and plain. No hype words, no "revolutionary", no "it's not X, it's Y" drama.
