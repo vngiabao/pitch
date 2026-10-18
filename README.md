@@ -1,6 +1,6 @@
 # A Story Founder OS: Funding Hunter and Application Pilot
 
-Owner website: https://pitch.gbaonvo.com - sign in with Google as gbao.n.vo@gmail.com. The full OS connects through Cloudflare Tunnel to this Windows PC; keep the PC awake, online and signed in. Automatic restart checks run at sign-in and every five minutes. See [deployment setup](deploy/README.md). The GitHub repository and recovery snapshot must stay private.
+Owner website: https://pitch.gbaonvo.com - sign in with Google as gbao.n.vo@gmail.com. The full OS connects through Cloudflare Tunnel to this Windows PC; keep the PC awake, online and signed in. Automatic restart checks run at sign-in and every five minutes. See [deployment setup](deploy/README.md). The application source is public. Keep operational databases, company materials, credentials, and recovery snapshots private. A read-only demonstration with synthetic data is available in [the project showcase](https://github.com/vngiabao/project-showcase/tree/main/founder-os).
 
 Both workers extend this existing Founder OS and share `data/founder.sqlite` with company memory, applications, Answer Bank, pitches, sources, approvals and frozen submissions. Original OneDrive files remain unchanged at their original paths.
 
