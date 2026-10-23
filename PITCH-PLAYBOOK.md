@@ -1,8 +1,8 @@
 # A Story pitch playbook
 
-The standard every A Story pitch, deck and tailored version must meet. The quality bar is the Michigan Business Challenge 3-slide deck of October 14, 2026 (https://claude.ai/artifact/PgnB9KSionF1AVm5EdPF4c). Bao built it over 59 rounds of direct feedback. Pitch Tailor and Pitch Coach read this file before every run. Where this file and an older deck disagree, this file wins. Where this file and approved company facts disagree, the facts win.
+The standard every A Story pitch, deck and tailored version must meet. The quality bar is the Michigan Business Challenge 3-slide deck (https://claude.ai/artifact/PgnB9KSionF1AVm5EdPF4c), built over many rounds of Bao's direct feedback and revised on October 23, 2026 after judge feedback (section 3). Pitch Tailor and Pitch Coach read this file before every run. Where this file and an older deck disagree, this file wins. Where this file and approved company facts disagree, the facts win.
 
-**The core pitch deck** (approved by Bao on October 15, 2026) is at https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN. It has 21 main slides plus 3 appendix slides. A frozen copy of every slide is in `seed-data/core-deck-2026-10-18/`, and the titles and speaker notes the agents read are in `seed-data/master-deck-2026-10.json`. Every program edition is cut from this deck; never redesign its slides for an edition.
+**The core pitch deck** (approved by Bao on October 15, 2026) is at https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN. It has 21 main slides plus 3 appendix slides. A frozen copy of every slide is in `seed-data/core-deck-2026-10-23/`, and the titles and speaker notes the agents read are in `seed-data/master-deck-2026-10.json`. Every program edition is cut from this deck; never redesign its slides for an edition.
 
 Contents: 1. What the pitch must make a judge understand · 2. The story spine · 3. Content rules · 4. Evidence guardrails · 5. Design system · 6. Slide patterns · 7. What Bao has rejected · 8. Tailoring to a competition · 9. Coaching lens · 10. Pre-flight checklist
 
@@ -14,8 +14,8 @@ In order, and nothing else first:
 
 1. **The legacy gap.** A whole life ends up as two dates and a folder of photos. What a person chose, believed, regretted and loved survives only in the stories someone keeps. Every retelling changes the story.
 2. **Families care - they just keep missing the moment.** 79% of U.S. adults want to know more about their parents' lives before parenthood. Only 37% know their mother's. 74% regret not learning more about relatives who have died. The question comes at midnight, and Mom is three time zones away.
-3. **Today's options keep pieces, not the story.** Albums keep faces and lose the voice. Memoir services like Storyworth turn a gift into weekly homework, and when the book is done, so is the story.
-4. **A Story is an AI biographer that calls your loved ones** and helps them tell their stories in their own voice. A scheduled call, a real conversation, kept as a memory, and the memory shapes the next call.
+3. **Today's options keep pieces, not the story.** Photo albums: the faces stay, the stories fade. Memoir services like Storyworth: a one-time project. Book done, story over.
+4. **A Story is an AI biographer that calls you and your loved ones and tells your stories in your own voice.** It calls, it listens, it saves, it recalls - and each memory shapes the next call. That loop is the habit.
 5. **Rome wasn't built in one day. Or by one person.** Relatives add photos, corrections and their own version of the same day. Each version stays side by side and credited. One autobiography grows into a documentary of a life.
 6. **It never assumes the story is finished. Today is part of it too.** This is the mission: the everyday, not only the past.
 7. **It works, families want it, and we know the next proof.** The product is live end to end. 50 leads, 10 beta families, 5 waiting to join as paying customers. Next: prove that families come back.
@@ -35,16 +35,17 @@ The order of argument, for any length. Short versions compress; they never reord
 | Why they don't ask | The behavioral cause | Not knowing where to start · the urge hits at the wrong time · distance |
 | Today's options | The consequence of current solutions | "They keep pieces, not the story." |
 | Urgency | Why it can't wait. Weave it into the beats above; it is not a separate lecture. | America is aging: 11,200 Americans turn 65 every day. 1 in 5 have no extended family within an hour. |
-| Meet A Story | Product, shown working | "An AI biographer that calls your loved ones and helps them tell their stories in their own voice." |
+| Meet A Story | Product, shown working as a left-to-right flow | "An AI biographer that calls you and your loved ones and tells your stories in your own voice." · "Each memory shapes the next call - A Habit." |
 | Collaborative storytelling | The differentiator | "Rome wasn't built in one day. Or by one person." |
 | The everyday | Mission and expansion | "It never assumes the story is finished. Today is part of it too." |
-| Proof | Traction and what's live | "Built with families. Ready to prove retention." |
+| Proof | Traction and what's live | "Our MVP is fully functional. Families are already using it." |
 | Business | Subscription, then books, then tiers | "The book is a chapter, not the finish line." |
 | Next | The proof the money buys | "We've built the product. Now we're proving families continue the story." |
 | Close | The line to remember | "So that 'I meant to ask' doesn't become 'I wish I had.'" |
 
 ## 3. Content rules
 
+- **Judges read each slide in about 35-45 seconds** (MBC judge feedback, October 23, 2026: the product slide was "very hard to follow"). Cut words, make type bigger, and never put text on a slide for everything said aloud. Show a process as a horizontal flow chart with one picture per step.
 - **Bao's script is the source of truth for wording.** Adapt length; do not replace his sentences with new slogans. Never import a narrative device from a reference deck (for example a borrowed persona such as "Meet Jamie") unless he asks for it.
 - **One idea per slide, and every element serves it.** If a block isn't required by the competition or the argument, cut it ("did they ask for the next proof part?").
 - **Concrete over abstract.** A person, an action, a number or a real screen beats a category label. Avoid "living family documentary" when it hides the actual difference.
@@ -149,9 +150,9 @@ Decks get read alone: in an application portal, a forwarded PDF, an investor's i
 | 80-year timeline with four values (chose, believed, regretted, loved) | MBC slide 1, top left | Opening the problem |
 | Decay row: Grandma 1958 → Mom 1990 → You 2026 → Your kids | MBC slide 1, bottom left | Showing word of mouth fails |
 | Teal "They want to know" stat panel (37%, 74%, 1 in 5) plus "So why don't they ask?" | MBC slide 1, right | Demand |
-| Today's options as Keep / Miss pairs | MBC slide 1, bottom right | Competition in one glance |
-| Four numbered steps beside a tilted phone in a gold oval, with feature cards on gold dot-leaders | MBC slide 2 | Product |
-| "One summer, three voices" strip | MBC slide 2, bottom | Collaborative storytelling |
+| Today's options as the loss only ("The faces stay. The stories fade." · "A one-time project. Book done, story over.") | MBC slide 1, bottom right | Competition in one glance |
+| Horizontal flow: 01 It calls → 02 It listens → 03 It saves → 04 It recalls, a real app screen under each, a loop back labelled "Each memory shapes the next call - A Habit", and the tilted phone plus book at the right ("Any branch, in print") | MBC slide 2 (Oct 23), core slide 10 | Product |
+| "One family vacation, 6 voices" strip: one card each for photos, a video and a voice message | MBC slide 2, bottom | Collaborative storytelling |
 | Traction panel with 50 / 10 / 5 | MBC slide 3 | Proof |
 | Subscription card (teal) above the books card (cream) | MBC slide 3 | Business model |
 | Habit math (66 days vs about 10 weekly tries) | General deck "the gap" | Why memoir apps stall |
@@ -170,6 +171,8 @@ Decks get read alone: in an application portal, a forwarded PDF, an investor's i
 - Photo disclaimers, "illustrative" labels, page-count claims about the book, war-era framing ("we're not selling to Vietnam War veterans").
 - Moving the strong why-now slides into the appendix.
 - Bottom footer lines; page numbers anywhere except the bottom right.
+- A product slide built as a column of feature cards beside step tiles: judges found it very hard to follow. Use the horizontal flow.
+- "Keep" lines in Today's options: show only what families lose.
 
 ## 8. Tailoring to a competition (Pitch Tailor)
 

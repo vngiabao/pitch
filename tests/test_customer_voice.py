@@ -75,19 +75,19 @@ class CustomerVoiceTests(unittest.TestCase):
 
     def test_fact_guard_blocks_thread_counts_unless_quoted_with_the_source(self):
         lab=PitchLab(self.s);g=FactGuard(lab,'Voice Prize')
-        bare=g.check([{'key':'problem','text':'17 of 63 threads on r/AgingParents voiced regret.'}],'PITCH_EDITION')
+        bare=g.check([{'key':'problem','text':'41 of 63 threads on r/AgingParents voiced regret.'}],'PITCH_EDITION')
         self.assertEqual([i['rule'] for i in bare['issues']],['unverified_number','unverified_number'],'before the scout has run, any such count is blocked')
         CustomerVoice(self.s).save(report());g=FactGuard(lab,'Voice Prize')
-        bare=g.check([{'key':'problem','text':'17 of 63 threads on r/AgingParents voiced regret.'}],'PITCH_EDITION')
+        bare=g.check([{'key':'problem','text':'41 of 63 threads on r/AgingParents voiced regret.'}],'PITCH_EDITION')
         self.assertEqual(bare['blocking'],2);self.assertIn('inside a quotation with the thread’s URL',bare['issues'][0]['text'])
-        quoted=g.check([{'key':'problem','text':'One caregiver wrote “17 of 63 threads here are people who waited too long” ('+URL+').'}],'PITCH_EDITION')
+        quoted=g.check([{'key':'problem','text':'One caregiver wrote “41 of 63 threads here are people who waited too long” ('+URL+').'}],'PITCH_EDITION')
         self.assertEqual(quoted['blocking'],0);self.assertEqual([i['rule'] for i in quoted['issues']],['cited','cited'])
-        no_source=g.check([{'key':'problem','text':'One caregiver wrote “17 of 63 threads here are people who waited too long”.'}],'PITCH_EDITION')
+        no_source=g.check([{'key':'problem','text':'One caregiver wrote “41 of 63 threads here are people who waited too long”.'}],'PITCH_EDITION')
         self.assertEqual(no_source['blocking'],2,'a quotation without its URL is still blocked')
-        wrong_source=g.check([{'key':'problem','text':'“17 threads” (https://example.org/not-a-source)'}],'PITCH_EDITION')
+        wrong_source=g.check([{'key':'problem','text':'“41 threads” (https://example.org/not-a-source)'}],'PITCH_EDITION')
         self.assertEqual(wrong_source['blocking'],1)
-        self.assertTrue(cited("“17 threads” "+URL,"17",[URL]));self.assertFalse(cited("17 threads "+URL,"17",[URL]));self.assertFalse(cited("“17 threads”","17",[]))
-        still=g.check([{'key':'traction','text':'We have 17 paying customers.'}],'PITCH_EDITION')
+        self.assertTrue(cited("“41 threads” "+URL,"41",[URL]));self.assertFalse(cited("41 threads "+URL,"41",[URL]));self.assertFalse(cited("“41 threads”","41",[]))
+        still=g.check([{'key':'traction','text':'We have 41 paying customers.'}],'PITCH_EDITION')
         self.assertTrue(any(i['rule']=='unverified_number' for i in still['issues']),'a bare number about A Story is never licensed by the scout')
 
     def test_scheduled_thursday_and_on_request_from_the_scouts_page(self):

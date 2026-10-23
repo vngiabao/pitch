@@ -1,7 +1,7 @@
 {
  "deck": "A Story - Pitch Deck (Oct 2026)",
  "url": "https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN",
- "captured": "2026-10-15",
+ "captured": "2026-10-23",
  "slides": [
   {
    "id": "cover",
@@ -9,7 +9,7 @@
    "title": "A Story - Family stories, in the voices that lived them.",
    "seconds": 20,
    "appendix": false,
-   "spoken": "Your loved ones have stories to tell in their own voice. We’re A Story. We build an AI biographer that calls them and helps them tell those stories. The whole family can add their part. Today I’ll show you why families keep losing these stories and what we built. I’ll share what’s already working and the proof we’re going after next. A Story is a member of NVIDIA Inception and the AssemblyAI Startup Program. We’re also a Cartesia Startups Grant recipient."
+   "spoken": "Your loved ones have stories to tell in their own voice. We’re A Story. We build an AI biographer that calls you and your loved ones and tells your stories in your own voice. The whole family can add their part. Today I’ll show you why families keep losing these stories and what we built. I’ll share what’s already working and the proof we’re going after next. A Story is a member of NVIDIA Inception and the AssemblyAI Startup Program. We’re also a Cartesia Startups Grant recipient."
   },
   {
    "id": "legacy-gap",
@@ -65,7 +65,7 @@
    "title": "They keep pieces, not the story",
    "seconds": 45,
    "appendix": false,
-   "spoken": "Most current options fall into two categories: photo albums and memoir services. Albums keep the pictures. They lose the life behind them. Memoir services like Storyworth send weekly prompts that lead to a physical keepsake. What’s supposed to be a meaningful gift turns into homework for the parents. Habit research found a median of 66 days of daily repetition. Weekly prompts allow only about ten attempts in that time. Many only get through the first few before life gets busy and they stop. Once the book is printed, the purpose is gone. The book ends. Everyday life keeps going. That’s where most of a life’s stories happen. Source: Lally et al. 2010."
+   "spoken": "Most current options fall into two categories: photo albums and memoir services. Albums keep the pictures. The faces stay, and the stories fade. Memoir services like Storyworth send weekly prompts that lead to a physical keepsake. What’s supposed to be a meaningful gift turns into homework for the parents. It’s a one-time project. Book done, story over. Habit research found a median of 66 days of daily repetition. Weekly prompts allow only about ten attempts in that time. Many only get through the first few before life gets busy and they stop. Once the book is printed, the purpose is gone. The book ends. Everyday life keeps going. That’s where most of a life’s stories happen. Source: Lally et al. 2010."
   },
   {
    "id": "blank-page",
@@ -78,10 +78,10 @@
   {
    "id": "meet-a-story",
    "section": "product",
-   "title": "Meet A Story: an AI biographer that calls your loved ones",
+   "title": "Meet A Story: an AI biographer that calls you and your loved ones",
    "seconds": 50,
    "appendix": false,
-   "spoken": "Most people will never write an autobiography. Their lives aren’t empty. Trying to piece together a whole life from a blank page is an overwhelming place to begin. Your loved ones can tell their stories in their own voice over the phone. A Story is the AI biographer that calls them and helps them do that. The phone rings at the time they picked. They answer and talk. A Story asks the questions and listens to what they actually say. It follows the conversation instead of a fixed script. After each call, A Story keeps the original voice and transcript. It turns what they shared into a memory the family can revisit. That memory connects to the photos and letters around it, and to the people and dates. The interviewer remembers what’s already been shared. It picks up unfinished stories and lets each memory shape the next conversation. Their life is kept a little at a time, while they’re still living it. Calls and the archive are live today. So are photo uploads and billing. The home screen shows Rose, the example family in the app."
+   "spoken": "Meet A Story, an AI biographer that calls you and your loved ones and tells your stories in your own voice. Here’s how it works. It calls at the time you picked, so it’s easy to come back. It listens and adapts to the actual conversation. There’s no fixed script. After each call, it saves the original voice and transcript, so the family can revisit them. Then it recalls. The interviewer remembers past conversations and picks up unfinished stories. Each memory shapes the next call. That’s how a life gets kept while it’s still being lived, one call at a time, as a habit. And any branch of the story can be printed for birthdays, anniversaries or family gatherings. Calls, the archive, photo uploads and billing are live today."
   },
   {
    "id": "every-narrator",
@@ -118,10 +118,10 @@
   {
    "id": "traction",
    "section": "proof",
-   "title": "Built with families. Ready to prove retention.",
+   "title": "Our MVP is fully functional. Families are already using it.",
    "seconds": 45,
    "appendix": false,
-   "spoken": "Families can already use the core product from start to finish. The scheduled AI phone interviews work. So do transcripts and the family archive. Relatives can be invited and add photos. Billing works too. We’re in private beta on TestFlight. Our App Store release is in review. Our first MVP brought in 50 leads. We chose 10 families for the private beta. We learned from what they actually did and redesigned the product before scaling. Another five are waiting to join as paying families when the redesigned product comes out. Many Hope College students want to preorder A Story or join our mailing list. They want to gift it to their grandparents this Thanksgiving. That’s student interest. We don’t have a college partnership. We’re members of NVIDIA Inception and the AssemblyAI Startup Program. We’re also recipients of a Cartesia Startups Grant. All traction is owner-reported. We don’t have payment records yet."
+   "spoken": "Families can already use the core product from start to finish. The scheduled AI phone interviews work. So do transcripts and the family archive. Relatives can be invited and add photos. Billing works too. We’re in private beta on TestFlight. Our App Store release is in review. Our first MVP brought in 50 leads. We chose 10 families for the private beta. We learned from what they actually did and redesigned the product before scaling. Another five are waiting to join as paying families when the redesigned product comes out. And we’ve made our first sales. On October 17 we set up a table at Hope College. About ten students reserved A Story for a dollar, and one bought a twenty-nine dollar book. Most want it as a Thanksgiving gift for their grandparents. These are individual students. We don’t have a college partnership. We’re members of NVIDIA Inception and the AssemblyAI Startup Program. We’re also recipients of a Cartesia Startups Grant. All traction is owner-reported. We haven’t reconciled the payment records yet."
   },
   {
    "id": "business",
@@ -153,7 +153,7 @@
    "title": "Launch for the holidays. Then prove they come back.",
    "seconds": 45,
    "appendix": false,
-   "spoken": "Next, we’re launching publicly and running the holiday gifting campaign. First, we’ll convert the five families already waiting. They’ll be our first paying families on the redesigned release. Second, we’ll launch into the gifting season. That means the App Store release and gift passes for adult children. It also means a first gifting push with the Hope College students who’ve shown interest. Third, we’ll prove families come back. We’ll track whether storytellers return for another call and whether relatives contribute. We’ll also track whether what they add shapes the next question. We’re planning our path to the first hundred through channels. We aren’t assuming a share of the market. For example, 1,000 qualified visits at 3% who buy and stay is 30 paying families. Those are example inputs. We’ll replace them with measured conversion. We expect families to stay beyond the memoir book because the call becomes a habit. There’s no homework. It comes at the time they chose. Every relative who joins adds their own version and a reason to keep going. Each call builds on the last because what the family adds shapes the next question. The longer a family uses A Story, the harder it is to replace. Years of voices and photos stay in one place, with the context around them. We’ll measure second-call rate and relatives contributing. We’ll also measure calls that use what the family added."
+   "spoken": "Next, we’re launching publicly and running the holiday gifting campaign. First, we’ll convert the five families already waiting. They’ll be our first paying families on the redesigned release. Second, we’ll launch into the gifting season. That means the App Store release and gift passes for adult children. It also means a gifting push with Hope College students, where we made our first sales. Third, we’ll prove families come back. We’ll track whether storytellers return for another call and whether relatives contribute. We’ll also track whether what they add shapes the next question. We’re planning our path to the first hundred through channels. We aren’t assuming a share of the market. For example, 1,000 qualified visits at 3% who buy and stay is 30 paying families. Those are example inputs. We’ll replace them with measured conversion. We expect families to stay beyond the memoir book because the call becomes a habit. There’s no homework. It comes at the time they chose. Every relative who joins adds their own version and a reason to keep going. Each call builds on the last because what the family adds shapes the next question. The longer a family uses A Story, the harder it is to replace. Years of voices and photos stay in one place, with the context around them. We’ll measure second-call rate and relatives contributing. We’ll also measure calls that use what the family added."
   },
   {
    "id": "team",
