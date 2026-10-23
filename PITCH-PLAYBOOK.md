@@ -55,7 +55,7 @@ The order of argument, for any length. Short versions compress; they never reord
 - **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. No arrows between those numbers, no conversion rates, never call the five "paying customers".
 - **First sales (October 17, 2026, owner-reported, not yet reconciled):** at a Hope College on-site table, about 10 students reserved A Story for $1 each and one bought a $29 book. Say "about 10" and "first sales"; never round up, never call it a partnership.
 - **Product state:** live end to end (calls, family archive, photo uploads, billing), private beta on TestFlight, App Store release in review.
-- **Partners and programs:** NVIDIA Inception, AssemblyAI Startup Program and Cartesia Startups Grant are accepted. Hope College: students reserved and bought on October 17 (see First sales). They are individual students, never a college partnership.
+- **Partners and programs:** NVIDIA Inception, Google for Startups, AssemblyAI Startup Program, Deepgram Startup Program and Cartesia Startups Grant are accepted (Google and Deepgram confirmed October 23, 2026). Hope College: students reserved and bought on October 17 (see First sales). They are individual students, never a college partnership.
 - **Write " - " (spaced short hyphen), never an em dash.** En dashes are fine in number ranges (7–10 minutes).
 - **No placeholders, internal notes, "illustrative" labels or photo disclaimers on slides.** Unknowns go in speaker notes.
 - **Urgency without fear.** Calm, warm and plain. No hype words, no "revolutionary", no "it's not X, it's Y" drama.
@@ -121,7 +121,7 @@ Rules: brown with yellow, or teal with yellow. Keep orange to a minimum. Never t
 - **Timeline:** a 3px dashed gold line between two brown date pills, with circular photos (5px cream border) on the line and teal labels under them.
 - **Decay row:** portraits, a speech bubble each, and 5-dot rows (filled gold vs hollow sand) showing details lost per generation. This is the "lost in the retelling" pattern.
 - **Takeaway line:** 28–32px/800 brown with the final phrase in gold, at the bottom of the slide or panel.
-- **Logo:** the A-with-heart mark beside "Story" in gold. Partner badges (NVIDIA Inception, AssemblyAI, Cartesia) as real logos, small, top right, under "Supported by".
+- **Logo:** the A-with-heart mark beside "Story" in gold. Partner badges (NVIDIA Inception, Google for Startups, AssemblyAI, Deepgram, Cartesia) as real logos, small, top right, under "Supported by".
 
 **Layout**
 - Dense slides use **quadrants** (Bao's MILEAD pattern): every area carries real content, and figures beat decoration.
