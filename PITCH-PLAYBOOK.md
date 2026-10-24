@@ -46,13 +46,16 @@ The order of argument, for any length. Short versions compress; they never reord
 ## 3. Content rules
 
 - **Judges read each slide in about 35-45 seconds** (MBC judge feedback, October 23, 2026: the product slide was "very hard to follow"). Cut words, make type bigger, and never put text on a slide for everything said aloud. Show a process as a horizontal flow chart with one picture per step.
+- **Number the labels on a dense slide** (1, 2, 3, 4 pills) so the audience knows what order to read in (MBC, October 23, 2026).
+- **App screens can be redesigned for a slide** (Bao: "this is the current screen we have for the app, though not good yet and you can improvise"), as long as they show features that exist.
+- **Sources:** the MBC 3-slide deck dropped on-slide sources at Bao's request; the investor deck keeps them.
 - **Bao's script is the source of truth for wording.** Adapt length; do not replace his sentences with new slogans. Never import a narrative device from a reference deck (for example a borrowed persona such as "Meet Jamie") unless he asks for it.
 - **One idea per slide, and every element serves it.** If a block isn't required by the competition or the argument, cut it ("did they ask for the next proof part?").
 - **Concrete over abstract.** A person, an action, a number or a real screen beats a category label. Avoid "living family documentary" when it hides the actual difference.
 - **Revenue order:** subscription (keeps the story growing), then books (a chapter, not the finish line), then the tier prices.
 - **No prices or "free" on the solution slide.** Prices belong on the business slide only.
 - **Team:** two founders. Daniel Hoang Nguyen (CEO) leads product and the product roadmap. Bao Vo (COO and CTO, since October 18, 2026) leads technology, fundraising and strategy, and runs all partnerships, web design, client-facing work and traction. Nhi Tran (CMO) appears only in Michigan Business Challenge materials.
-- **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. No arrows between those numbers, no conversion rates, never call the five "paying customers".
+- **Traction is owner-reported early interest:** 50 leads from the first MVP, 10 hand-picked beta families, 5 waiting to join as paying customers for the redesigned release. Show them as three equal tiles (the 5 in gold) with small gold ▶ markers between them, as on the MBC slide (October 23, 2026). Never a funnel, no conversion rates, never call the five "paying customers".
 - **First sales (October 17, 2026, owner-reported, not yet reconciled):** at a Hope College on-site table, about 10 students reserved A Story for $1 each and one bought a $29 book. Say "about 10" and "first sales"; never round up, never call it a partnership.
 - **Product state:** live end to end (calls, family archive, photo uploads, billing), private beta on TestFlight, App Store release in review.
 - **Partners and programs:** NVIDIA Inception, Google for Startups, AssemblyAI Startup Program, Deepgram Startup Program and Cartesia Startups Grant are accepted (Google and Deepgram confirmed October 23, 2026). Hope College: students reserved and bought on October 17 (see First sales). They are individual students, never a college partnership.
@@ -150,10 +153,12 @@ Decks get read alone: in an application portal, a forwarded PDF, an investor's i
 | 80-year timeline with four values (chose, believed, regretted, loved) | MBC slide 1, top left | Opening the problem |
 | Decay row: Grandma 1958 → Mom 1990 → You 2026 → Your kids | MBC slide 1, bottom left | Showing word of mouth fails |
 | Teal "They want to know" stat panel (37%, 74%, 1 in 5) plus "So why don't they ask?" | MBC slide 1, right | Demand |
+| Then/now photo "Mom, before she was Mom" (the same woman on stage in her 20s and packing a lunchbox today) with "Only 37% know" / "Everyone knows" tags | MBC slide 1, part 2; core slide 6 | Adult children want to know |
+| "Life happens" card: a 2:07 am voice message from Grandma, then "Sometimes you just need to hear their voice." Close on "You shouldn't have to wait for the perfect moment to feel close." | MBC slide 1, part 3; core slide 7 | Missing the moment |
 | Today's options as the loss only ("The faces stay. The stories fade." · "A one-time project. Book done, story over.") | MBC slide 1, bottom right | Competition in one glance |
 | Horizontal flow: 01 It calls → 02 It listens → 03 It saves → 04 It recalls, a real app screen under each, a loop back labelled "Each memory shapes the next call - A Habit", and the tilted phone plus book at the right ("Any branch, in print") | MBC slide 2 (Oct 23), core slide 10 | Product |
 | "One family vacation, 6 voices" strip: one card each for photos, a video and a voice message | MBC slide 2, bottom | Collaborative storytelling |
-| Traction panel with 50 / 10 / 5 | MBC slide 3 | Proof |
+| Traction panel with 50 / 10 / 5 as three equal tiles, the 5 in gold | MBC slide 3, core slide 15 | Proof |
 | Subscription card (teal) above the books card (cream) | MBC slide 3 | Business model |
 | Habit math (66 days vs about 10 weekly tries) | General deck "the gap" | Why memoir apps stall |
 | Aging clock (11,200 a day, about 8 a minute) | General deck "generations" | Urgency |
@@ -165,6 +170,8 @@ Decks get read alone: in an application portal, a forwarded PDF, an investor's i
 - Generic AI design: three rounded cards with icons in bubbles, purple-blue gradients, SaaS architecture diagrams, network graphics, waveforms as decoration, circular six-step loops, thin connector-line flows.
 - Sparse "premium" emptiness, or a single object floating on a slide.
 - Meaningless stock or generated images; icons that don't match the content (an hourglass for "distance").
+- Posed shots where an activity would show the idea: "them doing activities are better than a shot like this." Generated images that look AI: give GPT specific feedback and retry, and never reuse a GPT layout's fonts, sizes or colors - take only the elements.
+- Elements that can't be lined up exactly: "If you can't align just use the icon, or a different shape." Left and right padding inside a card must match.
 - Awkward arrows, black bars on photos, misaligned bubbles, text touching other elements, squeezed columns.
 - Poorly presented data (pie-like blobs, unlabeled bars). Show ratios instead ("2.2× more voice per dollar", "9% → 30%").
 - Orange-heavy palettes; teal and terracotta together.
