@@ -45,6 +45,9 @@ The order of argument, for any length. Short versions compress; they never reord
 
 ## 3. Content rules
 
+- **Never sell "AI calls and interviews Grandma" as the difference** (Bao, October 25, 2026: "any other app can do this", "you're trying to sell things that do not differentiate us"). Lead with what only A Story does: the whole family fills it with each version credited, what the family adds gives the next call a reason to happen and missing details go to whoever knows, and it doesn't end with a book.
+- **Long-term vision, in Bao's words:** "We can't build a time machine. But we can build a time capsule you can talk to." "A hundred years from now, we want your great-grandkids to chat with you, talk with you in your own voice, and one day sit with you as a hologram." Keep it honest: answers come from what the person actually said (the Illinois Holocaust Museum's survivor holograms answer only from recorded testimony). Today's wedge comes first; the vision is one or two lines.
+- **The Answer Bank** (`Pitch Competition/Answer-Bank-2026-10-25.md`) holds the best current version of every recurring answer. Every new application starts there. Don't redraft from scratch.
 - **Judges read each slide in about 35-45 seconds** (MBC judge feedback, October 23, 2026: the product slide was "very hard to follow"). Cut words, make type bigger, and never put text on a slide for everything said aloud. Show a process as a horizontal flow chart with one picture per step.
 - **Number the labels on a dense slide** (1, 2, 3, 4 pills) so the audience knows what order to read in (MBC, October 23, 2026).
 - **App screens can be redesigned for a slide** (Bao: "this is the current screen we have for the app, though not good yet and you can improvise"), as long as they show features that exist.
@@ -194,6 +197,7 @@ Inputs: the program's official rules (format, minutes, slide count, judging crit
    - University or student competitions (MBC, Honors Fund): the founding team and campus tie. Nhi only for MBC.
    - AgeTech and aging (AARP, NIA): older adults' dignity, ease (answer the phone, no app), and family connection. Avoid clinical claims.
    - Investor programs (YC, accelerators, angels): market size, why now, the repeat-use insight, the next milestone and the round.
+   - Y Combinator: short answers, YC partners read fast, so 1-4 plain sentences unless the question needs more. The founder video is about a minute with both founders on camera: Rodrick's four lines (read from the book), the time capsule vision, today's A Story led by the family difference, one personal line each (Daniel's uncles; Bao builds it and sells it), traction, the close.
    - Pitch nights (5x5: five slides, five minutes): legacy gap → want-to-know → A Story → collaborative → proof and ask.
 6. **The ask is program-specific**, tied to one result ("$X funds the public launch and the retention test"). Never carry another program's terms over.
 7. **Output:** a slide plan (which master slides, in what order, and what changes), a timed script in Bao's voice, a materials checklist (deck, video, one-pager, demo, logos), and the open questions only Bao can answer.
