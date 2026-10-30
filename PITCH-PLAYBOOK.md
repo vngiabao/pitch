@@ -4,7 +4,7 @@ The standard every A Story pitch, deck and tailored version must meet. The quali
 
 **The core pitch deck** (approved by Bao on October 15, 2026) is at https://claude.ai/artifact/KgbUok6tvB3HP2KdJRGNdN. It has 21 main slides plus 3 appendix slides. A frozen copy of every slide is in `seed-data/core-deck-2026-10-23/`, and the titles and speaker notes the agents read are in `seed-data/master-deck-2026-10.json`. Every program edition is cut from this deck; never redesign its slides for an edition.
 
-Contents: 1. What the pitch must make a judge understand · 2. The story spine · 3. Content rules · 4. Evidence guardrails · 5. Design system · 6. Slide patterns · 7. What Bao has rejected · 8. Tailoring to a competition · 9. Coaching lens · 10. Pre-flight checklist
+Contents: 1. What the pitch must make a judge understand · 2. The story spine · 3. Content rules · 4. Evidence guardrails · 5. Design system · 6. Slide patterns · 7. What Bao has rejected · 8. Tailoring to a competition · 9. Coaching lens · 10. Pre-flight checklist · 11. Written applications and résumés
 
 ---
 
@@ -243,4 +243,23 @@ Pitch Coach reads like a YC partner who also knows the product: kind, direct and
 - [ ] Traction wording: "waiting to join as paying customers", never "paying customers".
 - [ ] The ask is this program's own.
 - [ ] Pitch Coach scored it and every item below 4 has been addressed or consciously accepted.
+- [ ] Files are named by the program's own rule (MBC: bundle "TrackName-Venture Name", video "{Track Name}_{Venture Name}.mp4").
 - [ ] Bao approved the final version. Nothing is submitted without his explicit yes.
+
+## 11. Written applications and résumés (Bao, Oct 28 2026)
+
+Rulings from finishing the MBC Intent to Compete and Bao's business résumé. They apply to every written application answer, bio and résumé line.
+
+- **Written answers are not a pitch script.** Bao on the competition and Impact answers: "this sounds more like pitch script, talk langauge rather than bao's formal voice for writing." Write full, formal sentences. Keep one concrete image where Bao already approved it (the Q1 opening "A person can live eighty years and leave behind two dates and a folder of photos" stays).
+- **No label colons.** "avoid use the : style like in B2B come next or product. Bao would just write out." Write "B2B is in progress. We are in conversations with funeral homes", never "B2B comes next: ...".
+- **No he or she for the team.** "stop with the he or she when talk about us. just sthing like Held abc xyz." Team bios are fragments: "Bao Vo, Co-founder and COO. Leads technology, fundraising, partnerships and sales. Held a Fully Funded ECE Doctoral Fellowship at U-M."
+- **Short names in prose.** "Daniel incorporated. no need full name."
+- **Origin.** "Bao and Daniel started building A Story in 2026." Daniel incorporated the Delaware C-Corp in June 2026.
+- **The one-sentence description stays lean.** "A Story is an AI biographer that calls your loved ones and keeps their stories in their own voice, while relatives add their own memories so storytelling becomes a family habit." Bao cut "on a schedule, does the asking" and the photos, videos and memories list as "too much".
+- **B2B wording.** "B2B is in progress", with funeral homes in conversation and senior living as a separate channel. Never "partnerships" with funeral homes.
+- **AI-use answers.** AI (Claude and ChatGPT) was used "mostly in pitch design, and wording for the application, as well as helping finding number to define market size". Never "we used AI heavily", and never defend the idea or pricing as "not from AI".
+- **Acknowledgement questions** get one line: "We understand, and we followed it."
+- **Secondary tracks.** If the form lets us name a fallback track, answer that track's questions too and note it as secondary. For MBC Impact, frame A Story as an AI application for the aging population that closes the legacy gap.
+- **Nhi (MBC only).** CMO; "brand design, pitch design, product positioning". Don't list the early engineer in team answers.
+- **Résumé register is not pitch register.** "this is a b2c pitch, not on resume." Bao's résumé line: "Co-founded A Story, an AI-powered family storytelling platform featuring adaptive phone interviews, conversational memory, and multi-perspective storytelling to preserve original voices and build a living family documentary." Never name competitors on a résumé. First sales on a résumé: "sold over 10 paid signups and a book preorder at a campus event".
+- **Edit only what Bao names.** When one answer gets a style note, offer the same pass for the others and wait for his answer before touching them.
