@@ -22,3 +22,14 @@ deploy/private/
 *credentials*.json
 *token*.txt
 draft-answers.json
+
+# Cloud Worker build (Nov 4, 2026): keep source, never commit data, keys or bundles
+deploy/cloud-build/pitch/
+deploy/cloud-build/orig-test/
+deploy/cloud-*/**/app_bundle.py
+deploy/cloud-*/**/migration/
+deploy/cloud-*/**/.migration-key
+deploy/cloud-*/**/.dev.vars
+deploy/cloud-*/**/.wrangler/
+deploy/cloud-source/pitch-cloud/archive/
+deploy/cloud-source/pitch-cloud/node_modules/

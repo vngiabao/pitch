@@ -1,0 +1,13 @@
+// Rebuilt Nov 4, 2026 from the deployed pitch-cloud settings (the original config was not kept).
+// PitchWorkspace is an existing SQLite-backed Durable Object; "exports" declares it (Wrangler 4.15x style).
+{
+  "exports": { "PitchWorkspace": { "type": "durable-object", "storage": "sqlite" } },
+  "name": "pitch-cloud",
+  "main": "entry.py",
+  "compatibility_date": "2026-10-24",
+  "compatibility_flags": ["python_workers", "disable_python_external_sdk"],
+  "workers_dev": false,
+  "durable_objects": {
+    "bindings": [{ "name": "PITCH", "class_name": "PitchWorkspace" }]
+  }
+}

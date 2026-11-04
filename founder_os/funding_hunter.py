@@ -421,8 +421,14 @@ class FundingHunter:
             brief['basis']='unknown';brief['grounding_changed']=True
         analysis['credits']=credits_report(data)
         r.update(data=data,analysis=analysis,saved_analysis=saved,history=self.store.rows('SELECT * FROM program_history WHERE program_id=?',(r['program_id'],)),applications=self.store.rows('SELECT * FROM applications WHERE opportunity_id=?',(oid,)),outcomes=self.store.rows('SELECT * FROM funding_outcomes WHERE opportunity_id=? ORDER BY occurred_at DESC',(oid,)),decisions=self.store.rows('SELECT * FROM funding_decisions WHERE opportunity_id=? ORDER BY created_at DESC',(oid,)),source_provenance=self.store.rows('SELECT s.* FROM funding_sources s JOIN funding_source_links l ON l.source_id=s.id WHERE l.opportunity_id=?',(oid,)))
+        settled=('EXPIRED','ALREADY APPLIED','ACCEPTED','REJECTED')
         if r['last_verified'] and (datetime.now(timezone.utc)-stamp(r['last_verified'])).days>30:
-            r['verification_state']='VERIFICATION_REQUIRED';analysis['recommended_action']='REVIEW'
+            # Stale facts need a recheck, but an expired, applied, accepted or rejected program stays settled.
+            r['verification_state']='VERIFICATION_REQUIRED'
+            if analysis['recommended_action'] not in settled:analysis['recommended_action']='REVIEW'
+        # The owner's latest Skip or Watch wins over the agent's suggestion for open programs (Bao, Nov 4, 2026).
+        if r['decisions'] and r['decisions'][0]['decision'] in ('SKIP','WATCH') and analysis['recommended_action'] not in settled:
+            analysis['recommended_action']=r['decisions'][0]['decision']
         r['recommendation']=analysis['recommended_action'];r['fit_score']=analysis['scoring']['score']
         if self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='opportunity_supersessions'").fetchone():
             superseded=self.db.execute('SELECT * FROM opportunity_supersessions WHERE superseded_id=?',(oid,)).fetchone()
