@@ -5,7 +5,7 @@ from founder_os.store import Store,now,js
 from founder_os.funding_hunter import FundingHunter,blank_record
 from founder_os.hunter_policy import date_info
 from founder_os.server import FounderServer
-from tools.research_worker import output_schema,safe_env,schedule_key,claim_work,normalize_observations,resolve_cli
+from tools.research_worker import output_schema,safe_env,schedule_key,claim_work,normalize_observations,resolve_cli,within_query_budget
 
 class RuntimeTests(unittest.TestCase):
     def setUp(self):
@@ -56,6 +56,20 @@ class RuntimeTests(unittest.TestCase):
     def test_invalid_candidate_does_not_crash_run(self):
         r=self.h.runFundingHunter({'candidates':[{'title':'Fixture','url':'javascript:alert(1)'}]},'fixture')
         self.assertEqual(len(r['errors']),1);self.assertEqual(self.s.one('SELECT state FROM funding_runs')['state'],'PARTIAL')
+    def test_a_broad_scan_never_asks_for_more_queries_than_the_app_accepts(self):
+        families=json.loads((Path(__file__).resolve().parents[1]/'funding-search-families.json').read_text(encoding='utf-8'))['families']
+        limit=self.h.settings()['research_budget']['max_queries']
+        self.assertGreater(len(families),limit,'the real list has more families than the query budget; that is what stopped research')
+        seen=set()
+        for day in range(len(families)):
+            chosen=within_query_budget(families,limit,day)
+            self.assertEqual(len(chosen),limit);self.assertLessEqual(set(chosen),set(families));seen|=set(chosen)
+            # one query per chosen family comes back within the limit and is accepted, where 25 used to be refused
+            self.h.runFundingHunter({'queries':['q']*len(chosen)},'within-budget-'+str(day))
+        self.assertEqual(seen,set(families),'the moving window covers every family')
+        small={k:families[k] for k in list(families)[:5]}
+        self.assertEqual(within_query_budget(small,limit),small)
+        with self.assertRaisesRegex(ValueError,'budget exceeded'):self.h.runFundingHunter({'queries':['q']*len(families)},'one-per-family-unbounded')
 
 class ServerSecurityTests(unittest.TestCase):
     def setUp(self):

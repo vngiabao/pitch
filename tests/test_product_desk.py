@@ -191,7 +191,8 @@ class ProductPageTests(unittest.TestCase):
     def request(self,method,path,body=None,headers=None):
         conn=http.client.HTTPConnection('127.0.0.1',self.port);conn.request(method,path,body,headers or {});r=conn.getresponse();data=r.read();status=r.status;h=dict(r.getheaders());conn.close();return status,data,h
     def test_families_page_and_api(self):
-        status,html,h=self.request('GET','/families',headers={'Host':self.host})
+        status,html,h=self.request('GET','/families',headers={'Host':self.host});self.assertEqual(status,200);self.assertIn(b'founder-csrf',html);self.assertNotIn(b'__CSRF__',html)
+        status,html,h=self.request('GET','/families?old=1',headers={'Host':self.host})
         self.assertEqual(status,200);self.assertIn(b'/product.js',html);self.assertIn(b'href="/families"',html)
         cookie=h['Set-Cookie'].split(';')[0];token=cookie.split('=',1)[1]
         self.assertEqual(self.request('GET','/product.js',headers={'Host':self.host})[0],200)

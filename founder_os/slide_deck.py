@@ -218,7 +218,7 @@ def run_qa(manifest,timeout=180):
           +_frames(slides,local)+'<script>'+QA_JS+'</script></body></html>')
     with tempfile.TemporaryDirectory() as td:
         f=Path(td)/'qa.html';f.write_text(page,encoding='utf-8')
-        cmd=[browser,'--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--hide-scrollbars','--window-size=1920,1080',
+        cmd=[browser,'--headless=new','--edge-skip-compat-layer-relaunch','--disable-gpu','--no-first-run','--no-default-browser-check','--hide-scrollbars','--window-size=1920,1080',
              '--user-data-dir='+str(Path(td)/'profile'),'--allow-file-access-from-files','--virtual-time-budget=20000','--dump-dom',f.resolve().as_uri()]
         try:dom=subprocess.run(cmd,capture_output=True,timeout=timeout,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0)).stdout.decode('utf-8','replace')
         except subprocess.TimeoutExpired:return {**base,'available':False,'reason':'The browser took too long to render the slides.'}

@@ -300,7 +300,7 @@ def write_files(rid,page,timeout=120):
     browser=find_browser();pdf=None
     if browser and os.environ.get('FOUNDER_OS_PDF','on')!='off':
         try:
-            subprocess.run([browser,'--headless=new','--disable-gpu','--no-pdf-header-footer','--allow-file-access-from-files','--print-to-pdf='+str(pdf_path),html_path.as_uri()],capture_output=True,timeout=timeout,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            subprocess.run([browser,'--headless=new','--edge-skip-compat-layer-relaunch','--disable-gpu','--no-pdf-header-footer','--allow-file-access-from-files','--print-to-pdf='+str(pdf_path),html_path.as_uri()],capture_output=True,timeout=timeout,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
             if pdf_path.exists() and pdf_path.stat().st_size>1000:pdf=pdf_path
         except (subprocess.SubprocessError,OSError):pdf=None
     return {'html':html_path,'pdf':pdf}

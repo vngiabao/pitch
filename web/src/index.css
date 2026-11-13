@@ -1,0 +1,221 @@
+/* Hallmark · designed-as-app · genre: modern-minimal · design-system: DESIGN.md (project root) · one face: Switzer · anchor hue: navy 252 */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@font-face{font-family:'Switzer';src:url('./assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'Switzer';src:url('./assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-display:block}
+@font-face{font-family:'Switzer';src:url('./assets/fonts/switzer-600.woff2') format('woff2');font-weight:600 700;font-display:block}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --color-money: var(--money);
+    --color-deadline: var(--deadline);
+    --color-track: var(--track);
+    --color-good: var(--good);
+    --font-heading: var(--font-sans);
+    --font-sans: Switzer, ui-sans-serif, system-ui, sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --font-serif: Switzer, ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    --radius: 0.5rem;
+    --tracking-normal: 0em;
+}
+
+/* Highlight key (DESIGN.md): brass = money only, red = deadlines within 14 days only */
+:root {
+    --money: oklch(0.48 0.092 78);
+    --deadline: oklch(0.52 0.18 29);
+    --track: oklch(0.91 0.012 85);
+    /* done, accepted, confirmed: status only */
+    --good: oklch(0.44 0.085 160);
+    --background: oklch(0.968 0.007 85);
+    --foreground: oklch(0.243 0.05 258);
+    --card: oklch(0.995 0.004 85);
+    --card-foreground: oklch(0.243 0.05 258);
+    --popover: oklch(0.995 0.004 85);
+    --popover-foreground: oklch(0.243 0.05 258);
+    --primary: oklch(0.271 0.08 252);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.944 0.009 85);
+    --secondary-foreground: oklch(0.243 0.05 258);
+    --muted: oklch(0.944 0.009 85);
+    --muted-foreground: oklch(0.44 0.03 258);
+    --accent: oklch(0.944 0.009 85);
+    --accent-foreground: oklch(0.243 0.05 258);
+    --destructive: oklch(0.52 0.18 29);
+    --border: oklch(0.271 0.08 252 / 0.1);
+    --input: oklch(0.271 0.08 252 / 0.22);
+    --ring: oklch(0.271 0.08 252 / 0.55);
+    --chart-1: oklch(0.271 0.08 252);
+    --chart-2: oklch(0.64 0.124 80);
+    --chart-3: oklch(0.52 0.18 29);
+    --chart-4: oklch(0.55 0.05 252);
+    --chart-5: oklch(0.85 0.02 85);
+    --radius: 0.5rem;
+    --sidebar: oklch(0.944 0.009 85);
+    --sidebar-foreground: oklch(0.243 0.05 258);
+    --sidebar-primary: oklch(0.271 0.08 252);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.995 0.004 85);
+    --sidebar-accent-foreground: oklch(0.243 0.05 258);
+    --sidebar-border: oklch(0.271 0.08 252 / 0.1);
+    --sidebar-ring: oklch(0.271 0.08 252 / 0.55);
+}
+
+.dark {
+    --money: oklch(0.8 0.11 80);
+    --deadline: oklch(0.72 0.16 29);
+    --track: oklch(0.32 0.03 255);
+    --good: oklch(0.75 0.11 160);
+    --background: oklch(0.2 0.035 255);
+    --foreground: oklch(0.95 0.008 85);
+    --card: oklch(0.24 0.04 255);
+    --card-foreground: oklch(0.95 0.008 85);
+    --popover: oklch(0.24 0.04 255);
+    --popover-foreground: oklch(0.95 0.008 85);
+    --primary: oklch(0.86 0.05 85);
+    --primary-foreground: oklch(0.22 0.06 252);
+    --secondary: oklch(0.3 0.04 255);
+    --secondary-foreground: oklch(0.95 0.008 85);
+    --muted: oklch(0.3 0.04 255);
+    --muted-foreground: oklch(0.78 0.02 255);
+    --accent: oklch(0.3 0.04 255);
+    --accent-foreground: oklch(0.95 0.008 85);
+    --destructive: oklch(0.7 0.16 29);
+    --border: oklch(1 0 0 / 0.1);
+    --input: oklch(1 0 0 / 0.18);
+    --ring: oklch(0.86 0.05 85 / 0.6);
+    --chart-1: oklch(0.86 0.05 85);
+    --chart-2: oklch(0.75 0.12 80);
+    --chart-3: oklch(0.7 0.16 29);
+    --chart-4: oklch(0.7 0.05 252);
+    --chart-5: oklch(0.45 0.03 255);
+    --sidebar: oklch(0.22 0.04 255);
+    --sidebar-foreground: oklch(0.95 0.008 85);
+    --sidebar-primary: oklch(0.86 0.05 85);
+    --sidebar-primary-foreground: oklch(0.22 0.06 252);
+    --sidebar-accent: oklch(0.3 0.04 255);
+    --sidebar-accent-foreground: oklch(0.95 0.008 85);
+    --sidebar-border: oklch(1 0 0 / 0.1);
+    --sidebar-ring: oklch(0.86 0.05 85 / 0.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+/* Type scale (Bao, Nov 9): Tailwind text-2xl 24/32 title, text-xl 20/28 sentences, text-base 16/24 rows, text-sm 14/20 labels */
+@layer base {
+  body { font-variant-numeric: tabular-nums lining-nums; -webkit-font-smoothing: antialiased; }
+  /* The parts the browser draws: selection and the typing caret take the palette (navy on brass-tinted paper) */
+  ::selection { background-color: color-mix(in oklch, var(--primary) 18%, transparent); color: var(--foreground); }
+  input, textarea, [contenteditable] { caret-color: var(--primary); }
+}
+
+/* Ground (DESIGN-TASTE, "Grounds with material"; GROUNDS.md #18 square-dot grid): in the shell only, never inside panels */
+@utility ground-dots {
+  background-color: var(--background);
+  background-image: radial-gradient(oklch(0.271 0.08 252 / 0.09) 1px, transparent 1.2px);
+  background-size: 16px 16px;
+}
+/* The moment: the readiness ring draws once, 420ms ease-out; reduced motion shows the full arc at once */
+@keyframes ring-draw { from { stroke-dasharray: 0 100; } }
+.ring-draw { animation: ring-draw 420ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@media (prefers-reduced-motion: reduce) { .ring-draw { animation: none; } }
+
+/* Large windows scale the whole composition (DESIGN-TASTE: the ratio holds); every size is in rem */
+@media (min-width: 2200px) { html { font-size: 125%; } }
+
+/* Home (Bao's pick, Nov 11: the outbox wall). Motion after an emil-design-eng review: the picture settles when it
+   has loaded (360ms), the words rise (280ms) and the line of facts fades in (150ms). The button never animates.
+   Transform and opacity only; reduced motion shows the still screen. */
+:root {
+  /* The paper around the picture, sampled from the picture's own left and right edges so no seam shows */
+  --home-paper-left: rgb(250 239 229);
+  --home-paper-right: rgb(245 234 223);
+}
+/* The two paper tones ramp across the middle, where the picture covers them; only the thin strip above it shows */
+@utility bg-home-paper { background: linear-gradient(to right, var(--home-paper-left) 0 15%, var(--home-paper-right) 85% 100%); }
+/* The picture is 2752x1536 (1.792:1). On windows wider than that (Bao's are about 2.1:1) the whole model is fitted to
+   the window's height, so the name sits above the wall and the words under the shelf. The words share the shelf's
+   left edge: 3% into the picture. Narrower windows crop the sides. */
+.home-scene { object-fit: cover; object-position: 93% 50%; }
+.home-frame { padding: 1.25rem 1rem; color: oklch(0.243 0.05 258); }
+@media (min-width: 48rem) {
+  .home-scene { object-position: 50% 50%; }
+  .home-frame { padding: 1.9vh max(1.75rem, 2.1vw) clamp(1rem, 3.2vh, 3.5rem); }
+}
+@media (min-width: 48rem) and (min-aspect-ratio: 1792/1000) {
+  /* The mask is sized to the fitted picture (1.792 x the window's height), not to the window, so its fades land on
+     the picture's own edges. The picture sits 1.8% lower so the name clears the wall on short windows. */
+  .home-scene {
+    object-fit: contain; top: 1.8svh;
+    mask-image: linear-gradient(to right, transparent, black 2.6%, black 96%, transparent);
+    mask-size: 179.2svh 100%; mask-position: center; mask-repeat: no-repeat;
+  }
+  .home-frame { padding-left: max(1.75rem, calc(50vw - 84.2svh)); }
+}
+@keyframes home-arrive { from { opacity: 0; transform: scale(1.015); } }
+@keyframes home-rise { from { opacity: 0; transform: translateY(8px); } }
+@keyframes home-line { from { opacity: 0; } }
+.home-arrive { animation: home-arrive 360ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.home-rise { animation: home-rise 280ms cubic-bezier(0.23, 1, 0.32, 1) 40ms both; }
+.home-line { animation: home-line 150ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@media (prefers-reduced-motion: reduce) { .home-arrive, .home-rise, .home-line { animation: none; } }
+
+/* A message arrives from the foot of the screen (180ms); reduced motion shows it at once */
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+.toast-in { animation: toast-in 180ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@media (prefers-reduced-motion: reduce) { .toast-in { animation: none; } }
+
+/* Dialogs and tooltips fade in on tw-animate classes; reduced motion shows them at once */
+@media (prefers-reduced-motion: reduce) {
+  [data-slot^="dialog"], [data-slot^="alert-dialog"], [data-slot^="tooltip"] { animation: none; transition: none; }
+}

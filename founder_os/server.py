@@ -1,5 +1,6 @@
 """Loopback-only Founder OS command center, sharing the existing store."""
 import json
+import re
 import secrets
 import subprocess
 import sys
@@ -9,6 +10,10 @@ from pathlib import Path
 from urllib.parse import urlsplit,parse_qs,quote
 from .store import Store,PolicyError
 from .funding_hunter import FundingHunter
+
+# Pages rebuilt in the new app (web/). Keep in step with web/src/routes.tsx.
+NEXT_EXACT={'/next','/next/today','/today','/funding','/opportunities','/applications','/credits','/money','/pitch-lab','/pitches','/assumptions','/materials','/growth','/families','/drive','/press','/people','/decisions','/memory','/founder-profile','/activity','/scouts','/plans'}
+NEXT_PREFIX=('/opportunity/','/application/','/application-review/','/pitch-lab/','/pitch/','/material/','/run/')
 
 class FounderServer(ThreadingHTTPServer):
     def __init__(self,db_path,port,access=None):
@@ -38,12 +43,25 @@ class Handler(BaseHTTPRequestHandler):
         if not self._host_ok():return self.respond(403,{'error':'Host denied'})
         if not self._identity_ok():return self.respond(403,{'error':'Verified owner sign-in required'})
         p=urlsplit(self.path);route=p.path
-        if route=='/' or route in ('/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts','/drive','/founder-profile','/plans','/assumptions') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
+        # Founder OS on React + shadcn (the rebuild, Nov 2026). Paths listed in NEXT_EXACT / NEXT_PREFIX are served by
+        # the new app; the rest still get the old one. Any old page stays reachable by adding ?old=1 to its address,
+        # and any path can be opened in the new app with ?next=1 while it is being rebuilt.
+        if 'old=1' not in (p.query or '') and (route.rstrip('/') in NEXT_EXACT or route=='/' or route.startswith(NEXT_PREFIX) or ('next=1' in (p.query or '') and not route.startswith('/api/') and '.' not in route)):
+            html=(Path(__file__).with_name('ui')/'next'/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
+            return self.respond(200,html.encode(),'text/html',True)
+        if route=='/' or route in ('/funding','/opportunities','/activity','/applications','/memory','/materials','/decisions','/pitches','/credits','/people','/press','/pitch-lab','/money','/growth','/families','/scouts','/drive','/founder-profile','/plans','/assumptions') or route.startswith(('/opportunity/','/run/','/material/','/application-review/','/application/','/pitch/','/pitch-lab/')):
             html=(Path(__file__).with_name('ui')/'index.html').read_text(encoding='utf-8').replace('__CSRF__',self.server.token)
             return self.respond(200,html.encode(),'text/html',True)
         if route in ('/app.js','/pitch.js','/style.css','/edition.js','/edition.css','/growth.js','/growth.css','/scouts.js','/plans.js','/product.js','/profile.js','/ranker.js','/ranker.css','/drive.js','/assumptions.js','/vendor/gsap.min.js','/vendor/ScrollTrigger.min.js'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'text/javascript' if route.endswith('.js') else 'text/css')
-        if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2'):
+        if route.startswith('/next/assets/') and re.fullmatch(r'/next/assets/[A-Za-z0-9_.-]+\.(js|css|woff2|webp)',route):
+            f=Path(__file__).with_name('ui')/'next'/'assets'/route.rsplit('/',1)[1]
+            if f.is_file():return self.respond(200,f.read_bytes(),{'js':'text/javascript','css':'text/css','woff2':'font/woff2','webp':'image/webp'}[f.suffix[1:]])
+        if route.startswith('/next/logos/') and re.fullmatch(r'/next/logos/[a-z0-9-]+\.png',route):
+            # Program logos: each program's own favicon, fetched once and self-hosted (Bao's yes, Nov 11)
+            f=Path(__file__).with_name('ui')/'next'/'logos'/route.rsplit('/',1)[1]
+            if f.is_file():return self.respond(200,f.read_bytes(),'image/png')
+        if route in ('/fonts/mona-sans.woff2','/fonts/brygada-1918.woff2','/fonts/switzer-400.woff2','/fonts/switzer-500.woff2','/fonts/switzer-600.woff2'):
             return self.respond(200,(Path(__file__).with_name('ui')/route[1:]).read_bytes(),'font/woff2')
         if not self._authorized():return self.respond(403,{'error':'Open the Founder OS command center first'})
         if route.startswith('/edition-asset/'):
@@ -103,6 +121,17 @@ class Handler(BaseHTTPRequestHandler):
                 from .application_pilot import ApplicationPilot
                 from .application_review import ApplicationReview
                 ApplicationPilot(s);result=ApplicationReview(s).plan(route.rsplit('/',1)[1])
+            elif route=='/api/home':
+                # The home screen's one line: the same board as Today, trimmed to three facts and kept for 60 seconds,
+                # so the line arrives with the picture instead of a second later
+                import time
+                kept=getattr(self.server,'_home_facts',None)
+                if kept and time.monotonic()-kept[0]<60:result=kept[1]
+                else:
+                    b=h.dashboard()['money_board'];tracked=b.get('tracked') or []
+                    dated=sorted(((d['analysis']['scoring']['dates']['days_remaining'],d['data']['canonical_name']) for d in b['cash']+b['credits'] if d['analysis']['scoring']['dates']['days_remaining'] is not None and d['analysis']['scoring']['dates']['days_remaining']>=0),key=lambda x:x[0])
+                    result={'accepted':sum(1 for t in tracked if not t.get('waiting') and t.get('outcome') in ('Accepted','Won')),'waiting':sum(1 for t in tracked if t.get('waiting')),'next':{'name':dated[0][1],'days':dated[0][0]} if dated else None}
+                    self.server._home_facts=(time.monotonic(),result)
             elif route=='/api/dashboard':
                 from .inbox_tracker import InboxTracker
                 result=h.dashboard();result['inbox']=InboxTracker(s,h).dashboard()

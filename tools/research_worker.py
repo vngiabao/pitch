@@ -218,6 +218,19 @@ def lab_step(h,request):
     it=PitchLab(h.store).run_ai_stage(iid,lambda prompt,schema,stem,search:codex_json(h,request,prompt,schema,'lab-'+stem,search=search,timeout=1200)[0])
     return {'item':iid,'stage':it['stage'],'round':it['round']}
 
+def within_query_budget(families,max_queries,day=None):
+    """A broad scan asks one query per search family, so it can cover no more families than the query budget.
+
+    With more families than queries (25 families against a budget of 24 stopped every scan from Oct 25, 2026),
+    take a window that moves each day, so every family is still covered within a few runs.
+    """
+    keys=list(families)
+    if max_queries<1 or len(keys)<=max_queries:return families
+    day=datetime.now(timezone.utc).date().toordinal() if day is None else day
+    start=(day*max_queries)%len(keys)
+    chosen={keys[(start+i)%len(keys)] for i in range(max_queries)}
+    return {k:families[k] for k in keys if k in chosen}
+
 def research(h,request,probe=False):
     research_started_at=now()
     cli=resolve_cli(h)
@@ -269,6 +282,8 @@ def research(h,request,probe=False):
         chosen={credit[(3*day+i)%len(credit)] for i in range(3)}
         families={k:v for k,v in families.items() if k in chosen}
         config={**config,'families':families}
+    # Never ask for more queries than the app accepts back (runFundingHunter rejects the whole batch otherwise).
+    families=within_query_budget(families,h.settings()['research_budget']['max_queries']);config={**config,'families':families}
     contract=(ROOT/'FUNDING-HUNTER-RUNBOOK.md').read_text(encoding='utf-8')
     budget='This is a bounded live verification probe, not a full broad scan. Use only ONE public search query and ONE official program verification; return at most one opportunity. Do not report the deliberately narrow probe as a failure to cover all families.' if probe else 'Cover each of the '+str(len(families))+' configured search families with ONE query per family this run (maximum '+str(len(families))+' queries). Deduplicate results and deeply verify at most 8 promising programs. Prioritize non-dilutive cash (pitch competitions, grants, fellowships) with open deadlines, then free credits for the voice and LLM providers A Story already uses. Michigan and student-founder programs come first. Stay within 15 minutes; quality beats filling limits.'
     if bounded.get('targeted_program'):

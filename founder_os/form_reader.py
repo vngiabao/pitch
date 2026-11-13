@@ -144,7 +144,7 @@ class BrowserFormReader:
         exe=edge_path()
         if not exe:return {'state':'UNREADABLE','reason':'Microsoft Edge is not installed on this PC, so JavaScript forms cannot be read.','questions':[]}
         self.profile.mkdir(parents=True,exist_ok=True)
-        cmd=[exe,'--headless=new','--disable-gpu','--no-first-run','--disable-extensions','--disable-sync','--mute-audio','--user-data-dir='+str(self.profile),'--virtual-time-budget=15000','--dump-dom',url]
+        cmd=[exe,'--headless=new','--edge-skip-compat-layer-relaunch','--disable-gpu','--no-first-run','--disable-extensions','--disable-sync','--mute-audio','--user-data-dir='+str(self.profile),'--virtual-time-budget=15000','--dump-dom',url]
         try:r=subprocess.run(cmd,capture_output=True,timeout=90,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
         except subprocess.TimeoutExpired:return {'state':'UNREADABLE','reason':'The application page did not finish loading within 90 seconds.','questions':[]}
         html=r.stdout.decode('utf-8','replace')
