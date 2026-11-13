@@ -3,7 +3,7 @@ import { ArrowRight, ExternalLink } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Disclosure, Empty, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad } from "@/components/app/page"
+import { Disclosure, Empty, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad, evenBottoms } from "@/components/app/page"
 import { useFeedback } from "@/components/app/feedback"
 import { api, apiOnce } from "@/lib/api"
 import {
@@ -247,7 +247,7 @@ function Work({ data, busy, act }: { data: Data; busy: string | null; act: Act }
         {next && <Button size="lg" asChild><a href={answersUrl(next)!}>Open {plain(next.program)} answers</a></Button>}
       </PageHead>
       <FactsNotice show={data.noFacts} />
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-5">
           {previews.map((c) => <PreviewPanel key={c.id} c={c} busy={busy} act={act} primary={c.id === waiting?.id} />)}
           {groups.map((g) => <Group key={g.title} {...g} apart={data.apart} closing={data.closing} busy={busy} act={act} />)}
@@ -350,7 +350,7 @@ function Reports({ data, busy, act }: { data: Data; busy: string | null; act: Ac
           : <Button size="lg" variant="outline" disabled={!!busy} onClick={resume}>{busy === "resume" ? "Resuming…" : "Resume daily reports"}</Button>}
       </PageHead>
       <FactsNotice show={data.noFacts} />
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Panel title="Past reports" aside={reports.length || undefined}>
           {reports.length ? (
             <>
@@ -415,7 +415,7 @@ function Settings({ data, busy, act }: { data: Data; busy: string | null; act: A
           : <Button size="lg" disabled={!!busy} onClick={resume}>{busy === "resume" ? "Resuming…" : "Resume application preparation"}</Button>}
       </PageHead>
       <FactsNotice show={data.noFacts} />
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Panel title="Application Pilot" aside={<Tag tone={on ? "review" : "quiet"}>{on ? "On: prepares, then waits for you" : "Paused"}</Tag>}>
           <Rows label="What the agent does">
             <Row title="Reads official forms" line="It opens each program’s form and saves the questions." />

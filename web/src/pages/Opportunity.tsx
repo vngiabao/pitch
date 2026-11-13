@@ -2,7 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react"
 import { ArrowRight, ChevronRight, ExternalLink } from "lucide-react"
 
 import { useFeedback } from "@/components/app/feedback"
-import { Disclosure, Empty, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad } from "@/components/app/page"
+import { Disclosure, Empty, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { Button } from "@/components/ui/button"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Progress } from "@/components/ui/progress"
@@ -265,7 +265,7 @@ function Page({ id, page, reload }: { id: string; page: ProgramPage; reload: () 
 
       <Facts d={d} page={page} />
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-5">
           {win && <WinPanel win={win} busy={busy} onResearch={winResearch} onSeen={winSeen} />}
 

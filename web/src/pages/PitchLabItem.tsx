@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { CopyBox as WideCopyBox, Disclosure, Empty, Field, LoadGate, PageHead, Panel, Tag, useLoad } from "@/components/app/page"
+import { CopyBox as WideCopyBox, Disclosure, Empty, Field, LoadGate, PageHead, Panel, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { copyText, countWords, day, plural, prettyKey, stamp } from "@/lib/format"
 import { agentName, daysUntil, displayTitle, fromWords, kindWords, progressOf, qaSummary, spokenMinutes, stageWords, stepName, verdictTag, wholeScript, type Coach, type LabDetail, type Review } from "@/lib/lab"
@@ -422,7 +422,7 @@ export function PitchLabItemPage({ id }: { id: string }) {
                 {it.stage === "READY" && <Button size="lg" variant={edition ? "outline" : "default"} disabled={!!busy} onClick={approve}>{busy === "approve" ? "Approving…" : "Approve"}</Button>}
                 {!ready && !it.error && <Button size="lg" variant="outline" onClick={() => state.reload()}>Check again</Button>}
               </PageHead>
-              <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+              <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <div className="flex min-w-0 flex-col gap-5">
                   <StatusPanel it={it} />
                   {full && ready && <DeckPanel it={it} busy={busy} onBuild={build} />}

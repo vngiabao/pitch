@@ -6,7 +6,7 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { Empty, Fact, Field, LoadGate, PageHead, Panel, useLoad } from "@/components/app/page"
+import { Empty, Fact, Field, LoadGate, PageHead, Panel, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { METRIC_NEEDS, pointValue, rangeWords, todayEastern, useHashScroll, useRun, type Family, type FamilyEvent, type Intake, type Metric, type Pair, type ProductData } from "@/lib/customers"
 import { day, fileSize, plural } from "@/lib/format"
@@ -236,7 +236,7 @@ export function FamiliesPage() {
         if (!b.families.length) return (
           <>
             <PageHead title="Beta families" line="No families yet. Add each one yourself; the numbers are counted from what you log." />
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <Panel title="Add the first family"><AddFamily states={b.family_states} busy={busy} run={run} /></Panel>
               {intake}
             </div>
@@ -258,7 +258,7 @@ export function FamiliesPage() {
                 </div>
               </Panel>
             )}
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <Panel title="The journal">
                 <Limited items={b.families} label="Beta families">
                   {(f) => <FamilyItem key={f.id} f={f} kinds={b.event_kinds} states={b.family_states} busy={busy} run={run} removeEvent={removeEvent} />}

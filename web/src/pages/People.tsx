@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { Empty, Field, LoadGate, PageHead, Panel, Tag, useLoad } from "@/components/app/page"
+import { Empty, Field, LoadGate, PageHead, Panel, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { CONTACT_KINDS, stateWord, useHashScroll, useRun, type DriveData, type Person } from "@/lib/customers"
 import { day, plural } from "@/lib/format"
@@ -163,7 +163,7 @@ export function PeoplePage() {
               line={!list.length ? "No one here yet."
                 : due.length ? `${plural(due.length, "follow-up")} due${rest.length ? `, ${rest.length} more ${rest.length === 1 ? "person" : "people"} on schedule` : ""}.`
                   : `No follow-ups due. ${plural(list.length, "person", "people")}${next ? `, next follow-up ${day(next)}` : ""}.`} />
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <div className="flex min-w-0 flex-col gap-5">
                 {due.length > 0 && (
                   <Panel title={`Follow up now (${due.length})`}>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { useFeedback } from "@/components/app/feedback"
-import { Field, LoadGate, PageHead, Panel, useLoad } from "@/components/app/page"
+import { Field, LoadGate, PageHead, Panel, useLoad, evenBottoms } from "@/components/app/page"
 import { twoColumns } from "@/lib/agents"
 import { api } from "@/lib/api"
 import { GROUP_BLURBS, loadProfile, profileExample, profileInputType, type ProfileField, type ProfileNeed } from "@/lib/company"
@@ -232,7 +232,7 @@ export function FounderProfilePage() {
                 line={`${b.filled} of ${b.total} filled.${fromApplications ? ` Your open applications still ask for ${plural(needs.length, "fact")}.` : ""}`} />
               <div key={stamp} className="flex flex-col gap-5">
                 {needs.length > 0 && <DoNext needs={needs} fromApplications={fromApplications} acts={acts} />}
-                <div className="grid items-start gap-5 xl:grid-cols-2">
+                <div ref={evenBottoms} className="grid items-start gap-5 xl:grid-cols-2">
                   <div className="flex flex-col gap-5">{left.map((g) => <Group key={g.name} name={g.name} fields={g.fields} acts={acts} />)}</div>
                   <div className="flex flex-col gap-5">{right.map((g) => <Group key={g.name} name={g.name} fields={g.fields} acts={acts} />)}</div>
                 </div>

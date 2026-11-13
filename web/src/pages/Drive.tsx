@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { CopyBox, Fact, Field, LoadGate, PageHead, Panel, Tag, useLoad, Disclosure } from "@/components/app/page"
+import { CopyBox, Fact, Field, LoadGate, PageHead, Panel, Tag, useLoad, Disclosure, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { DRIVE_CSV_HELP, draftNote, hasHash, useHashScroll, useRun, type Draft, type DriveData, type DriveImportResult, type DriveMember, type DriveShown } from "@/lib/customers"
 import { copyText, day, plural } from "@/lib/format"
@@ -56,7 +56,7 @@ export function More({ summary, open, children }: { summary: string; open?: bool
 export function DraftBlock({ draft, plain, children }: { draft: Draft; plain?: boolean; children?: ReactNode }) {
   const note = draftNote(draft.note)
   return (
-    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+    <div ref={evenBottoms} className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
       <div className="flex flex-col gap-2">
         <span className="text-sm text-muted-foreground">Message</span>
         {plain
@@ -280,7 +280,7 @@ export function DrivePage() {
                 <Fact label="Referrals">{c.referrals}</Fact>
               </div>
             </Panel>
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <div className="flex min-w-0 flex-col gap-5">
                 {GROUPS.map(([key, title, note]) => {
                   const list = b.members.filter((m) => m.shown === key)

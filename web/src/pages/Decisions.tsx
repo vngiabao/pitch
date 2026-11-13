@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad, Disclosure as SharedDisclosure } from "@/components/app/page"
+import { Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad, Disclosure as SharedDisclosure, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import {
   KIND_WORDS, OUTCOME_CHOICES, decidedLine, decisionTitle, factValue, noDash, recentDecisions,
@@ -276,7 +276,7 @@ export function DecisionsPage() {
                   : `${plural(open.length, "fact")} to confirm, ${inboxWaiting} from your inboxes, ${plural(reminders.length, "reminder")}.`}>
                 {inbox && <Button size="lg" variant="outline" asChild><a href="/api/tracker/export.csv"><Download aria-hidden="true" />Export tracker (CSV)</a></Button>}
               </PageHead>
-              <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+              <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <div className="flex flex-col gap-5">
                   {open.length > 0 && (
                     <Panel title="Facts to confirm" aside={plural(open.length, "fact")}>

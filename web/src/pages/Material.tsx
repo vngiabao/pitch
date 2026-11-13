@@ -80,7 +80,7 @@ export function MaterialPage({ id }: { id: string }) {
       <LoadGate state={state}>
         {(m) => (
           <>
-            <PageHead title={fileName(m.relative_path)} line={[prettyKey(m.kind), fileSize(m.size_bytes), folderWords(m.relative_path), m.aliases.length ? plural(m.aliases.length, "identical copy", "identical copies") : ""].filter(Boolean).join(" · ")}>
+            <PageHead plain title={fileName(m.relative_path)} line={[prettyKey(m.kind), fileSize(m.size_bytes), folderWords(m.relative_path), m.aliases.length ? plural(m.aliases.length, "identical copy", "identical copies") : ""].filter(Boolean).join(" · ")}>
               <Button size="lg" asChild><a href={"/pitches?material=" + encodeURIComponent(id)}>Adapt in Pitch Studio</a></Button>
               <Button size="lg" variant="outline" asChild><a href={file}><Download aria-hidden="true" />Download original</a></Button>
             </PageHead>

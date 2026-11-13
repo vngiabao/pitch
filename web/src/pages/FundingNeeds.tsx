@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { ArrowRight, ChevronRight, Download, ExternalLink } from "lucide-react"
 
-import { Empty, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad } from "@/components/app/page"
+import { Empty, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad, evenBottoms } from "@/components/app/page"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { closingWords } from "@/lib/format"
@@ -178,7 +178,7 @@ function Page({ data }: { data: FundingNeeds }) {
   return (
     <>
       <PageHead title="Needs you" line={n ? `${n === 1 ? "1 thing in Funding needs" : `${n} things in Funding need`} you. Biggest first.` : "Nothing in Funding needs you right now."} />
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-5">
           {data.lead && <NextStep lead={data.lead} />}
           {data.card && <OtherStep lead={data.card} />}

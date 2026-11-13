@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
-import { Disclosure, Field, LoadGate, PageHead, Panel, Tag, useLoad } from "@/components/app/page"
+import { Disclosure, Field, LoadGate, PageHead, Panel, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { useFeedback } from "@/components/app/feedback"
 import { api, ApiError } from "@/lib/api"
 import { cleanName, plural, stamp } from "@/lib/format"
@@ -222,7 +222,7 @@ function Editor({ pitch, choices, onSaved }: { pitch: Pitch; choices: PitchChoic
           </Panel>
         )}
 
-        <div id="pitch-edit-layout" className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div id="pitch-edit-layout" ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <Panel title={pitch.format === "outline" ? "Session text & demo plan" : "Spoken draft"}
             aside={<span id="pitch-save-state" role="status" aria-live="polite" className={cn(!saveState.startsWith("Saved") && "font-semibold text-foreground")}>{saveState}</span>}>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)]">

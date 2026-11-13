@@ -3,7 +3,7 @@ import { ExternalLink } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { useFeedback } from "@/components/app/feedback"
-import { Empty, LoadGate, PageHead, Panel, Tag, useLoad } from "@/components/app/page"
+import { Empty, LoadGate, PageHead, Panel, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { PRESS_KIND_WORDS, stateWord, useRun, type PressData, type PressTarget } from "@/lib/customers"
 import { day, plural, stamp } from "@/lib/format"
@@ -159,7 +159,7 @@ export function PressPage() {
                 {r.searching ? "Searching…" : busy === "discover" ? "Starting…" : "Find more now"}
               </Button>
             </PageHead>
-            <div className={side ? "grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]" : "flex flex-col gap-5"}>
+            <div ref={evenBottoms} className={side ? "grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]" : "flex flex-col gap-5"}>
               <div className="flex min-w-0 flex-col gap-5">
                 <Panel title={`Open to pitch (${open.length})`}>
                   {open.length

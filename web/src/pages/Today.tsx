@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
+import { evenBottoms } from "@/components/app/page"
 import { cn } from "@/lib/utils"
 import { loadToday, moreWords, type Lead, type Mark, type Row, type Today } from "@/lib/today"
 import type { PageRoutes } from "@/lib/route-types"
@@ -232,7 +233,7 @@ export function TodayPage() {
         {today && (
           <>
             {today.marks.length > 0 && <Strip marks={today.marks} figures={today.figures} />}
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <div className="flex flex-col gap-5">
                 {today.lead
                   ? <NextStep lead={today.lead} />

@@ -104,3 +104,16 @@ text is the file's own), stamp present in `index.css`.
 
 ## Not re-audited
 `Run.tsx` and `lib/agents.ts` changed after the last hallmark Skill run (a "Fixed Nov 12" note with a 44px link, and the date guard behind it). Treated as small polish: the code gates and the impeccable detector were re-run (`[]`, 0 targets under 44px, 0 text under 14px), bao-design-review and skills-steward looked at both pages; the hallmark Skill was not called again for these two files.
+
+## `hallmark audit web/src/components/app/page.tsx` (fourth Skill call, Nov 12 late, after the two shared fixes)
+Scope: the state line under page titles (ink, dates and counts semibold) and `evenBottoms` (near-level panel pairs end on one line). Audit only; nothing edited after it. Read with the screenshots in `docs/design-concepts/2026-11-12-rebuild/final-even/` (28 pages at 1366, 1920, 2560).
+
+| Tell | Where | Severity | Fix |
+|---|---|---|---|
+| A bolded number that is not a vital | Pitch Lab item line "round **1**"; Pipeline "close within **14** days" | minor | Leave, or pass those lines as nodes with the emphasis chosen by hand |
+| Three lines stay instructions, so they gain ink but no fact | Pitch Studio, Applications, Materials | minor (already listed) | Replace with a state line |
+| Layout set by script | `evenBottoms` sets a min-height after first paint | minor | Accepted: no CSS can stretch only near-level columns; it runs once per resize, no animation |
+
+Gates in this file: 0 `transition-all`, 0 hover-scale, 0 raw colour values, 0 text under 14px, 0 italic, 0 em dashes, one font family, emphasis by weight only (semibold, tabular figures), the one transition is the chevron's transform with a reduced-motion rule, stamp present in `index.css`. Measured: 0 near-miss panel bottoms, 0 sideways scroll, 0 failed loads on 28 pages at three sizes. Detector `[]`.
+
+**0 critical · 0 major · 3 minor** (file). Pre-emit critique: P4 H4 E4 S5 R5 V3.

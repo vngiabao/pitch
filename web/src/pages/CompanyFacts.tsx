@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Empty, LoadGate, PageHead, Panel, useLoad } from "@/components/app/page"
+import { Empty, LoadGate, PageHead, Panel, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { groupFacts, noDash, type Claim, type Dashboard, type FactGroup } from "@/lib/company"
 import { day, plural } from "@/lib/format"
@@ -87,7 +87,7 @@ export function CompanyFactsPage() {
               {groups.length === 0
                 ? <Panel title="Approved profile"><Empty>No structured eligibility facts are approved yet.</Empty></Panel>
                 : (
-                  <div className="grid items-start gap-5 lg:grid-cols-2">
+                  <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-2">
                     {[left, right].map((col, i) => col.length > 0 && (
                       <div key={i} className="flex min-w-0 flex-col gap-5">{col.map((g) => <Group key={g.title} g={g} />)}</div>
                     ))}

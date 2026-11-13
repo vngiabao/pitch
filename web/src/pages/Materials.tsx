@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Disclosure, CopyBox, Empty, Field, LoadGate, PageHead, Panel, Tag, useLoad } from "@/components/app/page"
+import { Disclosure, CopyBox, Empty, Field, LoadGate, PageHead, Panel, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { useFeedback } from "@/components/app/feedback"
 import { api } from "@/lib/api"
 import { fileSize, plural, prettyKey, stamp } from "@/lib/format"
@@ -182,7 +182,7 @@ export function MaterialsPage() {
   return (
     <Shell active="Pitch" tab="/materials" title="Materials & answers">
       <PageHead title="Materials & answers" line="Search your decks, essays, scripts and research." />
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <LoadGate state={state}>
           {(lib) => <Files key={`${query.q}|${query.kind}|${query.category}`} lib={lib} query={query} busy={state.loading} go={go} />}
         </LoadGate>

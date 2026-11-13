@@ -18,7 +18,7 @@ shipped and is retired.
   read-form, report-now, connect and application-confirm, so those buttons in the new app do nothing harmful in the
   cloud. `build_bundle.py`'s text swaps only touch the old `app.js`; they are harmless now.
 - Claude already copied the source into `deploy/cloud-build/pitch/founder_os` (0 files differ) and rebuilt
-  `pitch-cloud/app_bundle.py` (checked Nov 12: it holds `ui/next/assets/index-DPeMvMPt.js`, `index-udLYWxJt.css`,
+  `pitch-cloud/app_bundle.py` (checked Nov 12: it holds `ui/next/assets/index-D80DaO7U.js`, `index-udLYWxJt.css`,
   the picture, 3 fonts, 5 logos and the patched `slide_deck.py`; no database inside).
 - Tests: 279 run, 2 failures and 1 error, all known and stale (2 `test_reservation_drive`, the drive closed Nov 2;
   1 module needs `jwt`, not installed on this PC).
@@ -40,7 +40,7 @@ shipped and is retired.
 - https://pitch.gbaonvo.com/ shows the home picture, the greeting and "Open today" behind Access; `/today`,
   `/funding`, `/pitch-lab`, `/growth`, `/decisions` and `/activity` each show the new shell with their department tab
   lit.
-- `/next/assets/index-DPeMvMPt.js` returns 200 behind Access.
+- `/next/assets/index-D80DaO7U.js` returns 200 behind Access.
 - `/funding?old=1` still shows the old screen.
 - The commit SHA is on `vngiabao/pitch` main.
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Check } from "lucide-react"
 
 import { useFeedback } from "@/components/app/feedback"
-import { Disclosure, LoadGate, PageHead, Panel, Tag, useHashScroll, useLoad } from "@/components/app/page"
+import { Disclosure, LoadGate, PageHead, Panel, Tag, useHashScroll, useLoad, evenBottoms } from "@/components/app/page"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { api } from "@/lib/api"
@@ -232,7 +232,7 @@ export function MoneyMapPage() {
                   : "Every route to money: what to sell, what to apply to, and where each pitch stands."}>
                 {top && <Button size="lg" asChild><a href={`/opportunity/${top.opportunity_id}`}>Open the top program</a></Button>}
               </PageHead>
-              <div className={cn("grid items-start gap-5", rank && "lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]")}>
+              <div ref={evenBottoms} className={cn("grid items-start gap-5", rank && "lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]")}>
                 {rank && <ApplyFirstPanel data={rank} />}
                 <MovesPanel moves={m.moves} busy={busy} onSet={setMove} />
               </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { Empty, Fact, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad } from "@/components/app/page"
+import { Empty, Fact, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { planStateWord, type PlanItem, type PlanReport, type Plans } from "@/lib/agents"
 import { noDash } from "@/lib/company"
 import { api } from "@/lib/api"
@@ -191,7 +191,7 @@ export function PlansPage() {
               line={r.writing ? "A brief is being written now. It appears here in about 2 minutes."
                 : r.latest ? `${plural((r.items || []).length, "brief")}. The latest was written ${day(r.latest.finished_at || r.latest.created_at)}.`
                 : "No brief yet. Ask a question to get the first one."} />
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <div className="flex flex-col gap-5">
                 <Panel title="Ask for a brief" aside="A one-page PDF in about 2 minutes">
                   <form onSubmit={ask} className="flex flex-col gap-4">

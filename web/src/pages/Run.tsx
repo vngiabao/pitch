@@ -1,4 +1,4 @@
-import { Empty, Fact, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad } from "@/components/app/page"
+import { Empty, Fact, LoadGate, PageHead, Panel, Row, Rows, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { errorCause, errorProgram, errorState, fixedCause, humanState, knownCause, plainKey, runTone, runUsage, type Run } from "@/lib/agents"
 import { api } from "@/lib/api"
 import { day, plural, stamp } from "@/lib/format"
@@ -105,8 +105,8 @@ export function RunPage({ id }: { id: string }) {
           return (
             <>
               <PageHead title="Research run"
-                line={<span className="flex flex-wrap items-center gap-3"><Tag tone={runTone(r.state)}>{humanState(r.state)}</Tag><time dateTime={r.started_at}>{stamp(r.started_at)}</time></span>} />
-              <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                line={<span className="flex flex-wrap items-center gap-3"><Tag tone={runTone(r.state)}>{humanState(r.state)}</Tag><time dateTime={r.started_at} className="font-semibold tabular-nums">{stamp(r.started_at)}</time></span>} />
+              <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <div className="flex flex-col gap-5">
                   {/* A strip of four zeros says nothing; it shows only when the run found something. */}
                   {found.some(([, n]) => n > 0) && (

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { useFeedback } from "@/components/app/feedback"
-import { LoadGate, PageHead, Panel, Row, Rows, useLoad } from "@/components/app/page"
+import { LoadGate, PageHead, Panel, Row, Rows, useLoad, evenBottoms } from "@/components/app/page"
 import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api"
 import { deskLine, loadDesk, type Desk } from "@/lib/growth"
@@ -71,7 +71,7 @@ function DeskView({ desk, reload }: { desk: Desk; reload: () => Promise<unknown>
         </Panel>
       )}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-5">
           <DealsPanel />
           <CampaignsPanel />

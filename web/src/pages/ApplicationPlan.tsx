@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Empty, LoadGate, PageHead, Panel, Row, Rows, useLoad } from "@/components/app/page"
+import { Empty, LoadGate, PageHead, Panel, Row, Rows, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { cycleLabel, external, plain, useLimit, type PlanReview } from "@/lib/applications"
 import type { PageRoutes } from "@/lib/route-types"
@@ -42,7 +42,7 @@ export function ApplicationPlanPage({ id }: { id: string }) {
                 ? <Button size="lg" asChild><a href={r.url} {...external}>Open the official form<ExternalLink aria-hidden="true" /></a></Button>
                 : <span className="text-base text-muted-foreground">Application link not found yet.</span>}
             </PageHead>
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <Attention blockers={r.blockers || []} />
               <Panel title="What happens next">
                 <Rows label="What happens next">

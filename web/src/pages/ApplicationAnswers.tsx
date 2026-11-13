@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
-import { Disclosure, Empty, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad } from "@/components/app/page"
+import { Disclosure, Empty, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad, evenBottoms } from "@/components/app/page"
 import { useFeedback } from "@/components/app/feedback"
 import { api } from "@/lib/api"
 import {
@@ -274,7 +274,7 @@ export function ApplicationAnswersPage({ id }: { id: string }) {
           return (
             <>
               <PageHead title={plain(a.program)} line={[plain(cycleLabel(a.cycle)), where].filter(Boolean).join(" · ")} />
-              <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+              <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <div className="flex flex-col gap-5">
                   {submitted ? <Status a={a} busy={busy} act={act} /> : <Steps a={a} busy={busy} act={act} />}
                   <Panel title="Questions and answers" aside="In the order the form asks them">

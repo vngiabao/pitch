@@ -6,7 +6,7 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { Disclosure, Empty, Fact, Field, LoadGate, PageHead, Panel, Tag, useLoad } from "@/components/app/page"
+import { Disclosure, Empty, Fact, Field, LoadGate, PageHead, Panel, Tag, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { day, plural } from "@/lib/format"
 import type { PageRoutes } from "@/lib/route-types"
@@ -289,7 +289,7 @@ export function AssumptionsPage() {
               <Button size="lg" disabled={b.researching || asking} onClick={challenge}>{b.researching ? "Working on it…" : asking ? "Asking…" : "Challenge now"}</Button>
             </PageHead>
 
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <ChallengePanel b={b} />
               <div className="flex min-w-0 flex-col gap-5">
                 <Panel title="Where the numbers stand" aside={plural(b.assumptions.length, "assumption")}>

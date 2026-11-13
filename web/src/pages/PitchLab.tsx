@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
 import { useFeedback } from "@/components/app/feedback"
-import { Disclosure, Empty, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad } from "@/components/app/page"
+import { Disclosure, Empty, Field, LoadGate, PageHead, Panel, Row, Rows, Tag, useHashScroll, useLoad, evenBottoms } from "@/components/app/page"
 import { api } from "@/lib/api"
 import { cleanName, day, plural } from "@/lib/format"
 import { LAB_AGENTS, displayTitle, itemLine, lessonFor, programOf, sortLab, stageTag, type Lab, type LabItem, type LabOptions } from "@/lib/lab"
@@ -205,7 +205,7 @@ export function PitchLabPage() {
           return (
             <>
               <PageHead title="Pitch Lab" line={line} />
-              <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+              <div ref={evenBottoms} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 <div className="flex flex-col gap-5">
                   <Panel title="Ready for you" aside="Newest first, one per program">
                     {s.ready.length ? <ReadyList groups={s.ready} /> : <Empty>No draft is ready yet. A finished draft lands here.</Empty>}

@@ -67,17 +67,54 @@ export function LoadGate<T>({ state, children }: { state: { data: T | null; erro
   return <div className="flex flex-col gap-5" aria-busy="true"><Skeleton className="h-28" /><Skeleton className="h-80" /></div>
 }
 
-// The top of a page: what this page is, in one line, and at most one or two actions.
-export function PageHead({ title, line, children }: { title: string; line?: ReactNode; children?: ReactNode }) {
+// The dates and counts in a state line are what the page turns on, so they are set heavier than the words
+// around them (the same way Home's line reads: "5 accepted, 7 waiting on results"). Only three things count:
+// a date the page turns on (not a "last search / last verified / written" stamp, which is context), a sum of
+// money, and a count that opens a clause ("11 things…", "12 of 21 answers"). A number inside a phrase
+// ("round 1", "within 14 days", a cycle year) stays plain.
+const VITAL = /((?<!(?:[Ll]ast \w+|written|Read|ran) )(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(?:–\d{1,2})?(?:, \d{4})?|\$\d[\d,]*(?:\.\d+)?|(?<=^|[.,;] | · )\d{1,3}(?:,\d{3})*(?:\.\d+)?%?(?: of \d+)?(?![\d:–-]))/g
+function vitals(line: string): ReactNode {
+  return line.split(VITAL).map((part, i) => i % 2 ? <strong key={i} className="font-semibold tabular-nums">{part}</strong> : part)
+}
+
+// The top of a page: what this page is, in one line, and at most one or two actions. The line is set in ink,
+// never grey: it often carries the page's key fact. `plain` keeps numbers that aren't vitals (a file size) unbolded.
+export function PageHead({ title, line, children, plain = false }: { title: string; line?: ReactNode; children?: ReactNode; plain?: boolean }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
       <div className="flex min-w-0 flex-col gap-1">
         <h2 className="text-2xl leading-tight font-semibold tracking-tight">{title}</h2>
-        {line && <p className="max-w-[70ch] text-base text-muted-foreground">{line}</p>}
+        {line && <p className="max-w-[70ch] text-base text-foreground">{typeof line === "string" && !plain ? vitals(line) : line}</p>}
       </div>
       {children && <div className="flex flex-wrap items-center gap-3">{children}</div>}
     </div>
   )
+}
+
+// For a two-column row of panels (`ref={evenBottoms}` on the grid): when the two columns end within NEAR pixels
+// of each other, the shorter one's last panel grows so both end on one line. Columns that differ by more are left
+// alone, since a short panel stretched to match a long list would be mostly empty.
+const NEAR = 80
+export function evenBottoms(el: HTMLDivElement | null) {
+  if (!el) return
+  const even = () => {
+    const cols = [...el.children].filter((c): c is HTMLElement => c instanceof HTMLElement)
+    // A column that arrives after the first render (a side panel shown once data loads) is watched too
+    for (const c of cols) watch.observe(c)
+    const ends = cols.map((c) => c.dataset.slot === "card" || !(c.lastElementChild instanceof HTMLElement) ? c : c.lastElementChild)
+    for (const t of ends) t.style.minHeight = ""
+    if (cols.length !== 2 || cols[0].offsetTop !== cols[1].offsetTop) return
+    const gap = cols[0].offsetHeight - cols[1].offsetHeight
+    if (gap === 0 || Math.abs(gap) > NEAR) return
+    const t = ends[gap < 0 ? 0 : 1]
+    t.style.minHeight = t.offsetHeight + Math.abs(gap) + "px"
+  }
+  const watch = new ResizeObserver(() => even())
+  const arrivals = new MutationObserver(() => even())
+  watch.observe(el)
+  arrivals.observe(el, { childList: true })
+  even()
+  return () => { watch.disconnect(); arrivals.disconnect() }
 }
 
 // A region of the page on its own ground. `title` is a 20px panel title; `aside` sits at the right of the title row.
